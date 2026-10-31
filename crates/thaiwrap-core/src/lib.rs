@@ -7,6 +7,8 @@
 #![deny(missing_docs)]
 #![warn(clippy::pedantic)]
 
+mod thai;
+
 use std::fmt;
 
 /// How the length of a line is measured.
