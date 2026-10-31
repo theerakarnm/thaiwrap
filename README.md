@@ -17,7 +17,7 @@ Thai is written without spaces between words. Slicing a string every N character
 //              ^ line 2 starts with an orphan vowel mark, and line 4 with an orphan vowel
 ```
 
-`thaiwrap` segments the text into words first, then fills each line greedily:
+`thaiwrap` finds the places where a line may break, applies the Thai text rules, then fills each line greedily:
 
 ```js
 wrapThai("กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า", 10)
@@ -137,9 +137,11 @@ Use `measure: "graphemes"` when you fit text into a space on screen (closer to w
 
 ## How it works
 
-1. Text is split into words with [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14 line break rules), compiled into the native addon.
-2. Words are placed on the current line until the next word would exceed `maxLength`, then a new line starts.
-3. Spaces at line edges are dropped.
+1. Break opportunities come from [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14), which finds Thai word boundaries and keeps punctuation with its word.
+   The segmenter is compiled into the native addon.
+2. The Thai text rules remove break positions that would start a line with a combining mark or end it with a leading vowel.
+3. Units are placed on the current line until the next unit would exceed `maxLength`, then a new line starts.
+4. Spaces at line edges are dropped.
 
 Because the dictionary ships inside the package, output is the same on every runtime and does not depend on the ICU version bundled with your Node or Bun install.
 

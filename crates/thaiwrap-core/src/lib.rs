@@ -1,8 +1,8 @@
 //! Thai-aware line wrapping.
 //!
-//! Thai is written without spaces between words, so lines can only break where a word
-//! segmenter says a word ends. This crate finds those positions with ICU4X, applies the
-//! Thai text rules, and fills lines greedily.
+//! Thai is written without spaces between words, so lines can only break where a line break
+//! opportunity exists. This crate finds those positions with the ICU4X UAX #14 line segmenter
+//! (dictionary-based for Thai), applies the Thai text rules, and fills lines greedily.
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 #![warn(clippy::pedantic)]
