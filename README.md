@@ -175,7 +175,7 @@ Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebA
 
 - Lone surrogates become U+FFFD.
 - Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.
-- Output can differ from `Intl.Segmenter` because the dictionary ships inside the package.
+- Output can differ from `Intl.Segmenter` because thaiwrap uses its own ICU4X dictionary and UAX #14 line breaking (for example it keeps `?` and `)` with the word before them).
 - A split inside a long word can leave a single final consonant on a line (for example `สร้า` / `ง`).
 - The same happens before punctuation that stays with the word. For example `wrapThai("ระบบเก็บเสียงดีมาก?", 10)` gives `["ระบบเก็บ", "เสียงดีมา", "ก?"]`.
 

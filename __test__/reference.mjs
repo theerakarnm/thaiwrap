@@ -1,3 +1,6 @@
+// Test oracle for Thai-letter, Thai-digit and space text only (see THAI_RUN in parity.mjs).
+// It breaks at word boundaries because Intl.Segmenter has no line granularity, so it differs
+// from thaiwrap's UAX #14 line breaks on punctuation, for example around "?" and ")".
 const words = new Intl.Segmenter('th', { granularity: 'word' })
 const graphemes = new Intl.Segmenter('th', { granularity: 'grapheme' })
 const HARD_BREAK = /\r\n|[\n\v\f\r\u0085\u2028\u2029]/

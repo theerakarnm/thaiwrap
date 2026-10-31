@@ -5,6 +5,9 @@ import { wrapReference } from './reference.mjs'
 
 export const CORPUS_DIR = new URL('../corpus/', import.meta.url)
 export const MAX_LENGTHS = [10, 20, 40]
+// Keep this to Thai letters, Thai digits and spaces. wrapReference breaks at word boundaries
+// (Intl.Segmenter has no line granularity), while thaiwrap uses UAX #14 line breaks.
+// Both agree only on these fragments, so do not widen it or reuse wrapReference for mixed text.
 const THAI_RUN = /[\u0E01-\u0E3A\u0E40-\u0E4E\u0E50-\u0E59 ]+/g
 const THAI_LETTER = /[\u0E01-\u0E2E]/
 
