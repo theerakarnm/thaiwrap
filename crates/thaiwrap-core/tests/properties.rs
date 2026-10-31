@@ -37,6 +37,9 @@ const SPECIAL: &[&str] = &[
     "๒๕๖๗",
     "\u{00AD}",
     " \u{200E}",
+    "\u{0301}",
+    "\u{200D}",
+    "\u{FE0F}",
 ];
 const MEASURES: &[Measure] = &[Measure::CodeUnits, Measure::Graphemes];
 const OVERFLOWS: &[Overflow] = &[Overflow::Split, Overflow::Keep];
@@ -187,7 +190,8 @@ fn is_soft_break(text: &str, prev: &Range<usize>, next: &Range<usize>) -> bool {
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(1024))]
 
-    // P1: soft breaks never start a line with a mark or ะ า ำ ๆ ฯ, nor end it with เ แ โ ใ ไ.
+    // P1: soft breaks never start a line with a mark or ะ า ำ ๆ ฯ, nor inside a grapheme cluster,
+    // nor end it with เ แ โ ใ ไ.
     #[test]
     fn wrap_should_obey_thai_rules_at_every_soft_break(
         text in text(), max in 1usize..=40, measure in measure_strategy(), overflow in overflow_strategy(),
@@ -207,6 +211,15 @@ proptest! {
             prop_assert!(
                 !is_leading_vowel(last),
                 "line ends with {last:?}: text={text:?} max={max} {measure:?} {overflow:?} lines={lines:?}"
+            );
+            let para = paragraphs(&text)
+                .into_iter()
+                .find(|p| p.start <= next.start && next.start < p.end)
+                .unwrap();
+            let offset = next.start - para.start;
+            prop_assert!(
+                grapheme_boundaries(&text[para]).contains(&offset),
+                "line starts inside a grapheme cluster: text={text:?} max={max} {measure:?} {overflow:?} lines={lines:?}"
             );
         }
     }
@@ -228,9 +241,13 @@ proptest! {
                 .unwrap();
             let para_text = &text[para.clone()];
             let (start, end) = (line.start - para.start, line.end - para.start);
+            let graphemes = grapheme_boundaries(para_text);
             let cuts: Vec<usize> = match overflow {
-                Overflow::Keep => word_segmenter().segment_str(para_text).collect(),
-                _ => grapheme_boundaries(para_text),
+                Overflow::Keep => word_segmenter()
+                    .segment_str(para_text)
+                    .filter(|b| graphemes.contains(b))
+                    .collect(),
+                _ => graphemes,
             };
             let legal = cuts.into_iter().find(|&b| b > start && b < end && allowed(para_text, b));
             prop_assert!(

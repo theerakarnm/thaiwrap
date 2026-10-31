@@ -12,9 +12,12 @@ use icu_segmenter::{LineSegmenter, LineSegmenterBorrowed};
 use crate::{lines, segment, thai};
 
 /// Every input string of `tests/matrix.rs`, including the ones printed by `print_observed_rows`.
-const MATRIX_INPUTS: [&str; 42] = [
+const MATRIX_INPUTS: [&str; 45] = [
     "กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า",
     "ที่",
+    "ก\u{0301}ข",
+    "กข\u{200D}ค",
+    "ไทย\u{FE0F}ดี",
     "กา",
     "กำ",
     "เกเก",
@@ -88,7 +91,7 @@ struct Diff {
     side: Side,
     thai: bool,
     subcategory: &'static str,
-    /// `Some(rule)` for group (a): `thai::allowed` rejects the position, so no output changes.
+    /// `Some(rule)` for group (a): `segment::units` drops the position, so no output changes.
     reason: Option<&'static str>,
     prev: char,
     next: char,
@@ -166,8 +169,12 @@ fn subcategory(prev: Option<char>, next: Option<char>) -> &'static str {
     }
 }
 
-/// The rule of `thai::allowed` that rejects `pos`, tested in the order of that function.
-fn rejected_by(para: &str, pos: usize) -> Option<&'static str> {
+/// The rule that removes `pos` from `segment::units`: `grapheme` first (the position is
+/// inside a grapheme cluster), then the rules of `thai::allowed` in the order of that function.
+fn rejected_by(para: &str, pos: usize, graphemes: &BTreeSet<usize>) -> Option<&'static str> {
+    if !graphemes.contains(&pos) {
+        return Some("grapheme");
+    }
     if thai::allowed(para, pos) {
         return None;
     }
@@ -258,6 +265,7 @@ fn paragraph_diffs(
         .segment_str(para)
         .filter(|&b| b > 0 && b < para.len())
         .collect();
+    let graphemes: BTreeSet<usize> = segment::grapheme_boundaries(para).collect();
     words
         .symmetric_difference(&line_breaks)
         .map(|&pos| {
@@ -281,7 +289,7 @@ fn paragraph_diffs(
                 } else {
                     subcategory(near_before, near_after)
                 },
-                reason: rejected_by(para, pos),
+                reason: rejected_by(para, pos, &graphemes),
                 prev: before.chars().next_back().unwrap_or(' '),
                 next: after.chars().next().unwrap_or(' '),
                 context: context(para, pos),
@@ -424,7 +432,7 @@ fn write_summary(out: &mut String, sources: &[Source]) {
         writeln!(out, "| {label} | {a} | {b} |").unwrap();
     }
     out.push_str("\nGroup (a) by rule:\n\n| Rule | Count |\n|---|---|\n");
-    for rule in ["space-normalization", "no-break", "thai-filter"] {
+    for rule in ["grapheme", "space-normalization", "no-break", "thai-filter"] {
         let n = count(sources, |d| d.reason == Some(rule));
         writeln!(out, "| {rule} | {n} |").unwrap();
     }
@@ -534,8 +542,8 @@ fn render(sources: &[Source]) -> String {
          Do not edit by hand.\n\n\
          The comparison uses raw break positions and is strict.\n\
          For each paragraph it takes the break positions of `WordSegmenter::new_dictionary` and of `LineSegmenter::new_dictionary` (positions 0 and the end removed) and reports every position that only one of them returns.\n\
-         Group (a) is every difference that `thai::allowed` rejects, so it cannot change any output line.\n\
-         The rule that rejects it is named: `space-normalization` (the position is followed by a break space), `no-break` (next to NBSP, U+2007, U+202F, U+2060 or U+FEFF), or `thai-filter` (Thai rules 1-3).\n\
+         Group (a) is every difference that `segment::units` drops, so it cannot change any output line.\n\
+         The rule that drops it is named: `grapheme` (the position is inside a grapheme cluster, for example between a letter and U+0301, ZWJ or U+FE0F), `space-normalization` (the position is followed by a break space), `no-break` (next to NBSP, U+2007, U+202F, U+2060 or U+FEFF), or `thai-filter` (Thai rules 1-3).\n\
          Group (b) is everything else, and those differences change the wrapped output.\n\
          \"Thai\" means the nearest non-space character on both sides is Thai; otherwise the difference is \"non-Thai\" with a sub-category.\n\
          The markdown lists the most frequent patterns with examples; the rest are rolled up, and every difference is in the CSV files `corpus/<source>/derived/segmenter-diffs.csv`.\n\

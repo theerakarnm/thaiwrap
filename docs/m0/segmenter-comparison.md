@@ -5,8 +5,8 @@ Do not edit by hand.
 
 The comparison uses raw break positions and is strict.
 For each paragraph it takes the break positions of `WordSegmenter::new_dictionary` and of `LineSegmenter::new_dictionary` (positions 0 and the end removed) and reports every position that only one of them returns.
-Group (a) is every difference that `thai::allowed` rejects, so it cannot change any output line.
-The rule that rejects it is named: `space-normalization` (the position is followed by a break space), `no-break` (next to NBSP, U+2007, U+202F, U+2060 or U+FEFF), or `thai-filter` (Thai rules 1-3).
+Group (a) is every difference that `segment::units` drops, so it cannot change any output line.
+The rule that drops it is named: `grapheme` (the position is inside a grapheme cluster, for example between a letter and U+0301, ZWJ or U+FE0F), `space-normalization` (the position is followed by a break space), `no-break` (next to NBSP, U+2007, U+202F, U+2060 or U+FEFF), or `thai-filter` (Thai rules 1-3).
 Group (b) is everything else, and those differences change the wrapped output.
 "Thai" means the nearest non-space character on both sides is Thai; otherwise the difference is "non-Thai" with a sub-category.
 The markdown lists the most frequent patterns with examples; the rest are rolled up, and every difference is in the CSV files `corpus/<source>/derived/segmenter-diffs.csv`.
@@ -14,17 +14,18 @@ In examples, `⟨|⟩` marks the position and `◌` marks a combining mark shown
 
 ## Summary
 
-Compared 1735 inputs (wisesight 1493, wikipedia-th 200, matrix 42) and 1753 paragraphs.
+Compared 1738 inputs (wisesight 1493, wikipedia-th 200, matrix 45) and 1756 paragraphs.
 
 | Script | (a) removed by filter | (b) remain |
 |---|---|---|
 | Thai | 4219 | 1 |
-| non-Thai | 4268 | 2943 |
+| non-Thai | 4271 | 2946 |
 
 Group (a) by rule:
 
 | Rule | Count |
 |---|---|
+| grapheme | 3 |
 | space-normalization | 8480 |
 | no-break | 5 |
 | thai-filter | 2 |
@@ -35,7 +36,7 @@ Group (b) by side and sub-category:
 |---|---|---|
 | word-only | Thai\|Latin-or-digit | 450 |
 | word-only | Thai\|Thai | 1 |
-| word-only | emoji-or-symbol | 30 |
+| word-only | emoji-or-symbol | 33 |
 | word-only | punctuation | 2449 |
 | line-only | other | 14 |
 
@@ -914,12 +915,12 @@ Group (b) by side and sub-category:
     - ` Ativ #⟨|⟩โตโยต◌้าท◌่า ` (wisesight:1191)
     - ` กม◌ั◌้ยอ◌่ะ #⟨|⟩โตแล◌้วเล◌ือ ` (wisesight:1358)
 
-The other 869 patterns, rolled up:
+The other 872 patterns, rolled up:
 
 | Script | Sub-category | Side | Patterns | Occurrences |
 |---|---|---|---|---|
 | non-Thai | Thai|Latin-or-digit | word-only | 251 | 327 |
-| non-Thai | emoji-or-symbol | word-only | 17 | 21 |
+| non-Thai | emoji-or-symbol | word-only | 20 | 24 |
 | non-Thai | other | line-only | 10 | 10 |
 | non-Thai | punctuation | word-only | 590 | 977 |
 | Thai | Thai|Thai | word-only | 1 | 1 |
@@ -1107,12 +1108,12 @@ The other 869 patterns, rolled up:
     - ` แปด SG 2.1⟨|⟩ ล◌้าน ไทยเ ` (wisesight:162)
     - ` ◌ินทอนม◌ัน 1⟨|⟩ บาทอ◌่ะ555 ` (wisesight:242)
 
-The other 382 patterns, rolled up:
+The other 385 patterns, rolled up:
 
 | Script | Sub-category | Side | Patterns | Occurrences |
 |---|---|---|---|---|
 | non-Thai | Thai|Latin-or-digit | word-only | 94 | 1288 |
-| non-Thai | emoji-or-symbol | word-only | 60 | 124 |
+| non-Thai | emoji-or-symbol | word-only | 63 | 127 |
 | non-Thai | other | word-only | 65 | 514 |
 | non-Thai | punctuation | word-only | 117 | 984 |
 | Thai | Thai|Thai | word-only | 46 | 603 |
@@ -1121,37 +1122,43 @@ The other 382 patterns, rolled up:
 
 - input #1 ` กระบวนการส◌ื◌่อสาร ส◌่งมอบ และสร◌้างค◌ุณค◌่า `: byte 48, word-only, Thai / Thai|Thai, group (a) space-normalization, ` การส◌ื◌่อสาร⟨|⟩ ส◌่งมอบ แล `
 - input #1 ` กระบวนการส◌ื◌่อสาร ส◌่งมอบ และสร◌้างค◌ุณค◌่า `: byte 67, word-only, Thai / Thai|Thai, group (a) space-normalization, ` สาร ส◌่งมอบ⟨|⟩ และสร◌้างค `
-- input #9 ` ใช◌้ React ก◌ับ TypeScript `: byte 9, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ใช◌้⟨|⟩ React ก◌ับ `
-- input #9 ` ใช◌้ React ก◌ับ TypeScript `: byte 15, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ใช◌้ React⟨|⟩ ก◌ับ TypeS `
-- input #9 ` ใช◌้ React ก◌ับ TypeScript `: byte 25, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, `  React ก◌ับ⟨|⟩ TypeScrip `
-- input #10 ` ราคา 1,250.50 บาท `: byte 12, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ราคา⟨|⟩ 1,250.50  `
-- input #10 ` ราคา 1,250.50 บาท `: byte 21, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` า 1,250.50⟨|⟩ บาท `
-- input #12 ` 👨⟦U+200D⟧👩⟦U+200D⟧👧 ok `: byte 18, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` 👨⟦U+200D⟧👩⟦U+200D⟧👧⟨|⟩ ok `
-- input #14 ` เด◌็กๆ เล◌่น `: byte 15, word-only, Thai / Thai|Thai, group (a) space-normalization, ` เด◌็กๆ⟨|⟩ เล◌่น `
-- input #15 ` กร◌ุงเทพฯ เป◌็นเม◌ืองหลวง `: byte 24, word-only, Thai / Thai|Thai, group (a) space-normalization, ` กร◌ุงเทพฯ⟨|⟩ เป◌็นเม◌ือง `
-- input #17 ` ก ◌่ข `: byte 3, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ก⟨|⟩ ◌่ข `
-- input #18 ` ส◌่งมอบ⟦U+200B⟧และ `: byte 18, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ส◌่งมอบ⟨|⟩⟦U+200B⟧และ `
-- input #19 ` ส◌่งมอบ   และ `: byte 18, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ส◌่งมอบ⟨|⟩   และ `
-- input #20 `   สว◌ัสด◌ี   `: byte 20, word-only, non-Thai / other, group (a) space-normalization, `   สว◌ัสด◌ี⟨|⟩   `
-- input #22 ` ก   ⟦U+000A⟧   ข `: byte 3, word-only, non-Thai / other, group (a) space-normalization, ` ก⟨|⟩    `
-- input #30 ` ก⟦U+00A0⟧ข `: byte 3, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ก⟨|⟩⟦U+00A0⟧ข `
-- input #30 ` ก⟦U+00A0⟧ข `: byte 5, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ก⟦U+00A0⟧⟨|⟩ข `
-- input #31 ` ราคา 100⟦U+00A0⟧บาท `: byte 12, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ราคา⟨|⟩ 100⟦U+00A0⟧บาท `
-- input #31 ` ราคา 100⟦U+00A0⟧บาท `: byte 16, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ราคา 100⟨|⟩⟦U+00A0⟧บาท `
-- input #31 ` ราคา 100⟦U+00A0⟧บาท `: byte 18, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ราคา 100⟦U+00A0⟧⟨|⟩บาท `
-- input #32 ` ⟦U+00A0⟧ ⟦U+00A0⟧ `: byte 2, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ⟦U+00A0⟧⟨|⟩ ⟦U+00A0⟧ `
-- input #33 ` a ⟦U+00A0⟧b `: byte 1, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` a⟨|⟩ ⟦U+00A0⟧b `
-- input #33 ` a ⟦U+00A0⟧b `: byte 4, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` a ⟦U+00A0⟧⟨|⟩b `
-- input #34 ` ก ⟦U+00A0⟧ ข `: byte 3, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ก⟨|⟩ ⟦U+00A0⟧ ข `
-- input #34 ` ก ⟦U+00A0⟧ ข `: byte 6, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ก ⟦U+00A0⟧⟨|⟩ ข `
-- input #35 ` x⟦U+000A⟧⟦U+00A0⟧ ก `: byte 4, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ⟦U+00A0⟧⟨|⟩ ก `
-- input #38 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 18, word-only, non-Thai / punctuation, group (b), ` สว◌ัสด◌ี⟨|⟩! (ภาษาไทย `
-- input #38 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 19, word-only, non-Thai / punctuation, group (a) space-normalization, ` สว◌ัสด◌ี!⟨|⟩ (ภาษาไทย) `
-- input #38 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 21, word-only, non-Thai / punctuation, group (b), ` สว◌ัสด◌ี! (⟨|⟩ภาษาไทย) `
-- input #38 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 42, word-only, non-Thai / punctuation, group (b), ` ! (ภาษาไทย⟨|⟩) `
-- input #39 ` ป◌ี๒๕๖๗ `: byte 6, word-only, Thai / Thai|Thai, group (b), ` ป◌ี⟨|⟩๒๕๖๗ `
-- input #40 ` แชท ค◌ัดลอก `: byte 9, word-only, Thai / Thai|Thai, group (a) space-normalization, ` แชท⟨|⟩ ค◌ัดลอก `
-- input #41 ` ของด◌ี ๆ ม◌ีเยอะ `: byte 15, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ของด◌ี⟨|⟩ ๆ ม◌ีเยอะ `
-- input #41 ` ของด◌ี ๆ ม◌ีเยอะ `: byte 19, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ของด◌ี ๆ⟨|⟩ ม◌ีเยอะ `
-- input #42 ` ผ◌ัก ผลไม◌้ ฯลฯ `: byte 9, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ผ◌ัก⟨|⟩ ผลไม◌้ ฯลฯ `
-- input #42 ` ผ◌ัก ผลไม◌้ ฯลฯ `: byte 25, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ผ◌ัก ผลไม◌้⟨|⟩ ฯลฯ `
+- input #3 ` ก́ข `: byte 3, word-only, non-Thai / emoji-or-symbol, group (a) grapheme, ` ก⟨|⟩́ข `
+- input #3 ` ก́ข `: byte 5, word-only, non-Thai / emoji-or-symbol, group (b), ` ก́⟨|⟩ข `
+- input #4 ` กข⟦U+200D⟧ค `: byte 6, word-only, non-Thai / emoji-or-symbol, group (a) grapheme, ` กข⟨|⟩⟦U+200D⟧ค `
+- input #4 ` กข⟦U+200D⟧ค `: byte 9, word-only, non-Thai / emoji-or-symbol, group (b), ` กข⟦U+200D⟧⟨|⟩ค `
+- input #5 ` ไทย️ด◌ี `: byte 9, word-only, non-Thai / emoji-or-symbol, group (a) grapheme, ` ไทย⟨|⟩️ด◌ี `
+- input #5 ` ไทย️ด◌ี `: byte 12, word-only, non-Thai / emoji-or-symbol, group (b), ` ไทย️⟨|⟩ด◌ี `
+- input #12 ` ใช◌้ React ก◌ับ TypeScript `: byte 9, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ใช◌้⟨|⟩ React ก◌ับ `
+- input #12 ` ใช◌้ React ก◌ับ TypeScript `: byte 15, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ใช◌้ React⟨|⟩ ก◌ับ TypeS `
+- input #12 ` ใช◌้ React ก◌ับ TypeScript `: byte 25, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, `  React ก◌ับ⟨|⟩ TypeScrip `
+- input #13 ` ราคา 1,250.50 บาท `: byte 12, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ราคา⟨|⟩ 1,250.50  `
+- input #13 ` ราคา 1,250.50 บาท `: byte 21, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` า 1,250.50⟨|⟩ บาท `
+- input #15 ` 👨⟦U+200D⟧👩⟦U+200D⟧👧 ok `: byte 18, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` 👨⟦U+200D⟧👩⟦U+200D⟧👧⟨|⟩ ok `
+- input #17 ` เด◌็กๆ เล◌่น `: byte 15, word-only, Thai / Thai|Thai, group (a) space-normalization, ` เด◌็กๆ⟨|⟩ เล◌่น `
+- input #18 ` กร◌ุงเทพฯ เป◌็นเม◌ืองหลวง `: byte 24, word-only, Thai / Thai|Thai, group (a) space-normalization, ` กร◌ุงเทพฯ⟨|⟩ เป◌็นเม◌ือง `
+- input #20 ` ก ◌่ข `: byte 3, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ก⟨|⟩ ◌่ข `
+- input #21 ` ส◌่งมอบ⟦U+200B⟧และ `: byte 18, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ส◌่งมอบ⟨|⟩⟦U+200B⟧และ `
+- input #22 ` ส◌่งมอบ   และ `: byte 18, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ส◌่งมอบ⟨|⟩   และ `
+- input #23 `   สว◌ัสด◌ี   `: byte 20, word-only, non-Thai / other, group (a) space-normalization, `   สว◌ัสด◌ี⟨|⟩   `
+- input #25 ` ก   ⟦U+000A⟧   ข `: byte 3, word-only, non-Thai / other, group (a) space-normalization, ` ก⟨|⟩    `
+- input #33 ` ก⟦U+00A0⟧ข `: byte 3, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ก⟨|⟩⟦U+00A0⟧ข `
+- input #33 ` ก⟦U+00A0⟧ข `: byte 5, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ก⟦U+00A0⟧⟨|⟩ข `
+- input #34 ` ราคา 100⟦U+00A0⟧บาท `: byte 12, word-only, non-Thai / Thai|Latin-or-digit, group (a) space-normalization, ` ราคา⟨|⟩ 100⟦U+00A0⟧บาท `
+- input #34 ` ราคา 100⟦U+00A0⟧บาท `: byte 16, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ราคา 100⟨|⟩⟦U+00A0⟧บาท `
+- input #34 ` ราคา 100⟦U+00A0⟧บาท `: byte 18, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` ราคา 100⟦U+00A0⟧⟨|⟩บาท `
+- input #35 ` ⟦U+00A0⟧ ⟦U+00A0⟧ `: byte 2, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ⟦U+00A0⟧⟨|⟩ ⟦U+00A0⟧ `
+- input #36 ` a ⟦U+00A0⟧b `: byte 1, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` a⟨|⟩ ⟦U+00A0⟧b `
+- input #36 ` a ⟦U+00A0⟧b `: byte 4, word-only, non-Thai / emoji-or-symbol, group (a) no-break, ` a ⟦U+00A0⟧⟨|⟩b `
+- input #37 ` ก ⟦U+00A0⟧ ข `: byte 3, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ก⟨|⟩ ⟦U+00A0⟧ ข `
+- input #37 ` ก ⟦U+00A0⟧ ข `: byte 6, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ก ⟦U+00A0⟧⟨|⟩ ข `
+- input #38 ` x⟦U+000A⟧⟦U+00A0⟧ ก `: byte 4, word-only, non-Thai / emoji-or-symbol, group (a) space-normalization, ` ⟦U+00A0⟧⟨|⟩ ก `
+- input #41 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 18, word-only, non-Thai / punctuation, group (b), ` สว◌ัสด◌ี⟨|⟩! (ภาษาไทย `
+- input #41 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 19, word-only, non-Thai / punctuation, group (a) space-normalization, ` สว◌ัสด◌ี!⟨|⟩ (ภาษาไทย) `
+- input #41 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 21, word-only, non-Thai / punctuation, group (b), ` สว◌ัสด◌ี! (⟨|⟩ภาษาไทย) `
+- input #41 ` สว◌ัสด◌ี! (ภาษาไทย) `: byte 42, word-only, non-Thai / punctuation, group (b), ` ! (ภาษาไทย⟨|⟩) `
+- input #42 ` ป◌ี๒๕๖๗ `: byte 6, word-only, Thai / Thai|Thai, group (b), ` ป◌ี⟨|⟩๒๕๖๗ `
+- input #43 ` แชท ค◌ัดลอก `: byte 9, word-only, Thai / Thai|Thai, group (a) space-normalization, ` แชท⟨|⟩ ค◌ัดลอก `
+- input #44 ` ของด◌ี ๆ ม◌ีเยอะ `: byte 15, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ของด◌ี⟨|⟩ ๆ ม◌ีเยอะ `
+- input #44 ` ของด◌ี ๆ ม◌ีเยอะ `: byte 19, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ของด◌ี ๆ⟨|⟩ ม◌ีเยอะ `
+- input #45 ` ผ◌ัก ผลไม◌้ ฯลฯ `: byte 9, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ผ◌ัก⟨|⟩ ผลไม◌้ ฯลฯ `
+- input #45 ` ผ◌ัก ผลไม◌้ ฯลฯ `: byte 25, word-only, Thai / Thai|Thai, group (a) space-normalization, ` ผ◌ัก ผลไม◌้⟨|⟩ ฯลฯ `

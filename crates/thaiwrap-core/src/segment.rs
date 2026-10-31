@@ -41,7 +41,15 @@ pub(crate) struct Unit {
 /// The units of a paragraph, in order. Only the first unit can have empty content
 /// (when the paragraph starts with spaces).
 pub(crate) fn units(para: &str) -> impl Iterator<Item = Unit> + '_ {
+    // The word segmenter also breaks inside a grapheme cluster, for example between a Thai
+    // letter and a following U+0301 or ZWJ, so keep only the breaks that are cluster
+    // boundaries. Both lists are sorted, so one pass merges them without allocating.
+    let mut graphemes = grapheme_boundaries(para).peekable();
     let mut ends = break_candidates(para)
+        .filter(move |&b| {
+            while graphemes.next_if(|&g| g < b).is_some() {}
+            graphemes.peek() == Some(&b)
+        })
         .filter(move |&b| thai::allowed(para, b))
         .chain(std::iter::once(para.len()));
     let mut start = 0;

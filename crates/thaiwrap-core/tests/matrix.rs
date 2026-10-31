@@ -19,6 +19,11 @@ fn default_lines(text: &str, max: usize) -> Vec<&str> {
     lines(text, max, WrapOptions::default())
 }
 
+/// Characters that continue the grapheme cluster before them, so no line may start with one.
+fn continues_grapheme(c: char) -> bool {
+    matches!(c, '\u{0300}'..='\u{036F}' | '\u{200D}' | '\u{FE00}'..='\u{FE0F}')
+}
+
 const ACCEPTANCE: &str = "กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า";
 const DEFAULT: (Measure, Overflow) = (Measure::CodeUnits, Overflow::Split);
 
@@ -288,6 +293,38 @@ fn blank_looking_text_only_should_give_no_lines() {
     assert_eq!(
         default_lines(" \n\u{00A0}\n\u{200B}", 10),
         Vec::<&str>::new()
+    );
+}
+
+fn assert_no_line_starts_inside_a_cluster(text: &str, max: usize, expected: &[&str]) {
+    let got = default_lines(text, max);
+    assert!(
+        got.iter().all(|l| !l.starts_with(continues_grapheme)),
+        "{text:?}: {got:?}"
+    );
+    assert_eq!(got, expected, "{text:?}");
+}
+
+#[test]
+fn a_combining_mark_from_another_script_should_stay_with_its_letter() {
+    assert_no_line_starts_inside_a_cluster("ก\u{0301}ข", 1, &["ก\u{0301}", "ข"]);
+}
+
+#[test]
+fn a_zero_width_joiner_should_stay_with_the_letter_before_it() {
+    assert_no_line_starts_inside_a_cluster("กข\u{200D}ค", 2, &["ก", "ข\u{200D}", "ค"]);
+}
+
+#[test]
+fn a_variation_selector_should_stay_with_the_letter_before_it() {
+    assert_no_line_starts_inside_a_cluster("ไทย\u{FE0F}ดี", 1, &["ไท", "ย\u{FE0F}", "ดี"]);
+}
+
+#[test]
+fn a_mark_after_a_thai_letter_should_count_with_it_in_graphemes() {
+    assert_eq!(
+        lines("ก\u{0301}ข", 2, opts(Measure::Graphemes, Overflow::Split)),
+        ["ก\u{0301}ข"]
     );
 }
 
