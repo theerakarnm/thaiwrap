@@ -1,4 +1,4 @@
-//! M0.2: compares the break positions of the word segmenter (used before ADR 0001) with the
+//! Compares the break positions of the word segmenter (used before ADR 0001) with the
 //! UAX #14 line segmenter (used since) and writes the report that ADR 0001 is decided on.
 //!
 //! Run with `cargo test -p thaiwrap-core --lib compare_segmenters -- --ignored --nocapture`.

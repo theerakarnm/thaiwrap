@@ -24,7 +24,7 @@ jobs:
   build-test:
     uses: ./.github/workflows/build-test.yml
   parity:
-    # Pinned to the exact Node release whose ICU recorded parity-known-diffs.json (Task 15),
+    # Pinned to the exact Node release whose ICU recorded parity-known-diffs.json,
     # so the weekly run cannot go red on an ICU update. Bumping the pin is a reviewed PR
     # that re-baselines. Not part of the release path.
     needs: build-test

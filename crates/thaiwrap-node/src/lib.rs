@@ -56,7 +56,7 @@ fn read_string(env: &Env, value: &Unknown<'_>, name: &str) -> Result<String> {
             &format!("{name} must be a string, got {}", type_name(value)),
         ));
     }
-    // Lossy on purpose: lone surrogates become U+FFFD (D10), whatever bytes the runtime's
+    // Lossy on purpose: lone surrogates become U+FFFD (see README Known limitations), whatever bytes the runtime's
     // napi_get_value_string_utf8 produces for them (runtimes may differ).
     let utf8 = value.coerce_to_string()?.into_utf8()?;
     Ok(String::from_utf8_lossy(utf8.as_slice()).into_owned())

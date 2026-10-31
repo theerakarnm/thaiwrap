@@ -82,7 +82,7 @@ fn overflow_strategy() -> impl Strategy<Value = Overflow> {
     prop::sample::select(OVERFLOWS)
 }
 
-// Test-local copies of the Thai rules (AGENTS.md rules 1-3, and D7 for no-break characters).
+// Test-local copies of the Thai rules (AGENTS.md rules 1-3, and the README line breaking rules for no-break characters).
 
 fn is_combining_mark(c: char) -> bool {
     matches!(c, '\u{0E31}' | '\u{0E34}'..='\u{0E3A}' | '\u{0E47}'..='\u{0E4E}')
@@ -140,7 +140,7 @@ fn allowed(para: &str, pos: usize) -> bool {
     }
 }
 
-/// Paragraph ranges, split at the hard breaks of D8; a final break adds no empty paragraph.
+/// Paragraph ranges, split at the hard breaks (LF, CRLF, CR, VT, FF, NEL, U+2028, U+2029); a final break adds no empty paragraph.
 fn paragraphs(text: &str) -> Vec<Range<usize>> {
     let mut out = Vec::new();
     let mut chars = text.char_indices().peekable();

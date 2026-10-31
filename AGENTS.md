@@ -4,7 +4,8 @@ Instructions for AI coding agents (Claude Code, Codex, Cursor and similar) worki
 
 ## Project overview
 
-`thaiwrap` wraps Thai text into lines of a maximum length at word boundaries. It is written in Rust and published to npm as a Node-API addon built with [napi-rs](https://napi.rs), targeting Node.js 22+ and Bun.
+`thaiwrap` wraps Thai text into lines of a maximum length at word boundaries.
+It is written in Rust and published to npm as a Node-API addon built with [napi-rs](https://napi.rs), targeting Node.js 22+ and Bun.
 
 Core behavior, which every change must preserve:
 
