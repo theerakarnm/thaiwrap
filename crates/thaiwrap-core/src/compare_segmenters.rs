@@ -1,15 +1,23 @@
-//! M0.2: compares the break positions of the word segmenter (used in v0.1) with the UAX #14
-//! line segmenter and writes the report that ADR 0001 is decided on.
+//! M0.2: compares the break positions of the word segmenter (used before ADR 0001) with the
+//! UAX #14 line segmenter (used since) and writes the report that ADR 0001 is decided on.
 //!
 //! Run with `cargo test -p thaiwrap-core --lib compare_segmenters -- --ignored --nocapture`.
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 use std::fs;
+use std::sync::OnceLock;
 
-use icu_segmenter::options::LineBreakOptions;
-use icu_segmenter::{LineSegmenter, LineSegmenterBorrowed};
+use icu_segmenter::options::{LineBreakOptions, WordBreakInvariantOptions};
+use icu_segmenter::{LineSegmenter, LineSegmenterBorrowed, WordSegmenter, WordSegmenterBorrowed};
 
 use crate::{lines, segment, thai};
+
+/// The word side of the comparison. `segment::break_candidates` is the line segmenter since
+/// ADR 0001, so the comparison needs its own word segmenter.
+fn word_segmenter() -> &'static WordSegmenterBorrowed<'static> {
+    static SEGMENTER: OnceLock<WordSegmenterBorrowed<'static>> = OnceLock::new();
+    SEGMENTER.get_or_init(|| WordSegmenter::new_dictionary(WordBreakInvariantOptions::default()))
+}
 
 /// Every input string of `tests/matrix.rs`, including the ones printed by `print_observed_rows`.
 const MATRIX_INPUTS: [&str; 48] = [
@@ -262,7 +270,10 @@ fn paragraph_diffs(
     para: &str,
     line_segmenter: &LineSegmenterBorrowed<'_>,
 ) -> Vec<Diff> {
-    let words: BTreeSet<usize> = segment::break_candidates(para).collect();
+    let words: BTreeSet<usize> = word_segmenter()
+        .segment_str(para)
+        .filter(|&b| b > 0 && b < para.len())
+        .collect();
     let line_breaks: BTreeSet<usize> = line_segmenter
         .segment_str(para)
         .filter(|&b| b > 0 && b < para.len())
