@@ -18,3 +18,10 @@ The cost is accepted: runs of Korean `ㅠ` get breaks between letters.
 ## Consequences
 Task 21 of docs/plans/2026-10-30-thaiwrap-v0.1.md switched `break_candidates` to the line segmenter in the commit `feat(core): break lines with the UAX 14 segmenter`.
 The matrix rows M2 and M4 and the corpus snapshots changed; the Thai-only parity results against `Intl.Segmenter` did not.
+Other change classes in the snapshots, all from the group (b) table:
+- No break before closing punctuation `? ! , : ; %`.
+- No break around `-` and `/` in numbers, phone numbers and URLs, and none before `–` in year ranges.
+- CJK, kana and Hangul break between every letter, not only `ㅠ`.
+A visible cost: a word now stays with the punctuation after it, so a dictionary mis-split inside that word shows.
+Observed with the built addon: `wrapThai("ระบบเก็บเสียงดีมาก?", 10)` gives `["ระบบเก็บ", "เสียงดีมา", "ก?"]`.
+No Thai rule is broken, but a lone final consonant before `?` is visible.

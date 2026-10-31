@@ -56,3 +56,6 @@ Numbers are single runs per runtime.
   No code was tuned in this task.
 - The napi `long` call (807 us on Node 22) is about 1.5x the pure-Rust `long` (538 us).
   The gap is the JS string conversion and the `Vec<String>` result.
+
+- Note, 2026-10-31: with the line segmenter (ADR 0001) the release darwin-arm64 `.node` is 1,477,760 bytes (observed with `ls -l`), because the CJ dictionary is no longer linked.
+  The 3,492,224 bytes above were measured with the word segmenter.
