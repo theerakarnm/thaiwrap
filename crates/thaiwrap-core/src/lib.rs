@@ -7,6 +7,7 @@
 #![deny(missing_docs)]
 #![warn(clippy::pedantic)]
 
+mod lines;
 mod thai;
 
 use std::fmt;
