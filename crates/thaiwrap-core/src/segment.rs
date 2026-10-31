@@ -2,26 +2,25 @@
 use std::ops::Range;
 use std::sync::OnceLock;
 
-use icu_segmenter::options::WordBreakInvariantOptions;
+use icu_segmenter::options::LineBreakOptions;
 use icu_segmenter::{
-    GraphemeClusterSegmenter, GraphemeClusterSegmenterBorrowed, WordSegmenter,
-    WordSegmenterBorrowed,
+    GraphemeClusterSegmenter, GraphemeClusterSegmenterBorrowed, LineSegmenter,
+    LineSegmenterBorrowed,
 };
 
 use crate::thai;
 
 static GRAPHEMES: GraphemeClusterSegmenterBorrowed<'static> = GraphemeClusterSegmenter::new();
 
-fn word_segmenter() -> &'static WordSegmenterBorrowed<'static> {
-    static SEGMENTER: OnceLock<WordSegmenterBorrowed<'static>> = OnceLock::new();
-    SEGMENTER.get_or_init(|| WordSegmenter::new_dictionary(WordBreakInvariantOptions::default()))
+fn line_segmenter() -> &'static LineSegmenterBorrowed<'static> {
+    static SEGMENTER: OnceLock<LineSegmenterBorrowed<'static>> = OnceLock::new();
+    SEGMENTER.get_or_init(|| LineSegmenter::new_dictionary(LineBreakOptions::default()))
 }
 
 /// Byte offsets inside `para` where the segmenter allows a break, without 0 and `para.len()`.
-/// The word segmenter reports "ส่งมอบ| |และ"; `thai::allowed` later drops the offset before the
-/// space, so the word and line segmenters (which never break before a space) give the same units.
+/// This is the UAX #14 line break opportunity list (ADR 0001); it never breaks before a space.
 pub(crate) fn break_candidates(para: &str) -> impl Iterator<Item = usize> + '_ {
-    word_segmenter()
+    line_segmenter()
         .segment_str(para)
         .filter(move |&b| b > 0 && b < para.len())
 }
@@ -41,7 +40,7 @@ pub(crate) struct Unit {
 /// The units of a paragraph, in order. Only the first unit can have empty content
 /// (when the paragraph starts with spaces).
 pub(crate) fn units(para: &str) -> impl Iterator<Item = Unit> + '_ {
-    // The word segmenter also breaks inside a grapheme cluster, for example between a Thai
+    // The line segmenter can also break inside a grapheme cluster, for example between a Thai
     // letter and a following U+0301 or ZWJ, so keep only the breaks that are cluster
     // boundaries. Both lists are sorted, so one pass merges them without allocating.
     let mut graphemes = grapheme_boundaries(para).peekable();

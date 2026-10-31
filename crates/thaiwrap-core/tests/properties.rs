@@ -3,8 +3,8 @@
 use std::ops::Range;
 use std::sync::OnceLock;
 
-use icu_segmenter::options::WordBreakInvariantOptions;
-use icu_segmenter::{GraphemeClusterSegmenter, WordSegmenter, WordSegmenterBorrowed};
+use icu_segmenter::options::LineBreakOptions;
+use icu_segmenter::{GraphemeClusterSegmenter, LineSegmenter, LineSegmenterBorrowed};
 use proptest::prelude::*;
 use thaiwrap_core::{wrap, Measure, Overflow, WrapOptions};
 
@@ -154,9 +154,9 @@ fn paragraphs(text: &str) -> Vec<Range<usize>> {
     out
 }
 
-fn word_segmenter() -> &'static WordSegmenterBorrowed<'static> {
-    static SEGMENTER: OnceLock<WordSegmenterBorrowed<'static>> = OnceLock::new();
-    SEGMENTER.get_or_init(|| WordSegmenter::new_dictionary(WordBreakInvariantOptions::default()))
+fn line_segmenter() -> &'static LineSegmenterBorrowed<'static> {
+    static SEGMENTER: OnceLock<LineSegmenterBorrowed<'static>> = OnceLock::new();
+    SEGMENTER.get_or_init(|| LineSegmenter::new_dictionary(LineBreakOptions::default()))
 }
 
 fn grapheme_boundaries(s: &str) -> Vec<usize> {
@@ -243,7 +243,7 @@ proptest! {
             let (start, end) = (line.start - para.start, line.end - para.start);
             let graphemes = grapheme_boundaries(para_text);
             let cuts: Vec<usize> = match overflow {
-                Overflow::Keep => word_segmenter()
+                Overflow::Keep => line_segmenter()
                     .segment_str(para_text)
                     .filter(|b| graphemes.contains(b))
                     .collect(),

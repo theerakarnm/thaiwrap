@@ -34,8 +34,7 @@ pub(crate) fn is_visible(c: char) -> bool {
 }
 
 /// No-break spaces and joiners glue their neighbours together: "100\u{00A0}บาท" must stay on
-/// one line. The word segmenter reports a boundary on both sides of them, so the rule has to
-/// live here, where both segmenter breaks and overflow cuts are checked.
+/// one line. The rule lives here, where both segmenter breaks and overflow cuts are checked.
 fn is_no_break(c: char) -> bool {
     matches!(
         c,

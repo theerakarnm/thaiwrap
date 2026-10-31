@@ -16,4 +16,5 @@ The other group (b) differences are improvements for real text: no break inside 
 The cost is accepted: runs of Korean `ㅠ` get breaks between letters.
 
 ## Consequences
-If approved, Task 21 of docs/plans/2026-10-30-thaiwrap-v0.1.md switches `break_candidates` to the line segmenter.
+Task 21 of docs/plans/2026-10-30-thaiwrap-v0.1.md switched `break_candidates` to the line segmenter in the commit `feat(core): break lines with the UAX 14 segmenter`.
+The matrix rows M2 and M4 and the corpus snapshots changed; the Thai-only parity results against `Intl.Segmenter` did not.

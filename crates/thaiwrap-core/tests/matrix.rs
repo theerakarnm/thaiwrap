@@ -398,14 +398,14 @@ fn print_observed_rows() {
 fn observed_m2_exclamation_and_paren_should_match_recorded_output() {
     let got = lines("สวัสดี! (ภาษาไทย)", 8, opts(DEFAULT.0, DEFAULT.1));
     assert_thai_line_rules(&got);
-    assert_eq!(got, vec!["สวัสดี!", "(ภาษาไทย", ")"]);
+    assert_eq!(got, vec!["สวัสดี!", "(ภาษา", "ไทย)"]);
 }
 
 #[test]
 fn observed_m4_thai_digits_should_match_recorded_output() {
     let got = lines("ปี๒๕๖๗", 3, opts(DEFAULT.0, DEFAULT.1));
     assert_thai_line_rules(&got);
-    assert_eq!(got, vec!["ปี", "๒๕๖", "๗"]);
+    assert_eq!(got, vec!["ปี๒", "๕๖๗"]);
 }
 
 #[test]

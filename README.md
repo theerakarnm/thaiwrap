@@ -137,7 +137,7 @@ Use `measure: "graphemes"` when you fit text into a space on screen (closer to w
 
 ## How it works
 
-1. Text is split into words with [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based word segmenter, compiled into the native addon.
+1. Text is split into words with [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14 line break rules), compiled into the native addon.
 2. Words are placed on the current line until the next word would exceed `maxLength`, then a new line starts.
 3. Spaces at line edges are dropped.
 
