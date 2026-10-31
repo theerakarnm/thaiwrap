@@ -178,6 +178,21 @@ fn input_start_should_be_kept_as_written() {
 }
 
 #[test]
+fn a_leading_vowel_before_a_space_should_stay_with_the_next_character() {
+    assert_eq!(default_lines("เ ก", 1), ["เ ก"]);
+}
+
+#[test]
+fn a_space_before_a_soft_hyphen_should_be_trimmed_from_the_line_end() {
+    assert_eq!(default_lines("ab \u{00AD}cd", 3), ["ab", "\u{00AD}cd"]);
+}
+
+#[test]
+fn the_last_chunk_of_a_split_word_should_take_the_next_unit() {
+    assert_eq!(default_lines("abcdef g", 4), ["abcd", "ef g"]);
+}
+
+#[test]
 fn a_mark_after_a_space_should_stay_on_the_line_of_the_space() {
     assert_eq!(default_lines("ก ่ข", 1), ["ก ่", "ข"]);
 }

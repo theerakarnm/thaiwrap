@@ -12,12 +12,15 @@ use icu_segmenter::{LineSegmenter, LineSegmenterBorrowed};
 use crate::{lines, segment, thai};
 
 /// Every input string of `tests/matrix.rs`, including the ones printed by `print_observed_rows`.
-const MATRIX_INPUTS: [&str; 45] = [
+const MATRIX_INPUTS: [&str; 48] = [
     "กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า",
     "ที่",
     "ก\u{0301}ข",
     "กข\u{200D}ค",
     "ไทย\u{FE0F}ดี",
+    "เ ก",
+    "ab \u{00AD}cd",
+    "abcdef g",
     "กา",
     "กำ",
     "เกเก",

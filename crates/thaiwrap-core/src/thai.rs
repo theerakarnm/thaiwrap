@@ -87,6 +87,7 @@ mod tests {
     #[test]
     fn allowed_should_reject_break_after_leading_vowel() {
         assert!(!at("เก", "เ"));
+        assert!(!at("เ ก", "เ "));
     }
     #[test]
     fn allowed_should_reject_break_before_sara_aa() {
@@ -125,9 +126,12 @@ mod tests {
         assert!(!at("a \u{00A0}b", "a"));
     }
     #[test]
-    fn allowed_should_reject_break_next_to_no_break_space() {
-        assert!(!at("100\u{00A0}บาท", "100"));
-        assert!(!at("100\u{00A0}บาท", "100\u{00A0}"));
+    fn allowed_should_reject_break_next_to_no_break_characters() {
+        for c in ['\u{00A0}', '\u{2007}', '\u{202F}', '\u{2060}', '\u{FEFF}'] {
+            let para = format!("100{c}บาท");
+            assert!(!at(&para, "100"), "{c:?}");
+            assert!(!at(&para, &format!("100{c}")), "{c:?}");
+        }
     }
     #[test]
     fn break_space_should_include_zwsp_and_exclude_nbsp() {
