@@ -11,16 +11,16 @@ All spike code lives on branch `spike/icu-data-size` (commit `7d8a7a0`, never me
 
 | option | segmenter | .node bytes (darwin-arm64) | .node bytes (linux-arm64-gnu) | differences by category | eligible |
 | --- | --- | --- | --- | --- | --- |
-| compiled data (today) | `LineSegmenter` | 1,477,760 | not measured (podman storage broken) | reference | reference |
-| (a) Thai only | `LineSegmenter` | 569,584 (-908,176, -61.5%) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 5 | yes |
-| (b) all dictionaries | `LineSegmenter` | 1,477,760 (same as compiled) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 0 | yes |
-| (a) + CJK | `LineSegmenter` | 569,584 (same as (a)) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 5 | yes |
+| compiled data (today) | `LineSegmenter` | 1,477,760 | 1,446,800 | reference | reference |
+| (a) Thai only | `LineSegmenter` | 569,584 (-908,176, -61.5%) | 595,552 (-851,248, -58.8%) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 5 | yes |
+| (b) all dictionaries | `LineSegmenter` | 1,477,760 (same as compiled) | 1,447,520 (+720) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 0 | yes |
+| (a) + CJK | `LineSegmenter` | 569,584 (same as (a)) | 595,552 (same as (a)) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 5 | yes |
 
 "Eligible" means zero differences on Thai, Latin, digits, punctuation, and emoji (D17).
 Sizes are `stat -f %z thaiwrap.darwin-arm64.node` after `bun run build` (release: lto, codegen-units 1, strip).
 Compiled data was rebuilt on the spike branch with default features; the committed `feat/v0.1` build had the same size.
-The linux-arm64-gnu column is empty because podman's container storage is broken on this machine.
-It was not repaired.
+The linux-arm64-gnu sizes were measured on 2026-10-31 after a podman storage reset, in `docker.io/library/rust:1-bookworm` on an arm64 podman machine.
+Each option was built from the spike branch with `bunx napi build --platform --release --manifest-path crates/thaiwrap-node/Cargo.toml` (plus `--no-default-features --features data_a|data_b|data_c`), and the size is `ls -l` of the produced `.node`.
 
 ## What the numbers mean
 
