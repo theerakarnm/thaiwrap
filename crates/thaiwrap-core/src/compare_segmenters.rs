@@ -196,6 +196,7 @@ fn rejected_by(para: &str, pos: usize, graphemes: &BTreeSet<usize>) -> Option<&'
 
 /// Printable form of one character; invisible ones show their code point, and so does the
 /// em dash, which repo rules keep out of Markdown files.
+/// Marks are printed plainly so that contexts read as the corpus text.
 fn show(c: char) -> String {
     let invisible = c.is_control()
         || (c.is_whitespace() && c != ' ')
@@ -205,8 +206,6 @@ fn show(c: char) -> String {
         );
     if invisible {
         format!("⟦U+{:04X}⟧", u32::from(c))
-    } else if thai::is_combining_mark(c) {
-        format!("◌{c}")
     } else {
         c.to_string()
     }
@@ -459,6 +458,8 @@ fn write_summary(out: &mut String, sources: &[Source]) {
 fn glyph(c: char) -> String {
     if c == ' ' {
         "␠".to_string()
+    } else if thai::is_combining_mark(c) {
+        format!("◌{c}")
     } else {
         show(c)
     }
@@ -548,7 +549,7 @@ fn render(sources: &[Source]) -> String {
          For each paragraph it takes the break positions of `WordSegmenter::new_dictionary` and of `LineSegmenter::new_dictionary` (positions 0 and the end removed) and reports every position that only one of them returns.\n\
          Group (a) is every difference that `segment::units` drops, so it cannot change any output line.\n\
          The rule that drops it is named: `grapheme` (the position is inside a grapheme cluster, for example between a letter and U+0301, ZWJ or U+FE0F), `space-normalization` (the position is followed by a break space), `no-break` (next to NBSP, U+2007, U+202F, U+2060 or U+FEFF), or `thai-filter` (Thai rules 1-3).\n\
-         Group (b) is everything else, and those differences change the wrapped output.\n\
+         Group (b) is everything else, and those differences can change the wrapped output.\n\
          \"Thai\" means the nearest non-space character on both sides is Thai; otherwise the difference is \"non-Thai\" with a sub-category.\n\
          The markdown lists the most frequent patterns with examples; the rest are rolled up, and every difference is in the CSV files `corpus/<source>/derived/segmenter-diffs.csv`.\n\
          In examples, `⟨|⟩` marks the position and `◌` marks a combining mark shown alone.\n\n",
