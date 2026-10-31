@@ -55,9 +55,10 @@ fn check(source: &str) {
     let mut expected_blocks = expected.split("\n\n");
     for actual_block in actual.split("\n\n") {
         let expected_block = expected_blocks.next().unwrap_or("<missing block>");
-        assert_eq!(
-            actual_block, expected_block,
-            "first differing block in {source} snapshot"
+        // Printed with `{}`: Debug would escape every Thai mark and join the lines with `\n`.
+        assert!(
+            actual_block == expected_block,
+            "first differing block in {source} snapshot\n--- expected\n{expected_block}\n+++ actual\n{actual_block}"
         );
     }
     panic!("{source} snapshot has extra blocks after the actual output");
