@@ -1,0 +1,81 @@
+name: release
+on: { push: { branches: [main] } }
+permissions: { contents: read }
+jobs:
+  release-please:
+    runs-on: ubuntu-24.04
+    permissions: { contents: write, pull-requests: write }
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      version: ${{ steps.rp.outputs.version }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v5
+        with: { config-file: release-please-config.json, manifest-file: .release-please-manifest.json }
+
+  build-test:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/build-test.yml
+
+  publish:
+    needs: [release-please, build-test]
+    runs-on: ubuntu-24.04
+    environment: npm
+    permissions: { contents: read, id-token: write }
+    env:
+      NPM_CONFIG_ACCESS: public
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: '24' } # no registry-url: it writes an .npmrc that expects NODE_AUTH_TOKEN
+      # Trusted publishing needs npm >= 11.5.1.
+      - run: node -e "const [a,b,c]=require('child_process').execSync('npm --version').toString().trim().split('.').map(Number); if (a<11||(a===11&&(b<5||(b===5&&c<1)))) { console.error('npm too old'); process.exit(1) }"
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: latest }
+      - run: bun install --frozen-lockfile
+      - uses: actions/download-artifact@v8
+        with: { path: artifacts, pattern: 'bindings-*', merge-multiple: true }
+      - uses: actions/download-artifact@v8
+        with: { name: js-binding }
+      - run: bunx napi create-npm-dirs
+      - run: bunx napi artifacts --output-dir artifacts
+      - run: bunx napi pre-publish -t npm --no-gh-release
+      - run: npm publish ${{ contains(needs.release-please.outputs.version, '-') && '--tag next' || '' }}
+
+  smoke-from-registry:
+    needs: [release-please, publish]
+    strategy:
+      matrix: { os: [ubuntu-24.04, ubuntu-24.04-arm] }
+    runs-on: ${{ matrix.os }}
+    steps:
+      # The registry can take a minute to serve a new version; retry up to 5 times, 30 s apart.
+      - run: |
+          for _ in 1 2 3 4 5; do docker run --rm oven/bun:slim sh -c '
+            mkdir /app && cd /app && bun init -y >/dev/null &&
+            bun add thaiwrap@${{ needs.release-please.outputs.version }} &&
+            bun -e "const {wrapThai}=require(\"thaiwrap\"); const r=wrapThai(\"กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า\",10); if (JSON.stringify(r)!==JSON.stringify([\"กระบวนการ\",\"สื่อสาร\",\"ส่งมอบ และ\",\"สร้าง\",\"คุณค่า\"])) process.exit(1); console.log(\"registry smoke ok\")"' && exit 0; sleep 30; done; exit 1
+
+  lockfile-from-macos:
+    needs: [release-please, publish]
+    runs-on: macos-15
+    steps:
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: latest }
+      - run: |
+          mkdir app && cd app && bun init -y >/dev/null
+          for _ in 1 2 3 4 5; do bun add thaiwrap@${{ needs.release-please.outputs.version }} && exit 0; sleep 30; done; exit 1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos-lockfile
+          path: |
+            app/package.json
+            app/bun.lock
+
+  install-macos-lockfile-on-linux:
+    needs: lockfile-from-macos
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/download-artifact@v8
+        with: { name: macos-lockfile, path: app }
+      - run: docker run --rm -v "$PWD/app":/app -w /app oven/bun:slim sh -c 'bun install --frozen-lockfile && bun -e "console.log(require(\"thaiwrap\").wrapThai(\"ก\",1))"'
