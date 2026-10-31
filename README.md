@@ -63,6 +63,7 @@ wrapThai(text: string, maxLength: number, options?: WrapOptions): string[]
 | `maxLength` | `number`      | Maximum length of each line. Must be a positive integer. |
 | `options`   | `WrapOptions` | Optional settings (see below).                |
 
+The bundled type declarations need TypeScript 4.5 or newer.
 Returns an array of lines.
 Break spaces (spaces and ZWSP) at line edges are trimmed.
 No-break spaces (U+00A0, U+2007, U+202F) are content.
@@ -139,7 +140,7 @@ Use `measure: "graphemes"` when you fit text into a space on screen (closer to w
 
 1. Break opportunities come from [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14), which finds Thai word boundaries and keeps punctuation with its word.
    The segmenter is compiled into the native addon.
-2. The Thai text rules remove break positions that would start a line with a combining mark or end it with a leading vowel.
+2. The Thai text rules remove break positions that would start a line with a combining mark or one of `ะ า ำ ๆ ฯ`, end it with a leading vowel, or fall next to a no-break character.
 3. Units are placed on the current line until the next unit would exceed `maxLength`, then a new line starts.
 4. Spaces at line edges are dropped.
 
@@ -156,12 +157,15 @@ Measured on a prototype (Linux x64, Rust 1.97, Node 22.23, Bun 1.4.4), in micros
 
 The v0.1 build measures about 5.8-5.9x faster than an `Intl.Segmenter` wrapper on Node 22, about 3.1-3.2x on Node 24, and about 3.0-3.3x on Bun 1.4.4 (Apple M1 Pro, 2026-10-31, see [benchmarks](docs/m0/benchmarks.md)).
 The wrapper is the reference used in the tests, which breaks at word boundaries.
+It also applies the Thai rules per grapheme.
+Against a plain word-break wrapper the gap was about 2.2-2.6x on Node 22, 1.5-1.8x on Node 24 and 2x on Bun.
 The gain matters most for high-volume work such as generating receipts, labels or PDFs in bulk.
 The table above is from an earlier prototype.
 
 ## Platform support
 
-`thaiwrap` is a native Node-API addon built with [napi-rs](https://napi.rs). Prebuilt binaries are provided for:
+`thaiwrap` is a native Node-API addon built with [napi-rs](https://napi.rs).
+Prebuilt binaries are provided for:
 
 | OS      | Architectures       |
 | ------- | ------------------- |

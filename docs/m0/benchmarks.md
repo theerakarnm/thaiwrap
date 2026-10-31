@@ -81,11 +81,10 @@ The change compares the median of the 3 runs.
 | graphemes_long | 598.80 / 604.92 / 598.38 | 629.59 / 632.32 / 635.98 | 598.80 | 632.32 | +5.6% (over +5%) |
 
 `graphemes_long` is above the +5% limit in AGENTS.md.
-It needs a decision before merge.
 No code was tuned.
 The maintainer accepted the graphemes_long +5.6% regression on 2026-10-31: it affects only the opt-in graphemes measure, and the line segmenter fixes breaks around punctuation.
 
-### napi binding vs Intl.Segmenter reference (mitata avg, HEAD)
+### napi binding vs Intl.Segmenter reference (mitata avg, a1d1120)
 
 | Runtime | Case | thaiwrap us | reference us | Speedup |
 | --- | --- | --- | --- | --- |
