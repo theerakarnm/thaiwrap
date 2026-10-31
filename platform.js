@@ -1,4 +1,3 @@
-// platform.js
 'use strict'
 const { napi } = require('./package.json')
 
@@ -31,7 +30,8 @@ function supportedPlatforms() {
 function describeLoadFailure(cause, current = currentPlatform(), supported = supportedPlatforms()) {
   const message = supported.includes(current)
     ? `thaiwrap could not load its native binary for ${current} (package ${napi.packageName}-${current}). ` +
-      'Reinstall dependencies on this machine; do not copy node_modules between operating systems.'
+      'Reinstall dependencies on this machine; do not copy node_modules between operating systems. ' +
+      'Make sure optional dependencies are installed (not --omit=optional).'
     : `thaiwrap has no prebuilt binary for ${current}. Supported: ${supported.join(', ')}.`
   return new Error(message, { cause })
 }
