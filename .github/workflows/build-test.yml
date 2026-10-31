@@ -21,9 +21,16 @@ jobs:
       - run: rustup toolchain install && rustup target add ${{ matrix.target }}
       - if: contains(matrix.flags, '-x')
         uses: mlugg/setup-zig@v2
+        # Without a version, setup-zig installs the latest release, which was 0.17.0 on 2026-10-31
+        # (https://ziglang.org/download/index.json). cargo-zigbuild added 0.17 support on 2026-10-03.
+        # Bump this deliberately, after checking cargo-zigbuild supports the new release.
+        with: { version: 0.17.0 }
       - if: contains(matrix.flags, '-x')
         run: cargo install cargo-zigbuild --locked
       - run: bun install --frozen-lockfile
+      # The napi build runs cargo without --locked, so a stale Cargo.lock would be updated silently in the shipped binaries.
+      - run: cargo metadata --locked --format-version 1 > /dev/null
+        shell: bash
       # npm (preinstalled on every runner) strips the `--` before passing the flags to napi.
       - run: npm run build -- --target ${{ matrix.target }} ${{ matrix.flags }}
       - if: matrix.target == 'x86_64-unknown-linux-gnu'
@@ -54,10 +61,12 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: '${{ matrix.node }}' }
       - uses: oven-sh/setup-bun@v2
+        if: matrix.node == '24'
         with: { bun-version: latest }
       - run: node --test __test__/node-runner.mjs
-      - run: bun test
-      - run: node __test__/e2e/smoke.mjs && bun __test__/e2e/smoke.mjs
+      - run: node __test__/e2e/smoke.mjs
+      - if: matrix.node == '24'
+        run: bun test && bun __test__/e2e/smoke.mjs
 
   test-linux:
     needs: build
