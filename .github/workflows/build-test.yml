@@ -1,0 +1,116 @@
+name: build-test
+on: { workflow_call: {} }
+permissions: { contents: read }
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: aarch64-apple-darwin, os: macos-15, flags: '' }
+          - { target: x86_64-apple-darwin, os: macos-15, flags: '' }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-24.04, flags: '--use-napi-cross' }
+          - { target: aarch64-unknown-linux-gnu, os: ubuntu-24.04, flags: '--use-napi-cross' }
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-24.04, flags: '-x' }
+          - { target: x86_64-pc-windows-msvc, os: windows-2025, flags: '' }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: latest }
+      - run: rustup toolchain install && rustup target add ${{ matrix.target }}
+      - if: contains(matrix.flags, '-x')
+        uses: mlugg/setup-zig@v2
+        # Without a version, setup-zig installs the latest release, which was 0.17.0 on 2026-10-31
+        # (https://ziglang.org/download/index.json). zig 0.17.0 with cargo-zigbuild 0.24.0 built the musl
+        # target locally on 2026-10-31. cargo-zigbuild does not pin zig, so bump zig deliberately.
+        with: { version: 0.17.0 }
+      - if: contains(matrix.flags, '-x')
+        run: cargo install cargo-zigbuild --locked
+      - run: bun install --frozen-lockfile
+      # The napi build runs cargo without --locked, so a stale Cargo.lock would be updated silently in the shipped binaries.
+      - run: cargo metadata --locked --format-version 1 > /dev/null
+        shell: bash
+      # npm (preinstalled on every runner) strips the `--` before passing the flags to napi.
+      - run: npm run build -- --target ${{ matrix.target }} ${{ matrix.flags }}
+      - if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: git diff --exit-code binding.d.ts
+      - if: matrix.target == 'x86_64-unknown-linux-gnu'
+        uses: actions/upload-artifact@v7
+        with: { name: js-binding, path: binding.js, if-no-files-found: error }
+      - uses: actions/upload-artifact@v7
+        with: { name: 'bindings-${{ matrix.target }}', path: 'thaiwrap.*.node', if-no-files-found: error }
+
+  test-host:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - { target: aarch64-apple-darwin, os: macos-15 }
+          - { target: x86_64-apple-darwin, os: macos-15-intel }
+          - { target: x86_64-pc-windows-msvc, os: windows-2025 }
+        node: ['22', '24']
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: 'bindings-${{ matrix.platform.target }}' }
+      - uses: actions/download-artifact@v8
+        with: { name: js-binding }
+      - uses: actions/setup-node@v7
+        with: { node-version: '${{ matrix.node }}' }
+      - uses: oven-sh/setup-bun@v2
+        if: matrix.node == '24'
+        with: { bun-version: latest }
+      - run: node --test __test__/node-runner.mjs
+      - run: node __test__/e2e/smoke.mjs
+      - if: matrix.node == '24'
+        run: bun test && bun __test__/e2e/smoke.mjs
+
+  test-linux:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-24.04, node: 'node:22-bookworm-slim', node24: 'node:24-bookworm-slim', bun: 'oven/bun:slim' }
+          - { target: aarch64-unknown-linux-gnu, os: ubuntu-24.04-arm, node: 'node:22-bookworm-slim', node24: 'node:24-bookworm-slim', bun: 'oven/bun:slim' }
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-24.04, node: 'node:22-alpine', node24: 'node:24-alpine', bun: 'oven/bun:alpine' }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: 'bindings-${{ matrix.target }}' }
+      - uses: actions/download-artifact@v8
+        with: { name: js-binding }
+      - run: |
+          for image in ${{ matrix.node }} ${{ matrix.node24 }}; do
+            docker run --rm -v "$PWD":/w -w /w "$image" sh -c 'node --test __test__/node-runner.mjs && node __test__/e2e/smoke.mjs'
+          done
+          docker run --rm -v "$PWD":/w -w /w ${{ matrix.bun }} sh -c 'bun test && bun __test__/e2e/smoke.mjs'
+
+  unsupported:
+    needs: build
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: js-binding }
+      - run: docker run --rm -v "$PWD":/w -w /w node:22-alpine node __test__/e2e/unsupported.mjs
+
+  package-contents:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { name: js-binding }
+      - uses: actions/setup-node@v7
+        with: { node-version: '24' }
+      - run: |
+          npm pack --dry-run --json --ignore-scripts > pack.json
+          node -e '
+            const files = JSON.parse(require("fs").readFileSync("pack.json","utf8"))[0].files.map(f => f.path).sort()
+            const expected = ["LICENSE","README.md","binding.d.ts","binding.js","index.d.ts","index.js","package.json","platform.js"]
+            if (JSON.stringify(files) !== JSON.stringify(expected)) { console.error(files); process.exit(1) }'

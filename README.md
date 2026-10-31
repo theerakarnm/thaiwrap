@@ -2,7 +2,8 @@
 
 Fast Thai line wrapping for Node.js and Bun, powered by Rust.
 
-`thaiwrap` breaks Thai text into lines of a maximum length **at word boundaries**, so no Thai word is ever cut in half and no line starts with an orphan vowel or tone mark.
+`thaiwrap` breaks Thai text into lines of a maximum length **at word boundaries**, so Thai words are not cut in half; a word longer than the line is cut only where Thai rules allow.
+No line starts with an orphan vowel or tone mark.
 
 > **Status:** pre-release. The API below is the planned v0.1 surface and may change before the first published version.
 
@@ -12,11 +13,11 @@ Thai is written without spaces between words. Slicing a string every N character
 
 ```js
 // Naive: slice every 10 characters
-["กระบวนการส", "ื่อสาร ส่", "งมอบ และสร", "้างคุณค่า"]
-//              ^ line starts with an orphan vowel mark
+["กระบวนการส", "ื่อสาร ส่ง", "มอบ และสร้", "างคุณค่า"]
+//              ^ line 2 starts with an orphan vowel mark, and line 4 with an orphan vowel
 ```
 
-`thaiwrap` segments the text into words first, then fills each line greedily:
+`thaiwrap` finds the places where a line may break, applies the Thai text rules, then fills each line greedily:
 
 ```js
 wrapThai("กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า", 10)
@@ -62,17 +63,61 @@ wrapThai(text: string, maxLength: number, options?: WrapOptions): string[]
 | `maxLength` | `number`      | Maximum length of each line. Must be a positive integer. |
 | `options`   | `WrapOptions` | Optional settings (see below).                |
 
-Returns an array of lines. Whitespace at the start and end of each line is trimmed.
+The bundled type declarations need TypeScript 4.5 or newer.
+Returns an array of lines.
+Break spaces (spaces and ZWSP) at line edges are trimmed.
+No-break spaces (U+00A0, U+2007, U+202F) are content.
 
-Invalid input throws instead of crashing the process: a non-string `text` throws `TypeError`, and a `maxLength` that is not a positive integer throws `RangeError`.
+Invalid input throws instead of crashing the process.
+Wrong types throw `TypeError`: `text` is not a string, `maxLength` is not a number, or `options` is not an object.
+Wrong values throw `RangeError`: `maxLength` is not an integer from 1 to `Number.MAX_SAFE_INTEGER`, or `measure` or `overflow` is not one of the listed values.
 
 ### Options
 
-Options are being finalized for v0.1. Planned:
+| Option     | Default        | Description |
+| ---------- | -------------- | ----------- |
+| `measure`  | `"codeUnits"`  | How line length is counted: `"codeUnits"` or `"graphemes"`. See [Measuring length](#measuring-length). |
+| `overflow` | `"split"`      | What to do with a word longer than `maxLength`: `"split"` or `"keep"`. See [Long words](#long-words). |
 
-| Option    | Default        | Description |
-| --------- | -------------- | ----------- |
-| `measure` | `"codeUnits"`  | How line length is counted. See [Measuring length](#measuring-length). |
+## Line breaking rules
+
+### Spaces
+
+Spaces are break opportunities.
+They are trimmed at line edges and kept inside a line.
+A zero width space (U+200B) breaks like a space.
+A no-break space (NBSP) never breaks.
+
+### Line breaks
+
+`\n`, `\r\n`, `\r`, VT, FF, NEL, U+2028, and U+2029 always end a line.
+
+### Blank lines
+
+An input line with no visible characters becomes `""`.
+A wrapped piece with no visible characters is dropped, so `""` never appears inside one paragraph.
+Blank lines before the first and after the last visible line are dropped.
+Blank lines between visible lines are kept, not collapsed.
+
+```js
+wrapThai("", 10)            // []
+wrapThai("   ", 10)         // []
+wrapThai("\n\n", 10)        // []
+wrapThai("ก\n\nข", 10)      // ["ก", "", "ข"]
+wrapThai("\n\nก\n\n", 10)   // ["ก"]
+wrapThai("ก\n\n\nข", 10)    // ["ก", "", "", "ข"]
+```
+
+### Long words
+
+`overflow: "split"` (default) cuts a word longer than `maxLength` at grapheme boundaries that keep Thai vowels and tone marks with their consonant.
+`overflow: "keep"` puts the whole word on its own line.
+
+A unit that cannot be cut is placed alone on its line, even when it is longer than `maxLength`.
+For example, `ที่` is one grapheme of 3 code units, and `กา` cannot start a line with `า`.
+
+For Thai text, use a `maxLength` of 5 or more.
+Then a line is longer than `maxLength` only in rare cases, such as a word followed by repeated ๆ (`เท่าๆๆ` is one unit of 6 code units).
 
 ## Measuring length
 
@@ -88,13 +133,16 @@ This matters for the result. The same input wrapped at 10 gives different lines 
 ["กระบวนการ", "สื่อสาร ส่ง", "มอบ และ", "สร้างคุณค่า"]
 ```
 
-Use code units when you need to match a character limit (database columns, SMS, fixed-width fields). Use a visual measure when you are fitting text into a space on screen or paper.
+Use code units when you need to match a character limit (database columns, SMS, fixed-width fields).
+Use `measure: "graphemes"` when you fit text into a space on screen (closer to what you see).
 
 ## How it works
 
-1. Text is split into words with [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based word segmenter, compiled into the native addon.
-2. Words are placed on the current line until the next word would exceed `maxLength`, then a new line starts.
-3. Spaces at line edges are dropped.
+1. Break opportunities come from [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14), which finds Thai word boundaries and keeps punctuation with its word.
+   The segmenter is compiled into the native addon.
+2. The Thai text rules remove break positions that would start a line with a combining mark or one of `ะ า ำ ๆ ฯ`, end it with a leading vowel, or fall next to a no-break character.
+3. Units are placed on the current line until the next unit would exceed `maxLength`, then a new line starts.
+4. Spaces at line edges are dropped.
 
 Because the dictionary ships inside the package, output is the same on every runtime and does not depend on the ICU version bundled with your Node or Bun install.
 
@@ -107,25 +155,48 @@ Measured on a prototype (Linux x64, Rust 1.97, Node 22.23, Bun 1.4.4), in micros
 | JS `Intl.Segmenter` baseline   | 8.9        | 1750      | 3.9       | 1008     |
 | `thaiwrap` (Rust via Node-API) | 3.3        | 828       | 2.2       | 531      |
 
-Roughly 2-3x faster on Node and about 1.8x on Bun. The gain matters most for high-volume work such as generating receipts, labels or PDFs in bulk. Numbers will be updated with the published version.
+The v0.1 build measures about 5.8-5.9x faster than an `Intl.Segmenter` wrapper on Node 22, about 3.1-3.2x on Node 24, and about 3.0-3.3x on Bun 1.4.4 (Apple M1 Pro, 2026-10-31, see [benchmarks](docs/m0/benchmarks.md)).
+The wrapper is the reference used in the tests, which breaks at word boundaries.
+It also applies the Thai rules per grapheme.
+Against a plain word-break wrapper the gap was about 2.2-2.6x on Node 22, 1.5-1.8x on Node 24 and 2x on Bun.
+The gain matters most for high-volume work such as generating receipts, labels or PDFs in bulk.
+The table above is from an earlier prototype.
+The chart below shows the v0.1 numbers (Apple M1 Pro, average time per call, lower is better).
+
+![thaiwrap vs Intl.Segmenter benchmark: 3-6x faster on Node 22, Node 24 and Bun 1.4.4](assets/pictures/benchmark.png)
+
+More charts are on the [benchmark page](https://thaiwrap.eukron.com/benchmarks/).
+Full documentation is on the [docs site](https://thaiwrap.eukron.com/docs/) (source in [`site/`](site)).
 
 ## Platform support
 
-`thaiwrap` is a native Node-API addon built with [napi-rs](https://napi.rs). Prebuilt binaries are planned for:
+`thaiwrap` is a native Node-API addon built with [napi-rs](https://napi.rs).
+Prebuilt binaries are provided for:
 
 | OS      | Architectures       |
 | ------- | ------------------- |
-| Linux   | x64, arm64 (glibc)  |
+| Linux   | x64 (glibc), arm64 (glibc), x64 (musl) |
 | macOS   | x64, arm64          |
 | Windows | x64                 |
 
-Runtimes: Node.js 18+ and Bun.
+Runtimes: Node.js 22+ and Bun.
+The Windows binary links the C runtime statically, so it needs no Visual C++ Redistributable.
+On other platforms, loading the package throws an error that names your platform.
 
 Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebAssembly build may be added later.
 
+## Known limitations
+
+- Lone surrogates become U+FFFD.
+- Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.
+- Output can differ from `Intl.Segmenter` because thaiwrap uses its own ICU4X dictionary and UAX #14 line breaking (for example it keeps `?` and `)` with the word before them).
+- A split inside a long word can leave a single final consonant on a line (for example `สร้า` / `ง`).
+- The same happens before punctuation that stays with the word.
+  For example `wrapThai("ระบบเก็บเสียงดีมาก?", 10)` gives `["ระบบเก็บ", "เสียงดีมา", "ก?"]`.
+
 ## Development
 
-Requirements: Rust (stable), Node.js 18+, Bun.
+Requirements: Rust (stable), Node.js 22+, Bun.
 
 ```bash
 git clone https://github.com/theerakarnm/thaiwrap.git

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>thaiwrap docs</title><meta name="description" content="API, options and line breaking rules for thaiwrap.">
+<link rel="stylesheet" href="/style.css"></head><body>
+<header class="nav"><div><a class="brand" href="/">thaiwrap</a><a href="/docs/" aria-current="page">Docs</a><a href="/benchmarks/">Benchmarks</a><a href="https://github.com/theerakarnm/wrapthai">GitHub</a></div></header>
+<main><div class="docs"><nav><a href="#install">Install</a><a href="#usage">Usage</a><a href="#api">API</a><a href="#options">Options</a><a href="#rules">Line breaking rules</a><a href="#measuring">Measuring length</a><a href="#how">How it works</a><a href="#platforms">Platforms</a><a href="#limits">Known limitations</a></nav>
+<div><h1>Docs</h1>
+<p class="lead">Status: pre-release. The API is the planned v0.1 surface and may change.</p>
+<h2 id="install">Install</h2><pre>npm install thaiwrap
+# or
+bun add thaiwrap</pre>
+<p>Prebuilt native binaries are installed for supported platforms. Node.js 22+ and Bun.</p>
+<h2 id="usage">Usage</h2><pre>import { wrapThai } from &quot;thaiwrap&quot;;
+
+const lines = wrapThai(&quot;กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า&quot;, 10);
+// [&quot;กระบวนการ&quot;, &quot;สื่อสาร&quot;, &quot;ส่งมอบ และ&quot;, &quot;สร้าง&quot;, &quot;คุณค่า&quot;]</pre>
+<h2 id="api">API</h2><pre>wrapThai(text: string, maxLength: number, options?: WrapOptions): string[]</pre>
+<table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>text</td><td>string</td><td>Thai, Latin or mixed text.</td></tr>
+<tr><td>maxLength</td><td>number</td><td>Maximum line length. A positive integer.</td></tr>
+<tr><td>options</td><td>WrapOptions</td><td>Optional settings.</td></tr></tbody></table>
+<p>Returns an array of lines. Break spaces (spaces and ZWSP) at line edges are trimmed. No-break spaces (U+00A0, U+2007, U+202F) are content.</p>
+<p>Wrong types throw <code>TypeError</code>. Wrong values throw <code>RangeError</code>: <code>maxLength</code> not an integer from 1 to <code>Number.MAX_SAFE_INTEGER</code>, or an unknown <code>measure</code> or <code>overflow</code>.</p>
+<h2 id="options">Options</h2>
+<table><thead><tr><th>Option</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td>measure</td><td>"codeUnits"</td><td>"codeUnits" or "graphemes". See <a href="#measuring">Measuring length</a>.</td></tr>
+<tr><td>overflow</td><td>"split"</td><td>"split" or "keep". What to do with a word longer than maxLength.</td></tr></tbody></table>
+<h2 id="rules">Line breaking rules</h2>
+<h3>Spaces</h3><p>Spaces are break opportunities. They are trimmed at line edges and kept inside a line. A zero width space (U+200B) breaks like a space. A no-break space never breaks.</p>
+<h3>Line breaks</h3><p>LF, CRLF, CR, VT, FF, NEL, U+2028 and U+2029 always end a line.</p>
+<h3>Blank lines</h3><p>A blank input line becomes <code>""</code>. Blank lines before the first and after the last visible line are dropped. Blank lines between visible lines are kept.</p>
+<pre>wrapThai(&quot;&quot;, 10)            // []
+wrapThai(&quot;ก\n\nข&quot;, 10)      // [&quot;ก&quot;, &quot;&quot;, &quot;ข&quot;]
+wrapThai(&quot;\n\nก\n\n&quot;, 10)   // [&quot;ก&quot;]</pre>
+<h3>Long words</h3><p><code>overflow: "split"</code> cuts a long word at grapheme boundaries that keep vowels and tone marks with their consonant. <code>"keep"</code> puts the whole word on its own line. A unit that cannot be cut sits alone on its line, even if longer than maxLength. For Thai text, use a maxLength of 5 or more.</p>
+<h2 id="measuring">Measuring length</h2>
+<p>By default, length is counted like <code>String.prototype.length</code> (UTF-16 code units). Vowel and tone marks above or below a consonant count as one unit each. The same input at 10:</p>
+<pre>// codeUnits (default)
+[&quot;กระบวนการ&quot;, &quot;สื่อสาร&quot;, &quot;ส่งมอบ และ&quot;, &quot;สร้าง&quot;, &quot;คุณค่า&quot;]
+
+// graphemes
+[&quot;กระบวนการ&quot;, &quot;สื่อสาร ส่ง&quot;, &quot;มอบ และ&quot;, &quot;สร้างคุณค่า&quot;]</pre>
+<p>Use code units to match a character limit (database columns, SMS). Use <code>measure: "graphemes"</code> to fit text on screen.</p>
+<h2 id="how">How it works</h2><ol>
+<li>Break opportunities come from the <a href="https://github.com/unicode-org/icu4x">ICU4X</a> dictionary line segmenter (UAX #14), compiled into the addon.</li>
+<li>Thai text rules remove breaks that would start a line with a combining mark or end it with a leading vowel.</li>
+<li>Units fill the current line until the next one would exceed maxLength.</li>
+<li>Spaces at line edges are dropped.</li></ol>
+<p>The dictionary ships inside the package, so output does not depend on the ICU version of your Node or Bun.</p>
+<h2 id="platforms">Platforms</h2>
+<table><thead><tr><th>OS</th><th>Architectures</th></tr></thead><tbody>
+<tr><td>Linux</td><td>x64 (glibc), arm64 (glibc), x64 (musl)</td></tr><tr><td>macOS</td><td>x64, arm64</td></tr><tr><td>Windows</td><td>x64</td></tr></tbody></table>
+<p>Not supported yet: browsers and edge runtimes such as Cloudflare Workers.</p>
+<h2 id="limits">Known limitations</h2><ul>
+<li>Lone surrogates become U+FFFD.</li>
+<li>Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.</li>
+<li>Output can differ from Intl.Segmenter, for example it keeps <code>?</code> and <code>)</code> with the word before them.</li>
+<li>A split inside a long word can leave a single final consonant on a line, for example <code>สร้า</code> / <code>ง</code>.</li></ul>
+</div></div><footer>MIT licensed. Pre-release (v0.x), the API may change. <a href="https://github.com/theerakarnm/wrapthai">Source on GitHub</a>.</footer></main></body></html>

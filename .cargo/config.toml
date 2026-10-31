@@ -1,0 +1,3 @@
+# Link the C runtime statically so the Windows addon does not need VCRUNTIME140.dll on clean machines.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
