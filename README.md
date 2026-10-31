@@ -170,6 +170,7 @@ The table above is from an earlier prototype.
 | Windows | x64                 |
 
 Runtimes: Node.js 22+ and Bun.
+The Windows binary links the C runtime statically, so it needs no Visual C++ Redistributable.
 On other platforms, loading the package throws an error that names your platform.
 
 Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebAssembly build may be added later.
