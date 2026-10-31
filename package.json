@@ -1,18 +1,34 @@
 {
   "name": "thaiwrap",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Fast Thai line wrapping for Node.js and Bun, powered by Rust",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/theerakarnm/thaiwrap.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theerakarnm/thaiwrap.git"
+  },
   "main": "index.js",
   "types": "index.d.ts",
   "exports": {
-    ".": { "types": "./index.d.ts", "default": "./index.js" },
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["index.js", "index.d.ts", "platform.js", "binding.js", "binding.d.ts"],
-  "engines": { "node": ">= 22" },
-  "publishConfig": { "access": "public" },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "platform.js",
+    "binding.js",
+    "binding.d.ts"
+  ],
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "napi": {
     "binaryName": "thaiwrap",
     "packageName": "@thaiwrap/binding",
