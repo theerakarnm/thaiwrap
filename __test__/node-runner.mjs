@@ -1,5 +1,6 @@
 // The file name keeps `bun test` from picking it up.
 import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
 import test from 'node:test'
 import { wrapThai } from '../index.js'
 import platform from '../platform.js'
@@ -16,3 +17,4 @@ for (const c of platformCases)
     assert.equal(error.cause, cause)
   })
 test('process survives invalid calls', () => assert.deepEqual(wrapThai('ก', 1), ['ก']))
+test('export surface is exactly wrapThai', () => assert.deepEqual(Object.keys(createRequire(import.meta.url)('../index.js')), ['wrapThai']))

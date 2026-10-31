@@ -112,5 +112,5 @@ jobs:
           npm pack --dry-run --json --ignore-scripts > pack.json
           node -e '
             const files = JSON.parse(require("fs").readFileSync("pack.json","utf8"))[0].files.map(f => f.path).sort()
-            const expected = ["LICENSE","README.md","binding.d.ts","binding.js","index.js","package.json","platform.js"]
+            const expected = ["LICENSE","README.md","binding.d.ts","binding.js","index.d.ts","index.js","package.json","platform.js"]
             if (JSON.stringify(files) !== JSON.stringify(expected)) { console.error(files); process.exit(1) }'

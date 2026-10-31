@@ -5,12 +5,12 @@
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/theerakarnm/thaiwrap.git" },
   "main": "index.js",
-  "types": "binding.d.ts",
+  "types": "index.d.ts",
   "exports": {
-    ".": { "types": "./binding.d.ts", "default": "./index.js" },
+    ".": { "types": "./index.d.ts", "default": "./index.js" },
     "./package.json": "./package.json"
   },
-  "files": ["index.js", "platform.js", "binding.js", "binding.d.ts"],
+  "files": ["index.js", "index.d.ts", "platform.js", "binding.js", "binding.d.ts"],
   "engines": { "node": ">= 22" },
   "publishConfig": { "access": "public" },
   "napi": {
