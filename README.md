@@ -154,7 +154,8 @@ Measured on a prototype (Linux x64, Rust 1.97, Node 22.23, Bun 1.4.4), in micros
 | JS `Intl.Segmenter` baseline   | 8.9        | 1750      | 3.9       | 1008     |
 | `thaiwrap` (Rust via Node-API) | 3.3        | 828       | 2.2       | 531      |
 
-The v0.1 build measures about 2.2-2.6x faster than an `Intl.Segmenter` wrapper on Node 22, about 1.5-1.8x on Node 24, and about 2x on Bun 1.4.4 (see [benchmarks](docs/m0/benchmarks.md)).
+The v0.1 build measures about 5.8-5.9x faster than an `Intl.Segmenter` wrapper on Node 22, about 3.1-3.2x on Node 24, and about 3.0-3.3x on Bun 1.4.4 (Apple M1 Pro, 2026-10-31, see [benchmarks](docs/m0/benchmarks.md)).
+The wrapper is the reference used in the tests, which breaks at word boundaries.
 The gain matters most for high-volume work such as generating receipts, labels or PDFs in bulk.
 The table above is from an earlier prototype.
 

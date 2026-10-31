@@ -59,3 +59,43 @@ Numbers are single runs per runtime.
 
 - Note, 2026-10-31: with the line segmenter (ADR 0001) the release darwin-arm64 `.node` is 1,477,760 bytes (observed with `ls -l`), because the CJ dictionary is no longer linked.
   The 3,492,224 bytes above were measured with the word segmenter.
+
+## After ADR 0001 (line segmenter), 2026-10-31
+
+Same machine as above (Apple M1 Pro, macOS arm64).
+Nothing else heavy ran during these runs.
+
+### Pure Rust: word segmenter vs line segmenter
+
+`cargo bench -p thaiwrap-core`, criterion mean per run.
+Each tree was built from `git archive` into its own `CARGO_TARGET_DIR`.
+Runs alternated word, line, word, line, word, line.
+The change compares the median of the 3 runs.
+
+| Benchmark | Word segmenter (33317f0), runs 1/2/3 us | Line segmenter (44bae54), runs 1/2/3 us | Median word us | Median line us | Change |
+| --- | --- | --- | --- | --- | --- |
+| short | 1.88 / 1.85 / 1.91 | 1.92 / 1.88 / 1.89 | 1.88 | 1.89 | +0.5% |
+| long | 576.03 / 541.51 / 534.19 | 569.68 / 555.62 / 555.40 | 541.51 | 555.62 | +2.6% |
+| mixed | 116.14 / 115.97 / 113.30 | 115.90 / 116.37 / 115.13 | 115.97 | 115.90 | -0.1% |
+| overflow_max4 | 733.37 / 735.13 / 727.35 | 754.57 / 760.63 / 760.21 | 733.37 | 760.21 | +3.7% |
+| graphemes_long | 598.80 / 604.92 / 598.38 | 629.59 / 632.32 / 635.98 | 598.80 | 632.32 | +5.6% (over +5%) |
+
+`graphemes_long` is above the +5% limit in AGENTS.md.
+It needs a decision before merge.
+No code was tuned.
+
+### napi binding vs Intl.Segmenter reference (mitata avg, HEAD)
+
+| Runtime | Case | thaiwrap us | reference us | Speedup |
+| --- | --- | --- | --- | --- |
+| Node 22.19.0 | short | 3.35 | 19.8 | 5.92x |
+| Node 22.19.0 | long | 869.47 | 5010 | 5.76x |
+| Node 24.22.2 | short | 3.46 | 11.0 | 3.19x |
+| Node 24.22.2 | long | 858.87 | 2630 | 3.06x |
+| Bun 1.4.4 | short | 2.90 | 9.7 | 3.34x |
+| Bun 1.4.4 | long | 714.08 | 2140 | 3.00x |
+
+The reference in `__test__/reference.mjs` got slower after `aa886db` (it builds a grapheme set per paragraph).
+These speedups are therefore larger than the ones measured before that commit.
+The reference breaks at word boundaries, so it does the same work as `thaiwrap` only on Thai-letter text such as these inputs.
+The release darwin-arm64 `.node` is 1,477,760 bytes.
