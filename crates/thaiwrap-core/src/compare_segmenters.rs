@@ -501,7 +501,8 @@ fn write_patterns(out: &mut String, sources: &[Source], group: char, shown: usiz
             let script = if thai { "Thai" } else { "non-Thai" };
             writeln!(
                 out,
-                "| {script} | {sub} | {} | {patterns} | {occurrences} |",
+                "| {script} | {} | {} | {patterns} | {occurrences} |",
+                cell(sub),
                 side.label()
             )
             .unwrap();

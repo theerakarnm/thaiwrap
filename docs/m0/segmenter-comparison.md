@@ -920,12 +920,12 @@ The other 873 patterns, rolled up:
 
 | Script | Sub-category | Side | Patterns | Occurrences |
 |---|---|---|---|---|
-| non-Thai | Thai|Latin-or-digit | word-only | 251 | 327 |
+| non-Thai | Thai\|Latin-or-digit | word-only | 251 | 327 |
 | non-Thai | emoji-or-symbol | word-only | 20 | 24 |
 | non-Thai | emoji-or-symbol | line-only | 1 | 1 |
 | non-Thai | other | line-only | 10 | 10 |
 | non-Thai | punctuation | word-only | 590 | 977 |
-| Thai | Thai|Thai | word-only | 1 | 1 |
+| Thai | Thai\|Thai | word-only | 1 | 1 |
 
 ## Group (a): differences the filter removes
 
@@ -1114,11 +1114,11 @@ The other 387 patterns, rolled up:
 
 | Script | Sub-category | Side | Patterns | Occurrences |
 |---|---|---|---|---|
-| non-Thai | Thai|Latin-or-digit | word-only | 94 | 1288 |
+| non-Thai | Thai\|Latin-or-digit | word-only | 94 | 1288 |
 | non-Thai | emoji-or-symbol | word-only | 64 | 128 |
 | non-Thai | other | word-only | 65 | 515 |
 | non-Thai | punctuation | word-only | 117 | 984 |
-| Thai | Thai|Thai | word-only | 47 | 604 |
+| Thai | Thai\|Thai | word-only | 47 | 604 |
 
 ## Differences in the matrix inputs
 
