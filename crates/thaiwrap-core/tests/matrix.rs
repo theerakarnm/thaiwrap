@@ -34,6 +34,20 @@ fn is_no_line_start(c: char) -> bool {
     )
 }
 
+/// Thai rules 1-3 on every line: no line starts with a mark or ะ า ำ ๆ ฯ, and none ends with a leading vowel.
+fn assert_thai_line_rules(lines: &[&str]) {
+    for line in lines {
+        assert!(
+            !line.starts_with(is_no_line_start),
+            "line starts with a mark or ะ า ำ ๆ ฯ: {line}"
+        );
+        assert!(
+            !line.ends_with(['เ', 'แ', 'โ', 'ใ', 'ไ']),
+            "line ends with a leading vowel: {line}"
+        );
+    }
+}
+
 /// Characters that continue the grapheme cluster before them, so no line may start with one.
 fn continues_grapheme(c: char) -> bool {
     matches!(c, '\u{0300}'..='\u{036F}' | '\u{200D}' | '\u{FE00}'..='\u{FE0F}')
@@ -68,7 +82,7 @@ fn naive_slice_regression_should_never_start_a_line_with_a_mark() {
                         !line.chars().next().is_some_and(is_no_line_start),
                         "max {max}: {line:?}"
                     );
-                    assert_ne!(line, "ื่อสาร ส่", "max {max}");
+                    assert_ne!(line, "ื่อสาร ส่ง", "max {max}");
                 }
             }
         }
@@ -376,46 +390,35 @@ fn print_observed_rows() {
         ("กรุงเทพฯ เป็นเมืองหลวง", 8, opts(DEFAULT.0, DEFAULT.1)),
         ("ผัก ผลไม้ ฯลฯ", 10, opts(DEFAULT.0, DEFAULT.1)),
     ] {
-        println!("{text:?} {max} -> {:?}", lines(text, max, o));
+        println!("{text} {max} -> {}", lines(text, max, o).join(" | "));
     }
 }
 
 #[test]
 fn observed_m2_exclamation_and_paren_should_match_recorded_output() {
     let got = lines("สวัสดี! (ภาษาไทย)", 8, opts(DEFAULT.0, DEFAULT.1));
-    assert!(got
-        .iter()
-        .all(|l| !l.starts_with(|c: char| "ะาำๆฯ".contains(c))));
+    assert_thai_line_rules(&got);
     assert_eq!(got, vec!["สวัสดี!", "(ภาษาไทย", ")"]);
 }
 
 #[test]
 fn observed_m4_thai_digits_should_match_recorded_output() {
     let got = lines("ปี๒๕๖๗", 3, opts(DEFAULT.0, DEFAULT.1));
-    assert!(got.iter().all(|l| {
-        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
-            && !l.ends_with(|c: char| "เแโใไ".contains(c))
-    }));
+    assert_thai_line_rules(&got);
     assert_eq!(got, vec!["ปี", "๒๕๖", "๗"]);
 }
 
 #[test]
 fn observed_m7_chat_should_match_recorded_output() {
     let got = lines("แชท คัดลอก", 3, opts(DEFAULT.0, DEFAULT.1));
-    assert!(got.iter().all(|l| {
-        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
-            && !l.ends_with(|c: char| "เแโใไ".contains(c))
-    }));
+    assert_thai_line_rules(&got);
     assert_eq!(got, vec!["แชท", "คัด", "ลอก"]);
 }
 
 #[test]
 fn observed_t2_maiyamok_after_space_should_match_recorded_output() {
     let got = lines("ของดี ๆ มีเยอะ", 5, opts(DEFAULT.0, DEFAULT.1));
-    assert!(got.iter().all(|l| {
-        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
-            && !l.ends_with(|c: char| "เแโใไ".contains(c))
-    }));
+    assert_thai_line_rules(&got);
     assert!(got.iter().all(|l| !l.starts_with('ๆ')));
     assert!(got.contains(&"ดี ๆ"));
     assert_eq!(got, vec!["ของ", "ดี ๆ", "มี", "เยอะ"]);
@@ -424,10 +427,7 @@ fn observed_t2_maiyamok_after_space_should_match_recorded_output() {
 #[test]
 fn observed_t3_rest_should_match_recorded_output() {
     let got = lines("กรุงเทพฯ เป็นเมืองหลวง", 8, opts(DEFAULT.0, DEFAULT.1));
-    assert!(got.iter().all(|l| {
-        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
-            && !l.ends_with(|c: char| "เแโใไ".contains(c))
-    }));
+    assert_thai_line_rules(&got);
     assert_eq!(got[0], "กรุงเทพฯ");
     assert_eq!(got, vec!["กรุงเทพฯ", "เป็น", "เมือง", "หลวง"]);
 }
@@ -435,10 +435,7 @@ fn observed_t3_rest_should_match_recorded_output() {
 #[test]
 fn observed_t4_paiyannoi_etc_should_match_recorded_output() {
     let got = lines("ผัก ผลไม้ ฯลฯ", 10, opts(DEFAULT.0, DEFAULT.1));
-    assert!(got.iter().all(|l| {
-        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
-            && !l.ends_with(|c: char| "เแโใไ".contains(c))
-    }));
+    assert_thai_line_rules(&got);
     assert!(got.iter().all(|l| !l.starts_with('ฯ')));
     assert_eq!(got, vec!["ผัก ผล", "ไม้ ฯลฯ"]);
 }
