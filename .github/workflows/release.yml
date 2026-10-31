@@ -1,10 +1,11 @@
 name: release
 on: { push: { branches: [main] } }
 permissions: { contents: read }
+concurrency: { group: release, cancel-in-progress: false }
 jobs:
   release-please:
     runs-on: ubuntu-24.04
-    permissions: { contents: write, pull-requests: write }
+    permissions: { contents: write, issues: write, pull-requests: write }
     outputs:
       release_created: ${{ steps.rp.outputs.release_created }}
       version: ${{ steps.rp.outputs.version }}
@@ -40,8 +41,11 @@ jobs:
         with: { name: js-binding }
       - run: bunx napi create-npm-dirs
       - run: bunx napi artifacts --output-dir artifacts
+      # napi pre-publish runs a bare `npm publish` for the platform packages, so the dist-tag comes from the environment.
       - run: bunx napi pre-publish -t npm --no-gh-release
-      - run: npm publish ${{ contains(needs.release-please.outputs.version, '-') && '--tag next' || '' }}
+        env: { NPM_CONFIG_TAG: "${{ contains(needs.release-please.outputs.version, '-') && 'next' || 'latest' }}" }
+      - run: npm publish
+        env: { NPM_CONFIG_TAG: "${{ contains(needs.release-please.outputs.version, '-') && 'next' || 'latest' }}" }
 
   smoke-from-registry:
     needs: [release-please, publish]
