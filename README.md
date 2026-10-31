@@ -172,6 +172,7 @@ Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebA
 ## Known limitations
 
 - Lone surrogates become U+FFFD.
+  On Bun 1.3.5 the text after a lone surrogate is also dropped, because of how Bun converts strings for native addons.
 - Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.
 - Output can differ from `Intl.Segmenter` because the dictionary ships inside the package.
 - A split inside a long word can leave a single final consonant on a line (for example `สร้า` / `ง`).
