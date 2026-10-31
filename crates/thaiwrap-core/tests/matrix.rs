@@ -19,6 +19,21 @@ fn default_lines(text: &str, max: usize) -> Vec<&str> {
     lines(text, max, WrapOptions::default())
 }
 
+/// Thai marks and ะ า ำ ๆ ฯ: no line may start with one.
+fn is_no_line_start(c: char) -> bool {
+    matches!(
+        c,
+        '\u{0E31}'
+            | '\u{0E34}'..='\u{0E3A}'
+            | '\u{0E47}'..='\u{0E4E}'
+            | '\u{0E30}'
+            | '\u{0E32}'
+            | '\u{0E33}'
+            | '\u{0E46}'
+            | '\u{0E2F}'
+    )
+}
+
 /// Characters that continue the grapheme cluster before them, so no line may start with one.
 fn continues_grapheme(c: char) -> bool {
     matches!(c, '\u{0300}'..='\u{036F}' | '\u{200D}' | '\u{FE00}'..='\u{FE0F}')
@@ -45,13 +60,12 @@ fn graphemes_should_count_marks_with_their_consonant() {
 
 #[test]
 fn naive_slice_regression_should_never_start_a_line_with_a_mark() {
-    let no_start = |c: char| matches!(c, '\u{0E31}' | '\u{0E34}'..='\u{0E3A}' | '\u{0E47}'..='\u{0E4E}' | '\u{0E30}' | '\u{0E32}' | '\u{0E33}' | '\u{0E46}' | '\u{0E2F}');
     for max in 1..=40 {
         for measure in [Measure::CodeUnits, Measure::Graphemes] {
             for overflow in [Overflow::Split, Overflow::Keep] {
                 for line in lines(ACCEPTANCE, max, opts(measure, overflow)) {
                     assert!(
-                        !line.chars().next().is_some_and(no_start),
+                        !line.chars().next().is_some_and(is_no_line_start),
                         "max {max}: {line:?}"
                     );
                     assert_ne!(line, "ื่อสาร ส่", "max {max}");
