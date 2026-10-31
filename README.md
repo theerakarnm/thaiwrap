@@ -13,8 +13,8 @@ Thai is written without spaces between words. Slicing a string every N character
 
 ```js
 // Naive: slice every 10 characters
-["กระบวนการส", "ื่อสาร ส่", "งมอบ และสร", "้างคุณค่า"]
-//              ^ line starts with an orphan vowel mark
+["กระบวนการส", "ื่อสาร ส่ง", "มอบ และสร้", "างคุณค่า"]
+//              ^ line 2 starts with an orphan vowel mark, and line 4 with an orphan vowel
 ```
 
 `thaiwrap` segments the text into words first, then fills each line greedily:
@@ -63,9 +63,13 @@ wrapThai(text: string, maxLength: number, options?: WrapOptions): string[]
 | `maxLength` | `number`      | Maximum length of each line. Must be a positive integer. |
 | `options`   | `WrapOptions` | Optional settings (see below).                |
 
-Returns an array of lines. Whitespace at the start and end of each line is trimmed.
+Returns an array of lines.
+Break spaces (spaces and ZWSP) at line edges are trimmed.
+No-break spaces (U+00A0, U+2007, U+202F) are content.
 
-Invalid input throws instead of crashing the process: a non-string `text` throws `TypeError`, and a `maxLength` that is not a positive integer throws `RangeError`.
+Invalid input throws instead of crashing the process.
+Wrong types throw `TypeError`: `text` is not a string, `maxLength` is not a number, or `options` is not an object.
+Wrong values throw `RangeError`: `maxLength` is not a finite integer >= 1, or `measure` or `overflow` is not one of the listed values.
 
 ### Options
 
@@ -128,7 +132,8 @@ This matters for the result. The same input wrapped at 10 gives different lines 
 ["กระบวนการ", "สื่อสาร ส่ง", "มอบ และ", "สร้างคุณค่า"]
 ```
 
-Use code units when you need to match a character limit (database columns, SMS, fixed-width fields). Use a visual measure when you are fitting text into a space on screen or paper.
+Use code units when you need to match a character limit (database columns, SMS, fixed-width fields).
+Use `measure: "graphemes"` when you fit text into a space on screen (closer to what you see).
 
 ## How it works
 

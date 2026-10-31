@@ -123,7 +123,9 @@ These are correctness rules, not style preferences. Tests must cover each one.
 2. **Never end a line with a leading vowel** (`เ แ โ ใ ไ`). They belong to the consonant after them.
 3. **Never start a line with** `ะ า ำ ๆ ฯ`.
 4. **Length is measured in UTF-16 code units by default** (same as JS `.length`). This is what makes the acceptance test pass. Other measures must be opt-in through options.
-5. **Whitespace at line edges is trimmed.** Spaces are break opportunities, not content.
+5. **Break spaces at line edges are trimmed.**
+   Break spaces (spaces and ZWSP) are break opportunities, not content.
+   No-break spaces (U+00A0, U+2007, U+202F) are content.
 6. **A word longer than `maxLength`** is handled by the documented overflow strategy, never by slicing at an arbitrary position.
    The default `split` cuts only at grapheme boundaries allowed by rules 1-3.
    A single unit that cannot be cut may exceed `maxLength`, alone on its line.
