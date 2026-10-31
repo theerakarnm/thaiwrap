@@ -33,9 +33,10 @@ export const invalidCases = [
   ...[[1e21, '1e+21'], [5e-324, '5e-324'], [-0, '0']].map(([n, shown]) => ({
     name: `maxLength message shows ${shown}`, args: ['ก', n], error: range(new RegExp(`^maxLength must be a positive integer, got ${shown.replace('+', '\\+')}$`)),
   })),
-  ...['10', undefined, null, 10n].map((v) => ({
+  ...['10', undefined, null].map((v) => ({
     name: `maxLength ${typeof v}`, args: ['ก', v], error: type(/^maxLength must be a number, got /),
   })),
+  { name: 'maxLength bigint', args: ['ก', 10n], error: type(/^maxLength must be a number, got bigint$/) },
   ...[123, null, undefined].map((v) => ({ name: `text ${v}`, args: [v, 10], error: type(/^text must be a string, got /) })),
   { name: 'text is checked first', args: [1, 0], error: type(/^text must be a string, got number$/) },
   { name: 'options string', args: ['ก', 10, 'x'], error: type(/^options must be an object, got string$/) },

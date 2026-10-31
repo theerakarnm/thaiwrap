@@ -163,7 +163,8 @@ fn type_name(value: &Unknown<'_>) -> &'static str {
         Ok(ValueType::Symbol) => "symbol",
         Ok(ValueType::Object) => "object",
         Ok(ValueType::Function) => "function",
-        // ValueType::BigInt exists only with the napi6 feature; napi4 reports BigInt as Unknown.
+        // Without the napi6 feature, BigInt is the only JS type that Node-API reports as Unknown.
+        Ok(ValueType::Unknown) => "bigint",
         _ => "an unsupported value",
     }
 }
