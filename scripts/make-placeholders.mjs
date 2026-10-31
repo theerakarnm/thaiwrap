@@ -30,9 +30,12 @@ const dirs = names.map((name) => {
 })
 
 console.log(`Wrote ${names.length} placeholder packages to ${dir}\n`)
+console.log('0. The npm organization `thaiwrap` must exist and you must be a member of it, or the six @thaiwrap/... publishes fail with E404.')
+console.log('   Create it at https://www.npmjs.com/org/create if needed.\n')
 console.log('1. Publish them yourself (interactive login with 2FA; no token goes into the repository or GitHub secrets):')
 console.log('   npm login')
 for (const d of dirs) console.log(`   (cd "${d}" && npm publish --access public)`)
-console.log('\n2. Within 2 days before the first release, add a trusted publisher to each (npm >= 11.15):')
+console.log('\n2. Within 2 days before the first release, add a trusted publisher to each (npm >= 11.15).')
+console.log('   npm expires unvalidated trusted-publisher configurations after 48 hours; if you miss it, run these again:')
 for (const n of names) console.log(`   npm trust github ${n} --file release.yml --repo ${repo} --env npm --allow-publish`)
 console.log('\n3. Afterwards run `npm logout` to remove the session token npm login stored in ~/.npmrc.')
