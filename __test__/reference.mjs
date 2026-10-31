@@ -48,8 +48,10 @@ function wrapParagraph(para, max, measure, overflow, out) {
     const [content] = trimBreakSpaces(s)
     if ([...content].some(isVisible)) out.push(content)
   }
+  // Like segment::units, keep only word breaks that are grapheme cluster boundaries.
+  const clusterStarts = new Set([...graphemes.segment(para)].map((g) => g.index))
   const ends = []
-  for (const { index } of words.segment(para)) if (index > 0 && allowed(para, index)) ends.push(index)
+  for (const { index } of words.segment(para)) if (index > 0 && clusterStarts.has(index) && allowed(para, index)) ends.push(index)
   ends.push(para.length)
   let start = 0, line = null, gap = ''
   for (const end of ends) {
@@ -73,7 +75,8 @@ function wrapParagraph(para, max, measure, overflow, out) {
   if (line) push(line.text)
 }
 
-export function wrapReference(text, maxLength, { measure = 'codeUnits', overflow = 'split' } = {}) {
+export function wrapReference(text, maxLength, options) {
+  const { measure = 'codeUnits', overflow = 'split' } = options ?? {}
   const paras = text.split(HARD_BREAK)
   if (paras.at(-1) === '') paras.pop()
   const out = []

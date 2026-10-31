@@ -5,6 +5,7 @@ import { computeParity, knownDiffsUrl } from './parity.mjs'
 
 const UPDATE = process.env.THAIWRAP_UPDATE_PARITY === '1'
 const key = (d) => `${d.id}@${d.maxLength}`
+const sameLines = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 const readKnown = (source) => {
   try {
     return JSON.parse(readFileSync(knownDiffsUrl(source), 'utf8'))
@@ -21,8 +22,13 @@ for (const result of computeParity()) {
     console.log(`${source}: ${result.inputs} inputs, ${diffs.length} differences, ${share} have at least one; node ${process.version}, icu ${process.versions.icu}`)
     const known = readKnown(source)
     if (UPDATE) {
-      const verdicts = new Map((known?.diffs ?? []).map((d) => [key(d), d.verdict]))
-      const next = { node: process.version, icu: process.versions.icu, diffs: diffs.map((d) => ({ ...d, verdict: verdicts.get(key(d)) ?? 'unreviewed' })) }
+      // A verdict applies to one pair of outputs, so keep it only when both are unchanged.
+      const previous = new Map((known?.diffs ?? []).map((d) => [key(d), d]))
+      const verdictFor = (d) => {
+        const old = previous.get(key(d))
+        return old && sameLines(old.rust, d.rust) && sameLines(old.reference, d.reference) ? old.verdict : 'unreviewed'
+      }
+      const next = { node: process.version, icu: process.versions.icu, diffs: diffs.map((d) => ({ ...d, verdict: verdictFor(d) })) }
       writeFileSync(knownDiffsUrl(source), JSON.stringify(next, null, 2) + '\n')
       return
     }
