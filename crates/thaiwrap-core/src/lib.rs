@@ -7,6 +7,8 @@
 #![deny(missing_docs)]
 #![warn(clippy::pedantic)]
 
+#[cfg(test)]
+mod compare_segmenters;
 mod lines;
 mod measure;
 mod segment;
