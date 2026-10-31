@@ -3,7 +3,7 @@ import { wrapThai } from '../index.js'
 import { describeLoadFailure } from '../platform.js'
 import { cases, invalidCases, platformCases } from './cases.mjs'
 
-for (const c of cases) test(c.name, () => expect(wrapThai(...c.args)).toEqual(c.expectedBun ?? c.expected))
+for (const c of cases) test(c.name, () => expect(wrapThai(...c.args)).toEqual(c.expected))
 for (const c of invalidCases)
   test(c.name, () => {
     let error

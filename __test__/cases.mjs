@@ -18,8 +18,7 @@ export const cases = [
   { name: 'blank: one between', args: ['ก\n\nข', 10], expected: ['ก', '', 'ข'] },
   { name: 'blank: edges dropped', args: ['\n\nก\n\n', 10], expected: ['ก'] },
   { name: 'blank: two between kept', args: ['ก\n\n\nข', 10], expected: ['ก', '', '', 'ข'] },
-  // Node (V8) replaces a lone surrogate with one U+FFFD. Bun's napi string conversion also drops the rest of the string.
-  { name: 'lone surrogate becomes U+FFFD in v0.1', args: ['a\uD800b', 10], expected: ['a\uFFFDb'], expectedBun: ['a\uFFFD'] },
+  { name: 'lone surrogate becomes U+FFFD in v0.1', args: ['a\uD800b', 10], expected: ['a\uFFFDb'] },
   { name: 'null options mean defaults', args: [ACCEPTANCE, 10, null], expected: ACCEPTANCE_LINES },
   { name: 'empty options mean defaults', args: [ACCEPTANCE, 10, {}], expected: ACCEPTANCE_LINES },
   { name: 'unknown option keys are ignored', args: [ACCEPTANCE, 10, { foo: 1 }], expected: ACCEPTANCE_LINES },
