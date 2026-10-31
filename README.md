@@ -69,7 +69,7 @@ No-break spaces (U+00A0, U+2007, U+202F) are content.
 
 Invalid input throws instead of crashing the process.
 Wrong types throw `TypeError`: `text` is not a string, `maxLength` is not a number, or `options` is not an object.
-Wrong values throw `RangeError`: `maxLength` is not a finite integer >= 1, or `measure` or `overflow` is not one of the listed values.
+Wrong values throw `RangeError`: `maxLength` is not an integer from 1 to `Number.MAX_SAFE_INTEGER`, or `measure` or `overflow` is not one of the listed values.
 
 ### Options
 
