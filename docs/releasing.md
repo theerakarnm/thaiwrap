@@ -12,15 +12,16 @@ Follow these steps in order.
    Without it, publishing the `@thaiwrap/...` packages fails with E404.
    Run `npm login` (interactive, with 2FA).
    Run `node scripts/make-placeholders.mjs` and publish the 7 placeholder packages yourself.
-   Run `npm logout` afterwards, because the session token stays in `~/.npmrc` otherwise.
    npm requires a package to exist before a trusted publisher can be configured for it.
 2. One-time, within 2 days before the first release: run the printed `npm trust github ... --allow-publish` commands.
    npm expires unvalidated trusted-publisher configurations after 48 hours.
    If you miss the window, run the `npm trust` commands again.
-   They need npm 11.15 or newer and 2FA.
+   They need npm 11.15 or newer and a logged-in session with 2FA.
    Or set the same values in each package's Settings -> Trusted publishing: workflow `release.yml`, environment `npm`, direct publish allowed.
    Trusted publisher configurations created after 2026-09-03 allow only staged publishing unless direct publish is enabled for the package, so `--allow-publish` matters.
    The workflow file name must be `release.yml`, because npm matches the workflow that runs `npm publish`.
+   Run `npm login` first if you logged out.
+   Run `npm logout` after the last `npm trust` command, because the session token stays in `~/.npmrc` otherwise.
 3. In GitHub, create the environment `npm` with yourself as required reviewer.
    Restrict its deployment branches to `main`, so only workflows on `main` can get the OIDC publish rights.
 4. Release: merge the release PR that release-please opened.
