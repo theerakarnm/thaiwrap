@@ -11,8 +11,11 @@ mod lines;
 mod measure;
 mod segment;
 mod thai;
+mod wrap;
 
 use std::fmt;
+
+pub use wrap::wrap;
 
 /// How the length of a line is measured.
 ///

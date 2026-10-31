@@ -1,0 +1,300 @@
+use thaiwrap_core::{wrap, Measure, Overflow, WrapError, WrapOptions};
+
+fn opts(measure: Measure, overflow: Overflow) -> WrapOptions {
+    let mut o = WrapOptions::default();
+    o.measure = measure;
+    o.overflow = overflow;
+    o
+}
+
+fn lines(text: &str, max: usize, o: WrapOptions) -> Vec<&str> {
+    wrap(text, max, &o)
+        .unwrap()
+        .into_iter()
+        .map(|r| &text[r])
+        .collect()
+}
+
+fn default_lines(text: &str, max: usize) -> Vec<&str> {
+    lines(text, max, WrapOptions::default())
+}
+
+const ACCEPTANCE: &str = "กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า";
+const DEFAULT: (Measure, Overflow) = (Measure::CodeUnits, Overflow::Split);
+
+#[test]
+fn acceptance_text_should_wrap_at_words_at_ten_code_units() {
+    assert_eq!(
+        default_lines(ACCEPTANCE, 10),
+        ["กระบวนการ", "สื่อสาร", "ส่งมอบ และ", "สร้าง", "คุณค่า"]
+    );
+}
+
+#[test]
+fn graphemes_should_count_marks_with_their_consonant() {
+    assert_eq!(
+        lines(ACCEPTANCE, 10, opts(Measure::Graphemes, Overflow::Split)),
+        ["กระบวนการ", "สื่อสาร ส่ง", "มอบ และ", "สร้างคุณค่า"]
+    );
+}
+
+#[test]
+fn naive_slice_regression_should_never_start_a_line_with_a_mark() {
+    let no_start = |c: char| matches!(c, '\u{0E31}' | '\u{0E34}'..='\u{0E3A}' | '\u{0E47}'..='\u{0E4E}' | '\u{0E30}' | '\u{0E32}' | '\u{0E33}' | '\u{0E46}' | '\u{0E2F}');
+    for max in 1..=40 {
+        for measure in [Measure::CodeUnits, Measure::Graphemes] {
+            for overflow in [Overflow::Split, Overflow::Keep] {
+                for line in lines(ACCEPTANCE, max, opts(measure, overflow)) {
+                    assert!(
+                        !line.chars().next().is_some_and(no_start),
+                        "max {max}: {line:?}"
+                    );
+                    assert_ne!(line, "ื่อสาร ส่", "max {max}");
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn split_should_cut_long_words_only_where_thai_rules_allow() {
+    assert_eq!(
+        lines(ACCEPTANCE, 4, opts(DEFAULT.0, DEFAULT.1)),
+        [
+            "กระบ",
+            "วนกา",
+            "ร",
+            "สื่อ",
+            "สาร",
+            "ส่ง",
+            "มอบ",
+            "และ",
+            "สร้า",
+            "ง",
+            "คุณ",
+            "ค่า"
+        ]
+    );
+}
+
+#[test]
+fn keep_should_leave_long_words_whole() {
+    assert_eq!(
+        lines(ACCEPTANCE, 4, opts(Measure::CodeUnits, Overflow::Keep)),
+        ["กระบวนการ", "สื่อสาร", "ส่ง", "มอบ", "และ", "สร้าง", "คุณค่า"]
+    );
+}
+
+#[test]
+fn huge_max_length_should_keep_the_text_on_one_line() {
+    assert_eq!(
+        default_lines(ACCEPTANCE, 2_147_483_648),
+        ["กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า"]
+    );
+}
+
+#[test]
+fn one_unsplittable_grapheme_should_exceed_max_length_alone() {
+    assert_eq!(default_lines("ที่", 1), ["ที่"]);
+}
+
+#[test]
+fn leading_vowel_and_no_line_start_letters_should_stay_with_their_neighbour() {
+    assert_eq!(default_lines("กา", 1), ["กา"]);
+    assert_eq!(default_lines("กำ", 1), ["กำ"]);
+    assert_eq!(default_lines("เกเก", 1), ["เก", "เก"]);
+}
+
+#[test]
+fn latin_words_should_split_per_character_or_stay_whole_with_keep() {
+    assert_eq!(default_lines("abc", 1), ["a", "b", "c"]);
+    assert_eq!(
+        lines("abc", 1, opts(Measure::CodeUnits, Overflow::Keep)),
+        ["abc"]
+    );
+    assert_eq!(
+        default_lines("supercalifragilistic", 5),
+        ["super", "calif", "ragil", "istic"]
+    );
+}
+
+#[test]
+fn family_emoji_should_stay_one_grapheme() {
+    assert_eq!(default_lines("👨‍👩‍👧", 2), ["👨‍👩‍👧"]);
+}
+
+#[test]
+fn mixed_latin_and_thai_should_break_at_spaces() {
+    assert_eq!(
+        default_lines("ใช้ React กับ TypeScript", 10),
+        ["ใช้ React", "กับ", "TypeScript"]
+    );
+}
+
+#[test]
+fn numbers_with_separators_should_stay_whole() {
+    assert_eq!(
+        default_lines("ราคา 1,250.50 บาท", 10),
+        ["ราคา", "1,250.50", "บาท"]
+    );
+}
+
+#[test]
+fn emoji_should_split_between_graphemes() {
+    assert_eq!(default_lines("👍👍👍", 4), ["👍👍", "👍"]);
+}
+
+#[test]
+fn family_emoji_should_count_as_one_grapheme() {
+    assert_eq!(
+        lines("👨‍👩‍👧 ok", 4, opts(Measure::Graphemes, Overflow::Split)),
+        ["👨‍👩‍👧 ok"]
+    );
+}
+
+#[test]
+fn corpus_emoji_with_thanthakhat_should_not_start_a_line_with_the_mark() {
+    assert_eq!(default_lines("😰😰😰์", 2), ["😰", "😰", "😰์"]);
+}
+
+#[test]
+fn maiyamok_should_stay_with_its_word() {
+    assert_eq!(default_lines("เด็กๆ เล่น", 5), ["เด็กๆ", "เล่น"]);
+}
+
+#[test]
+fn paiyannoi_should_stay_with_its_word() {
+    assert_eq!(default_lines("กรุงเทพฯ เป็นเมืองหลวง", 8)[0], "กรุงเทพฯ");
+}
+
+#[test]
+fn input_start_should_be_kept_as_written() {
+    assert_eq!(default_lines("่ก", 10), ["่ก"]);
+}
+
+#[test]
+fn a_mark_after_a_space_should_stay_on_the_line_of_the_space() {
+    assert_eq!(default_lines("ก ่ข", 1), ["ก ่", "ข"]);
+}
+
+#[test]
+fn zero_width_space_should_be_a_break_space() {
+    assert_eq!(default_lines("ส่งมอบ\u{200B}และ", 6), ["ส่งมอบ", "และ"]);
+}
+
+#[test]
+fn interior_spaces_should_be_kept_when_the_line_fits() {
+    assert_eq!(default_lines("ส่งมอบ   และ", 20), ["ส่งมอบ   และ"]);
+}
+
+#[test]
+fn interior_spaces_should_be_trimmed_at_a_wrap() {
+    assert_eq!(default_lines("ส่งมอบ   และ", 6), ["ส่งมอบ", "และ"]);
+}
+
+#[test]
+fn edge_spaces_should_be_trimmed() {
+    assert_eq!(default_lines("  สวัสดี  ", 20), ["สวัสดี"]);
+}
+
+#[test]
+fn line_feed_should_end_a_line() {
+    assert_eq!(
+        default_lines("บรรทัดแรก\nบรรทัดสอง", 50),
+        ["บรรทัดแรก", "บรรทัดสอง"]
+    );
+}
+
+#[test]
+fn spaces_around_a_line_feed_should_be_trimmed() {
+    assert_eq!(default_lines("ก   \n   ข", 10), ["ก", "ข"]);
+}
+
+#[test]
+fn empty_text_should_give_no_lines() {
+    assert_eq!(default_lines("", 10), Vec::<&str>::new());
+}
+
+#[test]
+fn spaces_only_should_give_no_lines() {
+    assert_eq!(default_lines("   ", 10), Vec::<&str>::new());
+}
+
+#[test]
+fn line_feeds_only_should_give_no_lines() {
+    assert_eq!(default_lines("\n\n", 10), Vec::<&str>::new());
+}
+
+#[test]
+fn one_blank_line_between_paragraphs_should_be_kept() {
+    assert_eq!(default_lines("ก\n\nข", 10), ["ก", "", "ข"]);
+}
+
+#[test]
+fn blank_lines_at_the_edges_should_be_dropped() {
+    assert_eq!(default_lines("\n\nก\n\n", 10), ["ก"]);
+}
+
+#[test]
+fn several_blank_lines_between_paragraphs_should_not_be_collapsed() {
+    assert_eq!(default_lines("ก\n\n\nข", 10), ["ก", "", "", "ข"]);
+}
+
+#[test]
+fn crlf_should_be_one_line_break() {
+    assert_eq!(default_lines("ก\r\n\r\nข\n", 10), ["ก", "", "ข"]);
+}
+
+#[test]
+fn no_break_space_should_never_break() {
+    assert_eq!(default_lines("ก\u{00A0}ข", 1), ["ก\u{00A0}ข"]);
+}
+
+#[test]
+fn no_break_space_should_keep_its_neighbours_on_one_line() {
+    assert_eq!(
+        default_lines("ราคา 100\u{00A0}บาท", 8),
+        ["ราคา", "100\u{00A0}บาท"]
+    );
+}
+
+#[test]
+fn no_break_space_and_spaces_only_should_give_no_lines() {
+    assert_eq!(default_lines("\u{00A0} \u{00A0}", 1), Vec::<&str>::new());
+}
+
+#[test]
+fn a_space_next_to_no_break_space_should_not_be_a_cut() {
+    assert_eq!(default_lines("a \u{00A0}b", 2), ["a \u{00A0}b"]);
+}
+
+#[test]
+fn a_cut_after_a_space_before_no_break_space_should_be_kept_when_legal() {
+    assert_eq!(default_lines("ก \u{00A0} ข", 1), ["ก \u{00A0}", "ข"]);
+}
+
+#[test]
+fn a_soft_wrapped_line_with_no_visible_character_should_be_dropped() {
+    assert_eq!(default_lines("x\n\u{00A0} ก", 2), ["x", "ก"]);
+}
+
+#[test]
+fn blank_looking_paragraphs_should_become_empty_lines() {
+    assert_eq!(default_lines("ก\n \n\u{00A0}\nข", 10), ["ก", "", "", "ข"]);
+}
+
+#[test]
+fn blank_looking_text_only_should_give_no_lines() {
+    assert_eq!(
+        default_lines(" \n\u{00A0}\n\u{200B}", 10),
+        Vec::<&str>::new()
+    );
+}
+
+#[test]
+fn max_length_zero_should_be_an_error() {
+    assert_eq!(
+        wrap("ก", 0, &WrapOptions::default()),
+        Err(WrapError::InvalidMaxLength)
+    );
+}
