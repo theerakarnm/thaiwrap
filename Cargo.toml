@@ -1,0 +1,17 @@
+[workspace]
+# Resolver 3 prefers dependency versions compatible with rust-version (MSRV job).
+resolver = "3"
+members = ["crates/thaiwrap-core"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+license = "MIT"
+repository = "https://github.com/theerakarnm/thaiwrap"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = 3
