@@ -15,6 +15,8 @@ async function get(url, init) {
   return res;
 }
 
+const HEADING = /^=+ .* =+$/;
+
 const lines = (text) => text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l !== "");
 
 async function wisesight() {
@@ -58,7 +60,11 @@ async function wikipedia() {
   const attribution = [
     "# Attribution",
     "",
-    "Excerpts from Thai Wikipedia (https://th.wikipedia.org), fetched once as a snapshot of the current revisions.",
+    "Excerpts from Thai Wikipedia (https://th.wikipedia.org) by Wikipedia contributors, licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).",
+    "Changes were made.",
+    "Each article is the plain-text extract of the revision listed below, with markup, references, links and tables removed.",
+    "From each extract, `lines.txt` keeps the first 10 paragraphs of at least 40 UTF-16 code units, after trimming each line and dropping section heading lines (`== ... ==`).",
+    "The other files in this directory (`snapshot.txt`, `derived/`, `parity-known-diffs.json`) are adaptations of this text and are shared under CC BY-SA 4.0 too.",
     "",
   ];
   for (const title of TITLES) {
@@ -68,10 +74,13 @@ async function wikipedia() {
     const data = await (await get(url, { headers: { "User-Agent": UA } })).json();
     const page = data.query.pages[0];
     const revid = page.revisions[0].revid;
-    const paragraphs = lines(page.extract).filter((l) => l.length >= MIN_LEN).slice(0, 10);
+    const paragraphs = lines(page.extract)
+      .filter((l) => !HEADING.test(l) && l.length >= MIN_LEN)
+      .slice(0, 10);
     out.push(...paragraphs);
+    const history = `https://th.wikipedia.org/w/index.php?title=${encodeURIComponent(page.title.replaceAll(" ", "_"))}&action=history`;
     attribution.push(
-      `- ${page.title}: revision ${revid}, https://th.wikipedia.org/w/index.php?oldid=${revid}, CC BY-SA 4.0, text excerpted without modification`,
+      `- ${page.title}: revision ${revid} (https://th.wikipedia.org/w/index.php?oldid=${revid}), authors in ${history}`,
     );
   }
   await writeFile(join(dir, "lines.txt"), out.join("\n") + "\n");

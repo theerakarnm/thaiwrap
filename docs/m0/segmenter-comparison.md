@@ -18,15 +18,15 @@ Compared 1741 inputs (wisesight 1493, wikipedia-th 200, matrix 48) and 1759 para
 
 | Script | (a) removed by filter | (b) remain |
 |---|---|---|
-| Thai | 4220 | 1 |
-| non-Thai | 4273 | 2947 |
+| Thai | 4254 | 1 |
+| non-Thai | 4291 | 2945 |
 
 Group (a) by rule:
 
 | Rule | Count |
 |---|---|
 | grapheme | 3 |
-| space-normalization | 8483 |
+| space-normalization | 8535 |
 | no-break | 5 |
 | thai-filter | 2 |
 
@@ -37,7 +37,7 @@ Group (b) by side and sub-category:
 | word-only | Thai\|Latin-or-digit | 450 |
 | word-only | Thai\|Thai | 1 |
 | word-only | emoji-or-symbol | 33 |
-| word-only | punctuation | 2449 |
+| word-only | punctuation | 2447 |
 | line-only | emoji-or-symbol | 1 |
 | line-only | other | 14 |
 
@@ -49,13 +49,13 @@ Group (b) by side and sub-category:
     - ` ยไปแล้ว...⟨|⟩.เมื่อไหร่ ` (wisesight:17)
     - ` ช้าง.⟨|⟩..... กินแ ` (wisesight:40)
     - ` ช้าง..⟨|⟩.... กินแล ` (wisesight:40)
-2. non-Thai / punctuation / word-only / before ` ศ ` / after ` . ` - 96 occurrences
+2. non-Thai / punctuation / word-only / before ` ศ ` / after ` . ` - 97 occurrences
     - ` รุ่นปี ค.ศ⟨|⟩. 2016ค่ะ  ` (wisesight:309)
     - ` ะเทศปี พ.ศ⟨|⟩. 2561 จะอ ` (wisesight:398)
     - wikipedia-th:14:404
     - wikipedia-th:14:759
     - wikipedia-th:16:154
-3. non-Thai / punctuation / word-only / before ` . ` / after ` ศ ` - 95 occurrences
+3. non-Thai / punctuation / word-only / before ` . ` / after ` ศ ` - 96 occurrences
     - ` ดรุ่นปี ค.⟨|⟩ศ. 2016ค่ะ ` (wisesight:309)
     - ` ระเทศปี พ.⟨|⟩ศ. 2561 จะ ` (wisesight:398)
     - wikipedia-th:14:401
@@ -97,18 +97,18 @@ Group (b) by side and sub-category:
     - ` รื่องราว #⟨|⟩TrueToMySh ` (wisesight:273)
     - ` lParisTH #⟨|⟩TrueMatch  ` (wisesight:273)
     - ` rueMatch #⟨|⟩TrueToMySh ` (wisesight:273)
-10. non-Thai / punctuation / word-only / before ` ␠ ` / after ` : ` - 19 occurrences
-    - ` ช ⟨|⟩: ไปกิน บา ` (wisesight:50)
-    - ` ่ ทุกที ญ ⟨|⟩: อร่อยมาก ` (wisesight:50)
-    - ` ก ละสิ! ช ⟨|⟩: ได้น้อย! ` (wisesight:50)
-    - ` มีความลับ ⟨|⟩: ‘ซีพี’ ห ` (wisesight:248)
-    - ` อายุ LINE ⟨|⟩: @daily-c ` (wisesight:346)
-11. non-Thai / punctuation / word-only / before ` ค ` / after ` . ` - 19 occurrences
+10. non-Thai / punctuation / word-only / before ` ค ` / after ` . ` - 20 occurrences
     - ` ย แต่ก็มีค⟨|⟩.พยายามผลั ` (wisesight:192)
     - ` โดรุ่นปี ค⟨|⟩.ศ. 2016ค่ ` (wisesight:309)
     - ` 5 ม.ค⟨|⟩.62 l สภาพ ` (wisesight:467)
     - ` ี่ 10 มี.ค⟨|⟩. ทำไมไม่ไ ` (wisesight:926)
     - ` คล้ายซีวิค⟨|⟩.. ` (wisesight:1016)
+11. non-Thai / punctuation / word-only / before ` ␠ ` / after ` : ` - 19 occurrences
+    - ` ช ⟨|⟩: ไปกิน บา ` (wisesight:50)
+    - ` ่ ทุกที ญ ⟨|⟩: อร่อยมาก ` (wisesight:50)
+    - ` ก ละสิ! ช ⟨|⟩: ได้น้อย! ` (wisesight:50)
+    - ` มีความลับ ⟨|⟩: ‘ซีพี’ ห ` (wisesight:248)
+    - ` อายุ LINE ⟨|⟩: @daily-c ` (wisesight:346)
 12. non-Thai / punctuation / word-only / before ` ม ` / after ` . ` - 19 occurrences
     - ` เลยล่ะ กทม⟨|⟩.มีแผนีถไฟ ` (wisesight:14)
     - ` เป็นเด็ก ม⟨|⟩.6 ที่เกลี ` (wisesight:152)
@@ -235,492 +235,492 @@ Group (b) by side and sub-category:
     - `  💲 รับ 600⟨|⟩-3000฿/วัน ` (wisesight:320)
     - ` el/next-30⟨|⟩-days/himm ` (wisesight:418)
     - ` avatar-360⟨|⟩-all-dimen ` (wisesight:418)
-33. non-Thai / punctuation / word-only / before ` = ` / after ` = ` - 10 occurrences
-    - wikipedia-th:156:1
-    - wikipedia-th:156:110
-    - wikipedia-th:158:1
-    - wikipedia-th:158:2
-    - wikipedia-th:158:111
-34. non-Thai / punctuation / word-only / before ` ง ` / after ` ) ` - 10 occurrences
+33. non-Thai / punctuation / word-only / before ` ง ` / after ` ) ` - 10 occurrences
     - ` ะบะดัดแปลง⟨|⟩) ซึ่งเป็น ` (wisesight:398)
     - ` ะบะดัดแปลง⟨|⟩) ซึ่งเป็น ` (wisesight:398)
     - `  2 ที่นั่ง⟨|⟩) ประกาศผล ` (wisesight:424)
     - ` ั้น บ้านดง⟨|⟩) วันที่ 2 ` (wisesight:431)
     - `  (รามคำแหง⟨|⟩) ร่วมรายก ` (wisesight:979)
-35. non-Thai / punctuation / word-only / before ` ย ` / after ` ) ` - 10 occurrences
+34. non-Thai / punctuation / word-only / before ` ย ` / after ` ) ` - 10 occurrences
     - ` วีป เอเชีย⟨|⟩) 'พบ' ปอง ` (wisesight:431)
     - ` (ประเทศไทย⟨|⟩) จำกัด ผู ` (wisesight:454)
     - ` ยอะไปหน่อย⟨|⟩) แต่มีเท็ ` (wisesight:570)
     - wikipedia-th:91:144
     - wikipedia-th:104:192
-36. non-Thai / punctuation / word-only / before ` ย ` / after ` . ` - 10 occurrences
+35. non-Thai / punctuation / word-only / before ` ย ` / after ` . ` - 10 occurrences
     - ` วกเกือบตาย⟨|⟩...... เบี ` (wisesight:40)
     - ` ต่งอะไรเลย⟨|⟩. Honda ci ` (wisesight:188)
     - ` ะ. ขาด เลย⟨|⟩. มาสด้าชน ` (wisesight:410)
     - ` รับจับมั้ย⟨|⟩.....ผมนิอ ` (wisesight:433)
     - ` ร 24-25 พย⟨|⟩. 60 ที่โร ` (wisesight:447)
-37. non-Thai / punctuation / word-only / before ` - ` / after ` 8 ` - 9 occurrences
+36. non-Thai / punctuation / word-only / before ` - ` / after ` 8 ` - 9 occurrences
     - ` แม่งตัด 7-⟨|⟩8 รอบ ไอห่ ` (wisesight:133)
     - ` 222 / 088-⟨|⟩888-8888 # ` (wisesight:263)
     - ` / 088-888-⟨|⟩8888 #Lizm ` (wisesight:263)
     - ` CDC : 088-⟨|⟩888-8888 T ` (wisesight:458)
     - ` : 088-888-⟨|⟩8888 The N ` (wisesight:458)
-38. non-Thai / punctuation / word-only / before ` . ` / after ` เ ` - 9 occurrences
+37. non-Thai / punctuation / word-only / before ` . ` / after ` เ ` - 9 occurrences
     - ` ไปแล้ว....⟨|⟩เมื่อไหร่จ ` (wisesight:17)
     - ` ตีเส้นถนน.⟨|⟩เลย มีแค่เ ` (wisesight:237)
     - ` เส้นทาง อ.⟨|⟩เมือง เชื่ ` (wisesight:275)
     - ` ลังงาน หน.⟨|⟩เลิศ พรรคส ` (wisesight:347)
     - ` ตึงเฒ่า จ.⟨|⟩เชียงใหม่  ` (wisesight:413)
-39. non-Thai / punctuation / word-only / before ` 8 ` / after ` - ` - 9 occurrences
+38. non-Thai / punctuation / word-only / before ` 8 ` / after ` - ` - 9 occurrences
     - ` 2222 / 088⟨|⟩-888-8888  ` (wisesight:263)
     - `  / 088-888⟨|⟩-8888 #Liz ` (wisesight:263)
     - `  CDC : 088⟨|⟩-888-8888  ` (wisesight:458)
     - `  : 088-888⟨|⟩-8888 The  ` (wisesight:458)
     - ` Nine : 088⟨|⟩-888-8888  ` (wisesight:458)
-40. non-Thai / punctuation / word-only / before ` ง ` / after ` . ` - 9 occurrences
+39. non-Thai / punctuation / word-only / before ` ง ` / after ` . ` - 9 occurrences
     - ` ช้าง⟨|⟩...... กิน ` (wisesight:40)
     - `  19.10 พนง⟨|⟩. แจ้งว่าใ ` (wisesight:229)
     - ` วจีนมา พนง⟨|⟩. เอาป้ายป ` (wisesight:229)
     - ` 5 สิ่ง⟨|⟩...รู้เท่า ` (wisesight:250)
     - ` ยจิงเรื่อง⟨|⟩..ปิ้ง..ย่ ` (wisesight:582)
-41. non-Thai / punctuation / word-only / before ` บ ` / after ` . ` - 9 occurrences
+40. non-Thai / punctuation / word-only / before ` บ ` / after ` . ` - 9 occurrences
     - ` ฮลูบอยครับ⟨|⟩. ส่วนเรื่ ` (wisesight:117)
     - ` นัลแล้วแบบ⟨|⟩... ฮ่วย ` (wisesight:121)
     - ` มรักษาครับ⟨|⟩... อันนี้ ` (wisesight:180)
     - ` นจับตาครับ⟨|⟩... ว่ากฎห ` (wisesight:192)
     - ` บ⟨|⟩.ดิอาจิโอ  ` (wisesight:454)
-42. non-Thai / punctuation / word-only / before ` # ` / after ` M ` - 8 occurrences
+41. non-Thai / punctuation / word-only / before ` # ` / after ` M ` - 8 occurrences
     - ` สติกอะคะ #⟨|⟩Mk โลตัสพร ` (wisesight:102)
     - ` yotaBuzz #⟨|⟩MOTORSHOWย ` (wisesight:535)
     - `  #Nissan #⟨|⟩Maxima ` (wisesight:1077)
     - ` yotaBuzz #⟨|⟩MOTORSHOWย ` (wisesight:1188)
     - ` yotaBuzz #⟨|⟩MOTORSHOWย ` (wisesight:1284)
-43. non-Thai / punctuation / word-only / before ` # ` / after ` S ` - 8 occurrences
+42. non-Thai / punctuation / word-only / before ` # ` / after ` S ` - 8 occurrences
     - ` #ChivasX #⟨|⟩ShareChiva ` (wisesight:263)
     - ` 0,250 ใน #⟨|⟩ShopeeTH ต ` (wisesight:317)
     - ` ne #song #⟨|⟩SangSom #G ` (wisesight:348)
     - ` กกลับไป… #⟨|⟩SangSom #Z ` (wisesight:413)
     - ` Original #⟨|⟩SiamParago ` (wisesight:424)
-44. non-Thai / punctuation / word-only / before ` # ` / after ` c ` - 8 occurrences
+43. non-Thai / punctuation / word-only / before ` # ` / after ` c ` - 8 occurrences
     - ` bestbeer #⟨|⟩craftbeer  ` (wisesight:458)
     - ` raftbeer #⟨|⟩craft #cel ` (wisesight:458)
     - ` r #craft #⟨|⟩celebrate  ` (wisesight:458)
     - ` elebrate #⟨|⟩countdown  ` (wisesight:458)
     - ` earparty #⟨|⟩cdc #theni ` (wisesight:458)
-45. non-Thai / punctuation / word-only / before ` # ` / after ` เ ` - 8 occurrences
+44. non-Thai / punctuation / word-only / before ` # ` / after ` เ ` - 8 occurrences
     - `  Kiehl’s #⟨|⟩เพิ่งซื้อม ` (wisesight:35)
     - ` รุ่นใหม่ #⟨|⟩เลื่อนแม่ม ` (wisesight:63)
     - ` ม่หยุด ‼️#⟨|⟩เบื่อ #รำ  ` (wisesight:233)
     - ` ________ #⟨|⟩เบบี้ฟางรี ` (wisesight:341)
     - ` เพื่อไทย #⟨|⟩เลือกตั้ง6 ` (wisesight:399)
-46. non-Thai / punctuation / word-only / before ` - ` / after ` 1 ` - 8 occurrences
+45. non-Thai / punctuation / word-only / before ` - ` / after ` 1 ` - 8 occurrences
     - ` อบรอนาน10-⟨|⟩15นาที กิน ` (wisesight:51)
     - ` อนอายุ 18-⟨|⟩19 ปี ลงทุ ` (wisesight:543)
     - ` คาะ 1.296-⟨|⟩1.539 ล้าน ` (wisesight:1176)
     - ` เวลา11.00-⟨|⟩12.00 น. M ` (wisesight:1190)
     - ` ลงไป7-⟨|⟩11อ้ายอยาก ` (wisesight:1260)
-47. non-Thai / punctuation / word-only / before ` - ` / after ` 3 ` - 8 occurrences
+46. non-Thai / punctuation / word-only / before ` - ` / after ` 3 ` - 8 occurrences
     - ` ว่าของ CX-⟨|⟩3 แต่วัสดุ ` (wisesight:78)
     - `  ซีเอ็กซ์-⟨|⟩3 สนุกกันอ ` (wisesight:268)
     - ` สูงกว่า 2-⟨|⟩3 เท่าของเ ` (wisesight:310)
     - ` 💲 รับ 600-⟨|⟩3000฿/วัน  ` (wisesight:320)
     - ` avel/next-⟨|⟩30-days/hi ` (wisesight:418)
-48. non-Thai / punctuation / word-only / before ` . ` / after ` ต ` - 8 occurrences
+47. non-Thai / punctuation / word-only / before ` . ` / after ` ต ` - 8 occurrences
     - ` ่า 130 ซม.⟨|⟩ต้องจับลูก ` (wisesight:202)
     - ` ะเทศนี้...⟨|⟩ตอแหล บิดเ ` (wisesight:245)
     - ` าแต่ท่าพน.⟨|⟩ต้องบีทีเอ ` (wisesight:504)
     - ` นมาสด้า...⟨|⟩ต้องมาสด้า ` (wisesight:994)
     - ` มาสด้า....⟨|⟩ต้องมาสด้า ` (wisesight:1025)
-49. non-Thai / punctuation / word-only / before ` 5 ` / after ` + ` - 8 occurrences
+48. non-Thai / punctuation / word-only / before ` 5 ` / after ` + ` - 8 occurrences
     - ` ้วยแหง 555⟨|⟩+ แต่กูก็เ ` (wisesight:66)
     - ` เต็มตัว555⟨|⟩+ ` (wisesight:88)
     - ` เปลือง 555⟨|⟩+ ` (wisesight:190)
     - `  นี้มะ 555⟨|⟩+ ` (wisesight:366)
     - ` บีก้อน5555⟨|⟩+ ` (wisesight:1052)
-50. non-Thai / punctuation / word-only / before ` h ` / after ` / ` - 8 occurrences
+49. non-Thai / punctuation / word-only / before ` h ` / after ` / ` - 8 occurrences
     - ` zada.co.th⟨|⟩/eucerin-o ` (wisesight:278)
     - ` erin.co.th⟨|⟩/local/th/ ` (wisesight:278)
     - ` h/local/th⟨|⟩/promotion ` (wisesight:278)
     - ` opee.co.th⟨|⟩/zaniazani ` (wisesight:317)
     - ` tors.co.th⟨|⟩/th/car/al ` (wisesight:391)
-51. non-Thai / punctuation / word-only / before ` m ` / after ` / ` - 8 occurrences
+50. non-Thai / punctuation / word-only / before ` m ` / after ` / ` - 8 occurrences
     - ` ttakij.com⟨|⟩/content/2 ` (wisesight:248)
     - ` .chevy.com⟨|⟩/lj4cl ค่ะ ` (wisesight:309)
     - ` sanook.com⟨|⟩/playlist/ ` (wisesight:348)
     - ` cebook.com⟨|⟩/beautyman ` (wisesight:355)
     - ` oparty.com⟨|⟩/travel/ne ` (wisesight:418)
-52. non-Thai / punctuation / word-only / before ` p ` / after ` : ` - 8 occurrences
+51. non-Thai / punctuation / word-only / before ` p ` / after ` : ` - 8 occurrences
     - ` านั้น http⟨|⟩://www.tha ` (wisesight:248)
     - ` คลิก: http⟨|⟩://bit.ly/ ` (wisesight:273)
     - ` ด้ที่ http⟨|⟩://s.chevy ` (wisesight:309)
     - ` C"... http⟨|⟩://fb.me/2 ` (wisesight:338)
     - ` ี่ >> http⟨|⟩://music.s ` (wisesight:348)
-53. non-Thai / punctuation / word-only / before ` ม ` / after ` " ` - 8 occurrences
+52. non-Thai / punctuation / word-only / before ` ม ` / after ` " ` - 8 occurrences
     - wikipedia-th:27:113
     - wikipedia-th:27:603
     - wikipedia-th:27:640
     - wikipedia-th:28:92
     - wikipedia-th:28:819
-54. non-Thai / punctuation / word-only / before ` ◌์ ` / after ` ) ` - 8 occurrences
+53. non-Thai / punctuation / word-only / before ` ◌์ ` / after ` ) ` - 8 occurrences
     - ` ทางออนไลน์⟨|⟩) N7 - สำห ` (wisesight:273)
     - ` da_(รถยนต์⟨|⟩) ` (wisesight:940)
     - wikipedia-th:21:1466
     - wikipedia-th:113:1335
     - wikipedia-th:113:1846
-55. non-Thai / punctuation / word-only / before ` ◌์ ` / after ` , ` - 8 occurrences
+54. non-Thai / punctuation / word-only / before ` ◌์ ` / after ` , ` - 8 occurrences
     - ` น นพลักษณ์⟨|⟩, แก้ว Mas ` (wisesight:273)
     - ` ียบ ลาแมร์⟨|⟩, ดิออร์,  ` (wisesight:446)
     - ` ร์, ดิออร์⟨|⟩, อีฟแซง ค ` (wisesight:446)
     - ` ียบ ลาแมร์⟨|⟩, ดิออร์,  ` (wisesight:1446)
     - ` ร์, ดิออร์⟨|⟩, อีฟแซง ค ` (wisesight:1446)
-56. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` 2 ` - 7 occurrences
+55. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` 2 ` - 7 occurrences
     - ` ็สั่งมากิน⟨|⟩2คนกับแฟน  ` (wisesight:216)
     - ` 3ทุ่ม เบลน⟨|⟩285 กลมละ  ` (wisesight:368)
     - ` ลก็ได้เกิน⟨|⟩20ทุกคันนะ ` (wisesight:443)
     - ` เบน⟨|⟩285 แม่โขง ` (wisesight:649)
     - ` VIP รายงาน⟨|⟩2คนไช่ไหมค ` (wisesight:696)
-57. non-Thai / Thai|Latin-or-digit / word-only / before ` า ` / after ` 2 ` - 7 occurrences
+56. non-Thai / Thai|Latin-or-digit / word-only / before ` า ` / after ` 2 ` - 7 occurrences
     - ` ่เอามาสด้า⟨|⟩2ละ ` (wisesight:134)
     - ` กว่ามาสด้า⟨|⟩2นิดๆ. อยู ` (wisesight:383)
     - ` อียดมาสด้า⟨|⟩2ครับ ` (wisesight:437)
     - ` ิตร มาสด้า⟨|⟩2 กรุงเทพ- ` (wisesight:443)
     - ` อียดมาสด้า⟨|⟩2ค่ะ ` (wisesight:760)
-58. non-Thai / Thai|Latin-or-digit / word-only / before ` า ` / after ` 5 ` - 7 occurrences
+57. non-Thai / Thai|Latin-or-digit / word-only / before ` า ` / after ` 5 ` - 7 occurrences
     - ` ด.มา แต่มา⟨|⟩5วันยังไม่ ` (wisesight:233)
     - ` มทำศูนย์มา⟨|⟩5-6ปี จนออ ` (wisesight:416)
     - ` กว่าพิซซ่า⟨|⟩555 ` (wisesight:642)
     - ` ่ที่รักน้า⟨|⟩5555 ` (wisesight:1379)
     - ` หิวไมอ่า⟨|⟩555ตั้กกี้ ` (wisesight:1425)
-59. non-Thai / punctuation / word-only / before ` ␠ ` / after ` ? ` - 7 occurrences
+58. non-Thai / punctuation / word-only / before ` ␠ ` / after ` ? ` - 7 occurrences
     - ` ไมถึงฟ้อง ⟨|⟩?! ` (wisesight:104)
     - ` รียลฮีโร่ ⟨|⟩? ▪ ร่วมสน ` (wisesight:344)
     - ` จ่ายกี่คน ⟨|⟩?? ` (wisesight:461)
     - ` มั้ยเนี่ย ⟨|⟩? ` (wisesight:616)
     - ` ันมั้ยล่ะ ⟨|⟩?? Cheers' ` (wisesight:619)
-60. non-Thai / punctuation / word-only / before ` # ` / after ` H ` - 7 occurrences
+59. non-Thai / punctuation / word-only / before ` # ` / after ` H ` - 7 occurrences
     - `  แล้ว!!! #⟨|⟩HowDareYou ` (wisesight:287)
     - ` wDareYou #⟨|⟩HondaxLook ` (wisesight:287)
     - ` ี่หายไป😊 #⟨|⟩HiluxRevoT ` (wisesight:370)
     - ` มืออาชีพ #⟨|⟩HimmapanAv ` (wisesight:418)
     - ` ไหร่ครับ #⟨|⟩Honda_(รถย ` (wisesight:940)
-61. non-Thai / punctuation / word-only / before ` # ` / after ` ไ ` - 7 occurrences
+60. non-Thai / punctuation / word-only / before ` # ` / after ` ไ ` - 7 occurrences
     - ` ื้อมาเอง #⟨|⟩ไว้อาลัย ` (wisesight:35)
     - ` #⟨|⟩ไม่แพงเอาเ ` (wisesight:36)
     - ` ันต้องมี #⟨|⟩ไว้รีวิวห้ ` (wisesight:730)
     - ` ียนนะคะ😙 #⟨|⟩ไว้รีวิวห้ ` (wisesight:770)
     - ` คมั้ยงับ #⟨|⟩ไว้รีวิวห้ ` (wisesight:795)
-62. non-Thai / punctuation / word-only / before ` ( ` / after ` A ` - 7 occurrences
+61. non-Thai / punctuation / word-only / before ` ( ` / after ` A ` - 7 occurrences
     - ` ประดิษฐ์ (⟨|⟩AI) เพื่อช ` (wisesight:469)
     - wikipedia-th:98:104
     - wikipedia-th:99:125
     - wikipedia-th:99:224
-    - wikipedia-th:159:2286
-63. non-Thai / punctuation / word-only / before ` - ` / after ` 2 ` - 7 occurrences
+    - wikipedia-th:157:2286
+62. non-Thai / punctuation / word-only / before ` - ` / after ` 2 ` - 7 occurrences
     - ` แต่วันนี้-⟨|⟩20 มีนาคมน ` (wisesight:424)
     - ` ่มเติม 02-⟨|⟩222-2222 ไ ` (wisesight:438)
     - ` ิม 02-222-⟨|⟩2222 ได้เล ` (wisesight:438)
     - ` ิชาการ 24-⟨|⟩25 พย. 60  ` (wisesight:447)
     - ` ่ได้แค่ 1-⟨|⟩2 เดือนเสี ` (wisesight:988)
-64. non-Thai / punctuation / word-only / before ` . ` / after ` - ` - 7 occurrences
+63. non-Thai / punctuation / word-only / before ` . ` / after ` - ` - 7 occurrences
     - ` efill 399.⟨|⟩- และ Supe ` (wisesight:279)
     - ` efill 499.⟨|⟩- ที่สาขาเ ` (wisesight:279)
     - ` efill 399.⟨|⟩- และ Supe ` (wisesight:279)
     - ` efill 499.⟨|⟩- (ระยะเวล ` (wisesight:279)
     - ` efill 399.⟨|⟩- และ Supe ` (wisesight:406)
-65. non-Thai / punctuation / word-only / before ` 9 ` / after ` . ` - 7 occurrences
+64. non-Thai / punctuation / word-only / before ` 9 ` / after ` . ` - 7 occurrences
     - ` Refill 399⟨|⟩.- และ Sup ` (wisesight:279)
     - ` Refill 499⟨|⟩.- ที่สาขา ` (wisesight:279)
     - ` Refill 399⟨|⟩.- และ Sup ` (wisesight:279)
     - ` Refill 499⟨|⟩.- (ระยะเว ` (wisesight:279)
     - ` Refill 399⟨|⟩.- และ Sup ` (wisesight:406)
-66. non-Thai / punctuation / word-only / before ` s ` / after ` ) ` - 7 occurrences
+65. non-Thai / punctuation / word-only / before ` s ` / after ` ) ` - 7 occurrences
     - ` ้ Hi Class⟨|⟩)' วันที่  ` (wisesight:402)
     - wikipedia-th:4:96
     - wikipedia-th:15:1560
     - wikipedia-th:37:695
     - wikipedia-th:53:108
-67. non-Thai / punctuation / word-only / before ` s ` / after ` : ` - 7 occurrences
+66. non-Thai / punctuation / word-only / before ` s ` / after ` : ` - 7 occurrences
     - `  ที่ https⟨|⟩://www.laz ` (wisesight:278)
     - ` ้ที่ https⟨|⟩://www.euc ` (wisesight:278)
     - ` นี้! https⟨|⟩://shopee. ` (wisesight:317)
     - ` ับ : https⟨|⟩://www.mit ` (wisesight:391)
     - ` https⟨|⟩://www.you ` (wisesight:485)
-68. non-Thai / punctuation / word-only / before ` ย ` / after ` " ` - 7 occurrences
+67. non-Thai / punctuation / word-only / before ` ย ` / after ` " ` - 7 occurrences
     - wikipedia-th:27:696
     - wikipedia-th:28:850
     - wikipedia-th:29:99
     - wikipedia-th:29:581
     - wikipedia-th:104:244
-69. non-Thai / punctuation / word-only / before ` ษ ` / after ` : ` - 7 occurrences
+68. non-Thai / punctuation / word-only / before ` ษ ` / after ` : ` - 7 occurrences
     - wikipedia-th:131:53
     - wikipedia-th:131:188
     - wikipedia-th:131:257
     - wikipedia-th:141:50
     - wikipedia-th:151:53
-70. non-Thai / punctuation / word-only / before ` า ` / after ` ) ` - 7 occurrences
+69. non-Thai / punctuation / word-only / before ` า ` / after ` ) ` - 7 occurrences
     - ` ะจำเดือนมา⟨|⟩) แนะนำเข้ ` (wisesight:282)
     - wikipedia-th:47:1236
     - wikipedia-th:52:200
     - wikipedia-th:64:1012
     - wikipedia-th:105:265
-71. non-Thai / Thai|Latin-or-digit / word-only / before ` 2 ` / after ` ค ` - 6 occurrences
+70. non-Thai / Thai|Latin-or-digit / word-only / before ` 2 ` / after ` ค ` - 6 occurrences
     - ` สั่งมากิน2⟨|⟩คนกับแฟน พ ` (wisesight:216)
     - ` ียดมาสด้า2⟨|⟩ครับ ` (wisesight:437)
     - ` ด้เจอทั้ง2⟨|⟩คนนี้ เป็น ` (wisesight:574)
     - ` IP รายงาน2⟨|⟩คนไช่ไหมค่ ` (wisesight:696)
     - ` ียดมาสด้า2⟨|⟩ค่ะ ` (wisesight:760)
-72. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` 3 ` - 6 occurrences
+71. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` 3 ` - 6 occurrences
     - ` างพร้อมกัน⟨|⟩3-4สายแบบน ` (wisesight:14)
     - ` จะบอก ก่อน⟨|⟩3ทุ่ม ยูเบ ` (wisesight:368)
     - ` นี้!! ก่อน⟨|⟩3ทุ่ม เบลน ` (wisesight:368)
     - ` บรถที่บ้าน⟨|⟩3คัน ถ้าทา ` (wisesight:443)
     - ` ใน⟨|⟩3 ตัวนี้เค ` (wisesight:630)
-73. non-Thai / punctuation / word-only / before ` ␠ ` / after ` ! ` - 6 occurrences
+72. non-Thai / punctuation / word-only / before ` ␠ ` / after ` ! ` - 6 occurrences
     - ` บ้างก็ได้ ⟨|⟩!!! เบื่อส ` (wisesight:118)
     - ` ม่ควรพลาด ⟨|⟩!! ลุ้นรับ ` (wisesight:344)
     - ` ่งอนาคตใน ⟨|⟩!! ฮอนด้า  ` (wisesight:469)
     - ` ไม่ ⟨|⟩! ` (wisesight:583)
     - ` N GTR R34 ⟨|⟩!! * คนไทย ` (wisesight:660)
-74. non-Thai / punctuation / word-only / before ` " ` / after ` ส ` - 6 occurrences
+73. non-Thai / punctuation / word-only / before ` " ` / after ` ส ` - 6 occurrences
     - ` สะพัด "⟨|⟩สันติบาล"  ` (wisesight:1415)
     - wikipedia-th:27:101
     - wikipedia-th:27:591
     - wikipedia-th:28:80
     - wikipedia-th:28:807
-75. non-Thai / punctuation / word-only / before ` # ` / after ` 4 ` - 6 occurrences
+74. non-Thai / punctuation / word-only / before ` # ` / after ` 4 ` - 6 occurrences
     - ` เฉา 🙏🏻❤️😍#⟨|⟩4u2 #4u2co ` (wisesight:414)
     - ` 🏻❤️😍#4u2 #⟨|⟩4u2cosmeti ` (wisesight:414)
     - ` osmetics #⟨|⟩4u2thailan ` (wisesight:414)
     - ` ่ะ 😻❤️😂👄 #⟨|⟩4u2 #4u2co ` (wisesight:571)
     - ` ️😂👄 #4u2 #⟨|⟩4u2cosmeti ` (wisesight:571)
-76. non-Thai / punctuation / word-only / before ` # ` / after ` C ` - 6 occurrences
+75. non-Thai / punctuation / word-only / before ` # ` / after ` C ` - 6 occurrences
     - `  #Toyota #⟨|⟩CHR ถือว่า ` (wisesight:78)
     - ` URCEAURA #⟨|⟩CentralDep ` (wisesight:122)
     - `  #Potato #⟨|⟩ChivasX #S ` (wisesight:263)
     - ` 5 รางวัล #⟨|⟩Chang #Rea ` (wisesight:344)
     - ` th/civic #⟨|⟩CivicRed # ` (wisesight:419)
-77. non-Thai / punctuation / word-only / before ` # ` / after ` ส ` - 6 occurrences
+76. non-Thai / punctuation / word-only / before ` # ` / after ` ส ` - 6 occurrences
     - ` ข้าโบสถ์ #⟨|⟩สวยกล้าท้า ` (wisesight:22)
     - ` ersparty #⟨|⟩ส่งสามัญชน ` (wisesight:347)
     - ` ครอบครัว #⟨|⟩สวยกล้าท้า ` (wisesight:452)
     - ` การแพทย์ #⟨|⟩สมูทอีคลีน ` (wisesight:538)
     - ` ctbeauty #⟨|⟩สวยสมบูรณ์ ` (wisesight:665)
-78. non-Thai / punctuation / word-only / before ` # ` / after ` อ ` - 6 occurrences
+77. non-Thai / punctuation / word-only / before ` # ` / after ` อ ` - 6 occurrences
     - ` กมากกกกก #⟨|⟩อ้าวเฮ้ยไม ` (wisesight:67)
     - ` บื่อ #รำ #⟨|⟩อยากใช้หอย ` (wisesight:233)
     - ` " KULOV" #⟨|⟩อย่าหยุด K ` (wisesight:307)
     - ` oyotaBuzz#⟨|⟩อาร์ต พศุต ` (wisesight:682)
     - ` yotaBuzz #⟨|⟩อาร์ตพศุตม ` (wisesight:1073)
-79. non-Thai / punctuation / word-only / before ` ( ` / after ` ( ` - 6 occurrences
+78. non-Thai / punctuation / word-only / before ` ( ` / after ` ( ` - 6 occurrences
     - ` ูง PA+++ (⟨|⟩(((((( 😍😎😘 ` (wisesight:617)
     - ` ง PA+++ ((⟨|⟩((((( 😍😎😘ช ` (wisesight:617)
     - `  PA+++ (((⟨|⟩(((( 😍😎😘ช่ ` (wisesight:617)
     - ` PA+++ ((((⟨|⟩((( 😍😎😘ช่ว ` (wisesight:617)
     - ` A+++ (((((⟨|⟩(( 😍😎😘ช่วย ` (wisesight:617)
-80. non-Thai / punctuation / word-only / before ` ( ` / after ` ไ ` - 6 occurrences
+79. non-Thai / punctuation / word-only / before ` ( ` / after ` ไ ` - 6 occurrences
     - wikipedia-th:41:29
     - wikipedia-th:46:243
     - wikipedia-th:47:1367
     - wikipedia-th:64:669
     - wikipedia-th:117:20
-81. non-Thai / punctuation / word-only / before ` e ` / after ` ) ` - 6 occurrences
+80. non-Thai / punctuation / word-only / before ` e ` / after ` ) ` - 6 occurrences
     - wikipedia-th:8:192
     - wikipedia-th:98:111
     - wikipedia-th:99:231
     - wikipedia-th:104:287
-    - wikipedia-th:159:2295
-82. non-Thai / punctuation / word-only / before ` l ` / after ` - ` - 6 occurrences
+    - wikipedia-th:157:2295
+81. non-Thai / punctuation / word-only / before ` l ` / after ` - ` - 6 occurrences
     - ` n-official⟨|⟩-store และ ` (wisesight:278)
     - ` th/car/all⟨|⟩-new-pajer ` (wisesight:391)
     - ` บ ‘360 All⟨|⟩-Dimension ` (wisesight:418)
     - ` ar-360-all⟨|⟩-dimension ` (wisesight:418)
     - ` imensional⟨|⟩-fantasy-l ` (wisesight:418)
-83. non-Thai / punctuation / word-only / before ` ช ` / after ` . ` - 6 occurrences
+82. non-Thai / punctuation / word-only / before ` ช ` / after ` . ` - 6 occurrences
     - ` ㅠ น้ำหอมผช⟨|⟩.ที่วันนี้ ` (wisesight:124)
     - ` พรรคของคสช⟨|⟩. คนนี้ก็จ ` (wisesight:164)
     - ` ทุนที่สปสช⟨|⟩.กระทรวงสา ` (wisesight:276)
     - ` ทาน 1.30 ช⟨|⟩.ม.) เริ่ม ` (wisesight:279)
     - ` มากๆ พี่ผช⟨|⟩.ที่ออกสาว ` (wisesight:700)
-84. non-Thai / punctuation / word-only / before ` น ` / after ` , ` - 6 occurrences
+83. non-Thai / punctuation / word-only / before ` น ` / after ` , ` - 6 occurrences
     - ` il หอมหวาน⟨|⟩,อร่อย ดื่ ` (wisesight:658)
     - wikipedia-th:11:249
     - wikipedia-th:23:1375
     - wikipedia-th:106:217
     - wikipedia-th:121:232
-85. non-Thai / punctuation / word-only / before ` า ` / after ` , ` - 6 occurrences
+84. non-Thai / punctuation / word-only / before ` า ` / after ` , ` - 6 occurrences
     - ` ป็น มารีญา⟨|⟩, เจนนี่ ป ` (wisesight:273)
     - wikipedia-th:111:425
     - wikipedia-th:111:439
     - wikipedia-th:112:291
     - wikipedia-th:112:391
-86. non-Thai / punctuation / word-only / before ` “ ` / after ` เ ` - 6 occurrences
+85. non-Thai / punctuation / word-only / before ` “ ` / after ` เ ` - 6 occurrences
     - ` ษตรอย่าง “⟨|⟩เครือเจริญ ` (wisesight:248)
     - ` ารจองของ “⟨|⟩เบียร์ช้าง ` (wisesight:248)
     - ` “⟨|⟩เรื่องราวท ` (wisesight:273)
     - wikipedia-th:50:357
     - wikipedia-th:60:357
-87. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` 1 ` - 5 occurrences
+86. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` 1 ` - 5 occurrences
     - ` ละรอบรอนาน⟨|⟩10-15นาที  ` (wisesight:51)
     - ` ี้หุ้นขึ้น⟨|⟩15จุด มากก ` (wisesight:63)
     - ` ลงเมื่อวาน⟨|⟩10จุด แบบน ` (wisesight:63)
     - ` เดือน⟨|⟩11 ` (wisesight:465)
     - ` ถึงขายเป็น⟨|⟩10ปีแล้วแต ` (wisesight:635)
-88. non-Thai / Thai|Latin-or-digit / word-only / before ` บ ` / after ` 1 ` - 5 occurrences
+87. non-Thai / Thai|Latin-or-digit / word-only / before ` บ ` / after ` 1 ` - 5 occurrences
     - ` ม่เหมาะกับ⟨|⟩100pipers  ` (wisesight:77)
     - ` นแดดอันดับ⟨|⟩1จากญี่ปุ่ ` (wisesight:617)
     - ` าสุดใส่ขอบ⟨|⟩16ไม่ได้คร ` (wisesight:1141)
     - ` ดรวมอันดับ⟨|⟩1แน่นอน ` (wisesight:1146)
     - ` ทองผมนะคับ⟨|⟩1ชวด 😂😂😂 ` (wisesight:1207)
-89. non-Thai / Thai|Latin-or-digit / word-only / before ` ย ` / after ` 3 ` - 5 occurrences
+88. non-Thai / Thai|Latin-or-digit / word-only / before ` ย ` / after ` 3 ` - 5 occurrences
     - ` ุ่นใหม่วัย⟨|⟩30ที่เห็นด ` (wisesight:18)
     - ` บผ้าอนามัย⟨|⟩30เซ็นของก ` (wisesight:100)
     - ` มา4จ่าย⟨|⟩3 ..... มา ` (wisesight:461)
     - ` 4จ่าย⟨|⟩3ว่ะ🙊 ` (wisesight:713)
     - ` นนี้จะบ่าย⟨|⟩3 ` (wisesight:1137)
-90. non-Thai / Thai|Latin-or-digit / word-only / before ` ◌้ ` / after ` 5 ` - 5 occurrences
+89. non-Thai / Thai|Latin-or-digit / word-only / before ` ◌้ ` / after ` 5 ` - 5 occurrences
     - ` ้านไม่ไหว้⟨|⟩555 ` (wisesight:353)
     - ` องโปรก็ได้⟨|⟩5555555555 ` (wisesight:1061)
     - ` นวันจันนี้⟨|⟩5566666 ` (wisesight:1347)
     - ` ใกล้⟨|⟩5ทุ่มละจะม ` (wisesight:1358)
     - ` ีล่ะตอนนี้⟨|⟩5555 หิวเล ` (wisesight:1430)
-91. non-Thai / emoji-or-symbol / word-only / before ` ⟦U+2014⟧ ` / after ` ⟦U+2014⟧ ` - 5 occurrences
+90. non-Thai / emoji-or-symbol / word-only / before ` ⟦U+2014⟧ ` / after ` ⟦U+2014⟧ ` - 5 occurrences
     - ` ightlife ⟦U+2014⟧⟨|⟩⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧ CDC  ` (wisesight:458)
     - ` ghtlife ⟦U+2014⟧⟦U+2014⟧⟨|⟩⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧ CDC : ` (wisesight:458)
     - ` htlife ⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟨|⟩⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧ CDC :  ` (wisesight:458)
     - ` tlife ⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟨|⟩⟦U+2014⟧⟦U+2014⟧ CDC : 0 ` (wisesight:458)
     - ` life ⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟦U+2014⟧⟨|⟩⟦U+2014⟧ CDC : 08 ` (wisesight:458)
-92. non-Thai / punctuation / word-only / before ` " ` / after ` ไ ` - 5 occurrences
+91. non-Thai / punctuation / word-only / before ` " ` / after ` ไ ` - 5 occurrences
     - wikipedia-th:28:841
     - wikipedia-th:29:90
     - wikipedia-th:29:572
     - wikipedia-th:104:597
     - wikipedia-th:122:36
-93. non-Thai / punctuation / word-only / before ` # ` / after ` L ` - 5 occurrences
+92. non-Thai / punctuation / word-only / before ` # ` / after ` L ` - 5 occurrences
     - `  ที่ร้าน #⟨|⟩Lizm ประชา ` (wisesight:263)
     - ` 888-8888 #⟨|⟩LizmBangko ` (wisesight:263)
     - ` /2IHUe1H #⟨|⟩LOrealPari ` (wisesight:273)
     - ` าหยุด KU #⟨|⟩L-ก-ฮ มีวา ` (wisesight:307)
     - ` ใส😯 หรือ #⟨|⟩Loveชุ่มชื ` (wisesight:665)
-94. non-Thai / punctuation / word-only / before ` # ` / after ` W ` - 5 occurrences
+93. non-Thai / punctuation / word-only / before ` # ` / after ` W ` - 5 occurrences
     - ` #⟨|⟩WiTThai -  ` (wisesight:338)
     - ` BLENE285 #⟨|⟩Waterzonic ` (wisesight:377)
     - ` mParagon #⟨|⟩WorldClass ` (wisesight:424)
     - ` mParagon #⟨|⟩WorldClass ` (wisesight:574)
     - ` วินเนอร์ #⟨|⟩WINNER ` (wisesight:820)
-95. non-Thai / punctuation / word-only / before ` # ` / after ` u ` - 5 occurrences
+94. non-Thai / punctuation / word-only / before ` # ` / after ` u ` - 5 occurrences
     - ` ายเอว 😁😀 #⟨|⟩ubeer ` (wisesight:163)
     - ` ้น #beer #⟨|⟩ubeer #gol ` (wisesight:266)
     - ` มาแล้ววว #⟨|⟩ubeer #bee ` (wisesight:1197)
     - ` จันทบุรี #⟨|⟩ubeer #uan ` (wisesight:1410)
     - ` ี #ubeer #⟨|⟩uangel ` (wisesight:1410)
-96. non-Thai / punctuation / word-only / before ` # ` / after ` ข ` - 5 occurrences
+95. non-Thai / punctuation / word-only / before ` # ` / after ` ข ` - 5 occurrences
     - ` หาน้ำกิน #⟨|⟩ข่าวว่าพรุ ` (wisesight:266)
     - ` ่านมา... #⟨|⟩ของแท้แน่น ` (wisesight:454)
     - ` ยงับ 💘🌸✨ #⟨|⟩ของดีบอกต่ ` (wisesight:730)
     - ` ดีบอกต่อ #⟨|⟩ของมันต้อง ` (wisesight:730)
     - ` หล่อฝุดๆ #⟨|⟩ขุนเรือง # ` (wisesight:1423)
-97. non-Thai / punctuation / word-only / before ` # ` / after ` ค ` - 5 occurrences
+96. non-Thai / punctuation / word-only / before ` # ` / after ` ค ` - 5 occurrences
     - ` ้าทุกแสง #⟨|⟩คู่หูท้าแด ` (wisesight:22)
     - ` ท้าทุกแสง#⟨|⟩คู่หูท้าแด ` (wisesight:452)
     - ` #⟨|⟩ครอบครัวBL ` (wisesight:995)
     - ` CKWHEELS #⟨|⟩ครอบครัวfo ` (wisesight:995)
     - ` oto Cafe #⟨|⟩คนจริงของจ ` (wisesight:1439)
-98. non-Thai / punctuation / word-only / before ` # ` / after ` ร ` - 5 occurrences
+97. non-Thai / punctuation / word-only / before ` # ` / after ` ร ` - 5 occurrences
     - ` #หงษ์ทอง #⟨|⟩รีเจนซี่ ` (wisesight:44)
     - ` ว้ยยยยยย #⟨|⟩รถกูมันคัน ` (wisesight:105)
     - ` ‼️#เบื่อ #⟨|⟩รำ #อยากใช ` (wisesight:233)
     - ` ฟางรีวิว #⟨|⟩รีวิวอย่าง ` (wisesight:341)
     - ` ของโว้ยย #⟨|⟩รีวิวคสอ # ` (wisesight:730)
-99. non-Thai / punctuation / word-only / before ` ( ` / after ` พ ` - 5 occurrences
+98. non-Thai / punctuation / word-only / before ` ( ` / after ` พ ` - 5 occurrences
     - wikipedia-th:58:833
     - wikipedia-th:107:421
     - wikipedia-th:107:541
     - wikipedia-th:154:555
     - wikipedia-th:162:88
-100. non-Thai / punctuation / word-only / before ` ( ` / after ` ม ` - 5 occurrences
+99. non-Thai / punctuation / word-only / before ` ( ` / after ` ม ` - 5 occurrences
     - ` ยคะหน่อง (⟨|⟩มาส์ก kose ` (wisesight:895)
     - ` เม็ดสาคู (⟨|⟩มันคือพยาธ ` (wisesight:1462)
     - wikipedia-th:183:435
     - wikipedia-th:183:702
     - wikipedia-th:183:936
-101. non-Thai / punctuation / word-only / before ` . ` / after ` ) ` - 5 occurrences
+100. non-Thai / punctuation / word-only / before ` . ` / after ` ) ` - 5 occurrences
     - `  1.30 ช.ม.⟨|⟩) เริ่ม 7  ` (wisesight:279)
     - wikipedia-th:181:842
     - wikipedia-th:182:319
     - wikipedia-th:182:604
     - wikipedia-th:195:1110
-102. non-Thai / punctuation / word-only / before ` . ` / after ` ก ` - 5 occurrences
+101. non-Thai / punctuation / word-only / before ` . ` / after ` ก ` - 5 occurrences
     - ` ุนที่สปสช.⟨|⟩กระทรวงสาธ ` (wisesight:276)
     - ` มรถกระบะ..⟨|⟩ก้อคงน้อยก ` (wisesight:480)
     - ` 34:0 … cr.⟨|⟩กาดสันคะยอ ` (wisesight:699)
     - ` า นีเวีย .⟨|⟩กันแดดอยาก ` (wisesight:703)
     - ` ียด จูค...⟨|⟩กับนิสสันโ ` (wisesight:1445)
-103. non-Thai / punctuation / word-only / before ` 2 ` / after ` - ` - 5 occurrences
+102. non-Thai / punctuation / word-only / before ` 2 ` / after ` - ` - 5 occurrences
     - `  สูงกว่า 2⟨|⟩-3 เท่าของ ` (wisesight:310)
     - ` ิ่มเติม 02⟨|⟩-222-2222  ` (wisesight:438)
     - ` ติม 02-222⟨|⟩-2222 ได้เ ` (wisesight:438)
     - wikipedia-th:94:640
     - wikipedia-th:94:879
-104. non-Thai / punctuation / word-only / before ` 3 ` / after ` % ` - 5 occurrences
+103. non-Thai / punctuation / word-only / before ` 3 ` / after ` % ` - 5 occurrences
     - ` ราว 33.333⟨|⟩% ก็ตกปีละ ` (wisesight:239)
     - ` มขึ้น 13.3⟨|⟩% เนื่องจา ` (wisesight:398)
     - ` มขึ้น 30.3⟨|⟩% และ รถกร ` (wisesight:398)
     - wikipedia-th:192:798
     - wikipedia-th:194:126
-105. non-Thai / punctuation / word-only / before ` 5 ` / after ` - ` - 5 occurrences
+104. non-Thai / punctuation / word-only / before ` 5 ` / after ` - ` - 5 occurrences
     - ` ทำศูนย์มา5⟨|⟩-6ปี จนออก ` (wisesight:416)
     - wikipedia-th:94:827
     - wikipedia-th:98:152
     - wikipedia-th:99:271
     - wikipedia-th:198:1229
-106. non-Thai / punctuation / word-only / before ` 9 ` / after ` % ` - 5 occurrences
+105. non-Thai / punctuation / word-only / before ` 9 ` / after ` % ` - 5 occurrences
     - ` เติบโต 3.9⟨|⟩% ส่งผลให้ ` (wisesight:398)
     - ` DP ที่ 3.9⟨|⟩%* รวมถึงก ` (wisesight:398)
     - ` 0.99⟨|⟩% แค่ยาริส ` (wisesight:1354)
     - ` เบี้ย 0.99⟨|⟩% มีเงื่อน ` (wisesight:1440)
     - wikipedia-th:192:1022
-107. non-Thai / punctuation / word-only / before ` I ` / after ` ) ` - 5 occurrences
+106. non-Thai / punctuation / word-only / before ` I ` / after ` ) ` - 5 occurrences
     - ` ะดิษฐ์ (AI⟨|⟩) เพื่อช่ว ` (wisesight:469)
     - wikipedia-th:171:133
     - wikipedia-th:173:809
     - wikipedia-th:195:468
     - wikipedia-th:195:628
-108. non-Thai / punctuation / word-only / before ` [ ` / after ` ใ ` - 5 occurrences
+107. non-Thai / punctuation / word-only / before ` [ ` / after ` ใ ` - 5 occurrences
     - ` าวอมชมพู [⟨|⟩ใหม่] N2 - ` (wisesight:273)
     - ` ้ออมชมพู [⟨|⟩ใหม่] G2.5 ` (wisesight:273)
     - `  โทนเข้ม [⟨|⟩ใหม่] G4.5 ` (wisesight:273)
     - ` ีโทนเข้ม [⟨|⟩ใหม่] G6 ส ` (wisesight:273)
     - ` ิวสีเข้ม [⟨|⟩ใหม่] G7 ส ` (wisesight:273)
-109. non-Thai / punctuation / word-only / before ` e ` / after ` - ` - 5 occurrences
+108. non-Thai / punctuation / word-only / before ` e ` / after ` - ` - 5 occurrences
     - ` ntasy-live⟨|⟩-show บริษ ` (wisesight:418)
     - ` san note e⟨|⟩-power ปีน ` (wisesight:973)
     - ` ริ่มมาใช้e⟨|⟩-cigเลย แต ` (wisesight:1380)
     - wikipedia-th:8:86
     - wikipedia-th:163:1007
-110. non-Thai / punctuation / word-only / before ` i ` / after ` ) ` - 5 occurrences
+109. non-Thai / punctuation / word-only / before ` i ` / after ` ) ` - 5 occurrences
     - ` Chiang Rai⟨|⟩) ` (wisesight:109)
     - wikipedia-th:104:485
     - wikipedia-th:104:650
     - wikipedia-th:111:196
     - wikipedia-th:113:2249
-111. non-Thai / punctuation / word-only / before ` l ` / after ` ) ` - 5 occurrences
+110. non-Thai / punctuation / word-only / before ` l ` / after ` ) ` - 5 occurrences
     - wikipedia-th:131:75
     - wikipedia-th:131:198
     - wikipedia-th:161:546
     - wikipedia-th:163:263
     - wikipedia-th:173:1432
-112. non-Thai / punctuation / word-only / before ` r ` / after ` ) ` - 5 occurrences
+111. non-Thai / punctuation / word-only / before ` r ` / after ` ) ` - 5 occurrences
     - ` pan Avatar⟨|⟩) การแสดงแ ` (wisesight:418)
     - wikipedia-th:39:538
     - wikipedia-th:131:265
     - wikipedia-th:151:63
     - wikipedia-th:174:696
-113. non-Thai / punctuation / word-only / before ` s ` / after ` , ` - 5 occurrences
+112. non-Thai / punctuation / word-only / before ` s ` / after ` , ` - 5 occurrences
     - ` ต่พวก Vios⟨|⟩,jazz,city ` (wisesight:1227)
     - wikipedia-th:37:794
     - wikipedia-th:37:819
     - wikipedia-th:37:854
     - wikipedia-th:37:895
+113. non-Thai / punctuation / word-only / before ` t ` / after ` ) ` - 5 occurrences
+    - wikipedia-th:155:192
+    - wikipedia-th:160:191
+    - wikipedia-th:161:66
+    - wikipedia-th:163:287
+    - wikipedia-th:164:910
 114. non-Thai / punctuation / word-only / before ` น ` / after ` ! ` - 5 occurrences
     - ` จพี่นิสสัน⟨|⟩!! รถราคา  ` (wisesight:323)
     - ` ทุกคนนนนนน⟨|⟩! Mistine  ` (wisesight:341)
@@ -745,178 +745,179 @@ Group (b) by side and sub-category:
     - wikipedia-th:112:551
     - wikipedia-th:112:719
     - wikipedia-th:121:221
-118. non-Thai / punctuation / word-only / before ` า ` / after ` " ` - 5 occurrences
+118. non-Thai / punctuation / word-only / before ` อ ` / after ` . ` - 5 occurrences
+    - `  เส้นทาง อ⟨|⟩.เมือง เชื ` (wisesight:275)
+    - ` นาคต” กับอ⟨|⟩.วินิช พรม ` (wisesight:338)
+    - ` อ⟨|⟩.แม่สอด ร่ ` (wisesight:874)
+    - ` เอ⟨|⟩... บุหรี่ ` (wisesight:1184)
+    - wikipedia-th:180:337
+119. non-Thai / punctuation / word-only / before ` า ` / after ` " ` - 5 occurrences
     - ` า! "มาสด้า⟨|⟩" ฟ้องลูกค ` (wisesight:104)
     - ` "หนูนา⟨|⟩" ช่วยลูกพ ` (wisesight:1433)
     - wikipedia-th:61:1649
     - wikipedia-th:186:479
     - wikipedia-th:195:248
-119. non-Thai / punctuation / word-only / before ` ◌ี ` / after ` ) ` - 5 occurrences
+120. non-Thai / punctuation / word-only / before ` ◌ี ` / after ` ) ` - 5 occurrences
     - wikipedia-th:110:1009
     - wikipedia-th:113:1621
     - wikipedia-th:137:251
     - wikipedia-th:154:567
     - wikipedia-th:191:450
-120. non-Thai / punctuation / word-only / before ` ◌่ ` / after ` ] ` - 5 occurrences
+121. non-Thai / punctuation / word-only / before ` ◌่ ` / after ` ] ` - 5 occurrences
     - ` ชมพู [ใหม่⟨|⟩] N2 - สำห ` (wisesight:273)
     - ` ชมพู [ใหม่⟨|⟩] G2.5 - ส ` (wisesight:273)
     - ` เข้ม [ใหม่⟨|⟩] G4.5 สำห ` (wisesight:273)
     - ` เข้ม [ใหม่⟨|⟩] G6 สำหรั ` (wisesight:273)
     - ` เข้ม [ใหม่⟨|⟩] G7 สำหรั ` (wisesight:273)
-121. non-Thai / punctuation / word-only / before ` ◌้ ` / after ` ! ` - 5 occurrences
+122. non-Thai / punctuation / word-only / before ` ◌้ ` / after ` ! ` - 5 occurrences
     - ` โพส จ้อเจ้⟨|⟩!!! ` (wisesight:65)
     - ` eTH ตอนนี้⟨|⟩! https:// ` (wisesight:317)
     - ` 6 ตอน "โอ้⟨|⟩!-แอลอีดี  ` (wisesight:338)
     - ` ขายราคานี้⟨|⟩!! ก่อน3ทุ ` (wisesight:368)
     - ` ทำตามดูได้⟨|⟩! #Jameson ` (wisesight:679)
-122. non-Thai / punctuation / word-only / before ` ’ ` / after ` 6 ` - 5 occurrences
+123. non-Thai / punctuation / word-only / before ` ’ ` / after ` 6 ` - 5 occurrences
     - ` 2 ธันวาคม’⟨|⟩60 หมดเขต  ` (wisesight:279)
     - ` 7 ธันวาคม’⟨|⟩60 จนถึง 3 ` (wisesight:279)
     - ` 31 มกราคม’⟨|⟩61 สามารถ  ` (wisesight:279)
     - ` 7 ธันวาคม’⟨|⟩60 จนถึง 3 ` (wisesight:406)
     - ` 31 มกราคม’⟨|⟩61 นะคร้าบ ` (wisesight:406)
-123. non-Thai / Thai|Latin-or-digit / word-only / before ` 0 ` / after ` น ` - 4 occurrences
+124. non-Thai / Thai|Latin-or-digit / word-only / before ` 0 ` / after ` น ` - 4 occurrences
     - ` มาประมาณ10⟨|⟩นาทีละ พนั ` (wisesight:242)
     - ` เวลา 11.00⟨|⟩น. ▪ สงวนส ` (wisesight:344)
     - ` 00 - 15:00⟨|⟩น. -ผู้ที่ ` (wisesight:493)
     - ` ก่อนเวลา30⟨|⟩นาที -ผู้ท ` (wisesight:493)
-124. non-Thai / Thai|Latin-or-digit / word-only / before ` 0 ` / after ` เ ` - 4 occurrences
+125. non-Thai / Thai|Latin-or-digit / word-only / before ` 0 ` / after ` เ ` - 4 occurrences
     - ` อร์เติม300⟨|⟩เกก้อไม่ขึ ` (wisesight:80)
     - ` ้าอนามัย30⟨|⟩เซ็นของกูเ ` (wisesight:100)
     - ` ยด้วย 9/10⟨|⟩เลยงับ 💘🌸✨ ` (wisesight:730)
     - ` เอาบีที50⟨|⟩เทินใด้ก่ค ` (wisesight:974)
-125. non-Thai / Thai|Latin-or-digit / word-only / before ` 2 ` / after ` แ ` - 4 occurrences
+126. non-Thai / Thai|Latin-or-digit / word-only / before ` 2 ` / after ` แ ` - 4 occurrences
     - ` รวม เพิ่ม2⟨|⟩แสน จัดว่า ` (wisesight:55)
     - ` มพูพาน M12⟨|⟩แดงกล่ำ S1 ` (wisesight:414)
     - ` นลดอาจจะ 2⟨|⟩แสนแบบเทีย ` (wisesight:1204)
     - ` ดก็ยกเลิก2⟨|⟩แรงมากิน55 ` (wisesight:1394)
-126. non-Thai / Thai|Latin-or-digit / word-only / before ` W ` / after ` ย ` - 4 occurrences
+127. non-Thai / Thai|Latin-or-digit / word-only / before ` W ` / after ` ย ` - 4 occurrences
     - ` #MOTORSHOW⟨|⟩ยกมาที่นี่ ` (wisesight:535)
     - ` #MOTORSHOW⟨|⟩ยกมาที่นี่ ` (wisesight:1188)
     - ` #MOTORSHOW⟨|⟩ยกมาที่นี่ ` (wisesight:1284)
     - ` #MOTORSHOW⟨|⟩ยกมาที่นี่ ` (wisesight:1285)
-127. non-Thai / Thai|Latin-or-digit / word-only / before ` ก ` / after ` 5 ` - 4 occurrences
+128. non-Thai / Thai|Latin-or-digit / word-only / before ` ก ` / after ` 5 ` - 4 occurrences
     - ` ไม่ได้อะแก⟨|⟩555 เล่นตั ` (wisesight:198)
     - ` ่ถนัดชงรัก⟨|⟩5555 งั้นก ` (wisesight:377)
     - ` ไม่ออก ตลก⟨|⟩5555555555 ` (wisesight:667)
     - ` วจานนึงอีก⟨|⟩555 ` (wisesight:1458)
-128. non-Thai / Thai|Latin-or-digit / word-only / before ` ม ` / after ` 3 ` - 4 occurrences
+129. non-Thai / Thai|Latin-or-digit / word-only / before ` ม ` / after ` 3 ` - 4 occurrences
     - ` นเจอร์เติม⟨|⟩300เกก้อไม ` (wisesight:80)
     - ` ทรัลพระราม⟨|⟩3 โลตัสพระ ` (wisesight:922)
     - ` ลตัสพระราม⟨|⟩3 ร่วมไหม ` (wisesight:922)
     - ` แถวบ้านผม⟨|⟩30-50บาทคร ` (wisesight:1458)
-129. non-Thai / Thai|Latin-or-digit / word-only / before ` อ ` / after ` 5 ` - 4 occurrences
+130. non-Thai / Thai|Latin-or-digit / word-only / before ` อ ` / after ` 5 ` - 4 occurrences
     - ` อ้แช! ฮืออ⟨|⟩5555555555 ` (wisesight:629)
     - ` ตอลด้วยหรอ⟨|⟩5555 ` (wisesight:1019)
     - ` ได้ด้วยหรอ⟨|⟩55555 ` (wisesight:1328)
     - ` าเฟสไม่เจอ⟨|⟩55555 ` (wisesight:1424)
-130. non-Thai / Thai|Latin-or-digit / word-only / before ` า ` / after ` 3 ` - 4 occurrences
+131. non-Thai / Thai|Latin-or-digit / word-only / before ` า ` / after ` 3 ` - 4 occurrences
     - ` มาสด้า⟨|⟩3ดาวกี่บาท ` (wisesight:321)
     - ` มาก่อนเวลา⟨|⟩30นาที -ผู ` (wisesight:493)
     - ` pasio สุขา⟨|⟩3 (รามคำแห ` (wisesight:979)
     - ` บ หรือ เอา⟨|⟩3GB 5วันมา ` (wisesight:983)
-131. non-Thai / Thai|Latin-or-digit / word-only / before ` ◌ี ` / after ` 2 ` - 4 occurrences
+132. non-Thai / Thai|Latin-or-digit / word-only / before ` ◌ี ` / after ` 2 ` - 4 occurrences
     - ` อร์โมเดลปี⟨|⟩2012 ฟอร์ด ` (wisesight:647)
     - ` ้มียาริสปี⟨|⟩2014ครับตั ` (wisesight:898)
     - ` ล์ท่าพระมี⟨|⟩299ไหมคะ ` (wisesight:916)
     - ` าหงษ์ทองปี⟨|⟩2529 ให้รา ` (wisesight:1270)
-132. non-Thai / Thai|Latin-or-digit / word-only / before ` ◌่ ` / after ` 2 ` - 4 occurrences
+133. non-Thai / Thai|Latin-or-digit / word-only / before ` ◌่ ` / after ` 2 ` - 4 occurrences
     - ` ใบเสร็จที่⟨|⟩2 R#000052 ` (wisesight:435)
     - ` มันต้องใส่⟨|⟩2คนป้ะ ` (wisesight:864)
     - ` หลังวันที่⟨|⟩28จัดไปพาไ ` (wisesight:997)
     - ` แรง วันที่⟨|⟩28นี้ครับ ` (wisesight:1469)
-133. non-Thai / emoji-or-symbol / word-only / before ` 8 ` / after ` – ` - 4 occurrences
+134. non-Thai / emoji-or-symbol / word-only / before ` 8 ` / after ` – ` - 4 occurrences
     - wikipedia-th:22:829
     - wikipedia-th:25:1729
     - wikipedia-th:29:358
     - wikipedia-th:107:434
-134. non-Thai / other / line-only / before ` ㅠ ` / after ` ㅠ ` - 4 occurrences
+135. non-Thai / other / line-only / before ` ㅠ ` / after ` ㅠ ` - 4 occurrences
     - ` อนแน่เลย ㅠ⟨|⟩ㅠㅠㅠ ` (wisesight:43)
     - ` นแน่เลย ㅠㅠ⟨|⟩ㅠㅠ ` (wisesight:43)
     - ` แน่เลย ㅠㅠㅠ⟨|⟩ㅠ ` (wisesight:43)
     - ` ช่เลยค่า ㅠ⟨|⟩ㅠ น้ำหอมผช ` (wisesight:124)
-135. non-Thai / punctuation / word-only / before ` ␠ ` / after ` ) ` - 4 occurrences
+136. non-Thai / punctuation / word-only / before ` ␠ ` / after ` ) ` - 4 occurrences
     - ` ี่ห้อเดิม ⟨|⟩) ` (wisesight:73)
     - ` - Netflix ⟨|⟩) ชอบมาก ส ` (wisesight:543)
     - wikipedia-th:46:281
     - wikipedia-th:47:1405
-136. non-Thai / punctuation / word-only / before ` " ` / after ` จ ` - 4 occurrences
+137. non-Thai / punctuation / word-only / before ` " ` / after ` จ ` - 4 occurrences
     - ` ามที่ว่า "⟨|⟩จะเรียนต่อ ` (wisesight:152)
     - ` อที่ไหน" "⟨|⟩จะเรียนต่อ ` (wisesight:152)
     - wikipedia-th:49:606
     - wikipedia-th:147:713
-137. non-Thai / punctuation / word-only / before ` " ` / after ` ต ` - 4 occurrences
+138. non-Thai / punctuation / word-only / before ` " ` / after ` ต ` - 4 occurrences
     - wikipedia-th:81:258
     - wikipedia-th:81:339
     - wikipedia-th:81:386
     - wikipedia-th:81:745
-138. non-Thai / punctuation / word-only / before ` " ` / after ` ม ` - 4 occurrences
+139. non-Thai / punctuation / word-only / before ` " ` / after ` ม ` - 4 occurrences
     - ` งานเข้า! "⟨|⟩มาสด้า" ฟ้ ` (wisesight:104)
     - wikipedia-th:49:407
     - wikipedia-th:104:235
     - wikipedia-th:104:1212
-139. non-Thai / punctuation / word-only / before ` " ` / after ` ร ` - 4 occurrences
+140. non-Thai / punctuation / word-only / before ` " ` / after ` ร ` - 4 occurrences
     - wikipedia-th:147:280
     - wikipedia-th:147:504
     - wikipedia-th:148:239
     - wikipedia-th:186:368
-140. non-Thai / punctuation / word-only / before ` # ` / after ` E ` - 4 occurrences
+141. non-Thai / punctuation / word-only / before ` # ` / after ` E ` - 4 occurrences
     - ` #⟨|⟩ERROR! ` (wisesight:179)
     - ` ้าที่รัก #⟨|⟩EnjoyHonda ` (wisesight:514)
     - ` ้าที่รัก #⟨|⟩EnjoyHonda ` (wisesight:548)
     - ` กเว่อร์💕 #⟨|⟩ElisThaila ` (wisesight:646)
-141. non-Thai / punctuation / word-only / before ` # ` / after ` G ` - 4 occurrences
+142. non-Thai / punctuation / word-only / before ` # ` / after ` G ` - 4 occurrences
     - ` งเบย T T #⟨|⟩GOT7 #GOT7 ` (wisesight:13)
     - `  T #GOT7 #⟨|⟩GOT7Offici ` (wisesight:13)
     - ` #SangSom #⟨|⟩GreasyCafe ` (wisesight:348)
     - ` easyCafe #⟨|⟩GCTechnico ` (wisesight:348)
-142. non-Thai / punctuation / word-only / before ` # ` / after ` K ` - 4 occurrences
+143. non-Thai / punctuation / word-only / before ` # ` / after ` K ` - 4 occurrences
     - ` 55) ❤️😍💋 #⟨|⟩KAx7Eleven ` (wisesight:435)
     - ` x7Eleven #⟨|⟩KAUVBabyFa ` (wisesight:435)
     - ` อีกครั้ง #⟨|⟩KAx7Eleven ` (wisesight:737)
     - ` x7Eleven #⟨|⟩KAUVBabyFa ` (wisesight:737)
-143. non-Thai / punctuation / word-only / before ` # ` / after ` a ` - 4 occurrences
+144. non-Thai / punctuation / word-only / before ` # ` / after ` a ` - 4 occurrences
     - ` t/30921/ #⟨|⟩adayonline ` (wisesight:348)
     - ` thailand #⟨|⟩adidasorig ` (wisesight:424)
     - ` bysingha #⟨|⟩asiabestbe ` (wisesight:458)
     - ` thailand #⟨|⟩adidasorig ` (wisesight:574)
-144. non-Thai / punctuation / word-only / before ` # ` / after ` e ` - 4 occurrences
+145. non-Thai / punctuation / word-only / before ` # ` / after ` e ` - 4 occurrences
     - ` Thailand #⟨|⟩evothaiedi ` (wisesight:398)
     - ` iedition #⟨|⟩evothaiedi ` (wisesight:398)
     - `  ทุกสาขา #⟨|⟩est33 #est ` (wisesight:458)
     - ` า #est33 #⟨|⟩est33bysin ` (wisesight:458)
-145. non-Thai / punctuation / word-only / before ` # ` / after ` t ` - 4 occurrences
+146. non-Thai / punctuation / word-only / before ` # ` / after ` t ` - 4 occurrences
     - ` ginal ใน #⟨|⟩theunoffic ` (wisesight:424)
     - ` rty #cdc #⟨|⟩thenine #t ` (wisesight:458)
     - ` #thenine #⟨|⟩theup #ban ` (wisesight:458)
     - ` zzy แบ้ว #⟨|⟩toyotabuzz ` (wisesight:1285)
-146. non-Thai / punctuation / word-only / before ` # ` / after ` ก ` - 4 occurrences
+147. non-Thai / punctuation / word-only / before ` # ` / after ` ก ` - 4 occurrences
     - ` ________ #⟨|⟩กันแดดมิสท ` (wisesight:341)
     - ` ดดมิสทีน #⟨|⟩กันแดดโยชิ ` (wisesight:341)
     - ` Songkran #⟨|⟩กันแดดกันแ ` (wisesight:617)
     - ` ดีที่สุด #⟨|⟩กันแดดอันด ` (wisesight:617)
-147. non-Thai / punctuation / word-only / before ` # ` / after ` ล ` - 4 occurrences
+148. non-Thai / punctuation / word-only / before ` # ` / after ` ล ` - 4 occurrences
     - ` นคันน้อย #⟨|⟩ลำแสงแห่งฟ ` (wisesight:105)
     - ` oMyShade #⟨|⟩ลอรีอัลปาร ` (wisesight:273)
     - ` #⟨|⟩ลอรีเอะเฟร ` (wisesight:528)
     - ` ่เว่นค่ะ #⟨|⟩ล็อคกลิ่นม ` (wisesight:528)
-148. non-Thai / punctuation / word-only / before ` # ` / after ` ห ` - 4 occurrences
+149. non-Thai / punctuation / word-only / before ` # ` / after ` ห ` - 4 occurrences
     - ` ยยยยยยยย #⟨|⟩หงษ์ทอง #ร ` (wisesight:44)
     - ` yGalerie #⟨|⟩หน้าสดแต่ไ ` (wisesight:122)
     - ` anAvatar #⟨|⟩หิมพานต์อว ` (wisesight:418)
     - ` ณ์หน้าสด #⟨|⟩หน้าสดแต่ไ ` (wisesight:641)
-149. non-Thai / punctuation / word-only / before ` # ` / after ` แ ` - 4 occurrences
+150. non-Thai / punctuation / word-only / before ` # ` / after ` แ ` - 4 occurrences
     - ` ่าม พ้าม #⟨|⟩แวะมาตบเสี ` (wisesight:11)
     - ` ตูดกูเลย #⟨|⟩แสบตาโว้ยย ` (wisesight:105)
     - ` พง มาหมด #⟨|⟩แต่NissanT ` (wisesight:511)
     - ` ้างตะหาก #⟨|⟩แคบหมู ` (wisesight:1053)
-150. non-Thai / punctuation / word-only / before ` # ` / after ` โ ` - 4 occurrences
-    - `  #Toyota #⟨|⟩โตโยต้าสุว ` (wisesight:325)
-    - ` วจสอบได้ #⟨|⟩โปรโมชั่นถ ` (wisesight:454)
-    - ` Ativ #⟨|⟩โตโยต้าท่า ` (wisesight:1191)
-    - ` กมั้ยอ่ะ #⟨|⟩โตแล้วเลือ ` (wisesight:1358)
 
-The other 873 patterns, rolled up:
+The other 872 patterns, rolled up:
 
 | Script | Sub-category | Side | Patterns | Occurrences |
 |---|---|---|---|---|
@@ -924,24 +925,24 @@ The other 873 patterns, rolled up:
 | non-Thai | emoji-or-symbol | word-only | 20 | 24 |
 | non-Thai | emoji-or-symbol | line-only | 1 | 1 |
 | non-Thai | other | line-only | 10 | 10 |
-| non-Thai | punctuation | word-only | 590 | 977 |
+| non-Thai | punctuation | word-only | 589 | 976 |
 | Thai | Thai\|Thai | word-only | 1 | 1 |
 
 ## Group (a): differences the filter removes
 
-1. Thai / Thai|Thai / word-only / before ` น ` / after ` ␠ ` - 533 occurrences
+1. Thai / Thai|Thai / word-only / before ` น ` / after ` ␠ ` - 539 occurrences
     - ` พิ่มทุกวัน⟨|⟩ มาดูกันนะ ` (wisesight:1)
     - ` ดกับเราแทน⟨|⟩ ผมรู้สึกเ ` (wisesight:7)
     - ` เราร่มเย็น⟨|⟩ เข้าวัดเล ` (wisesight:22)
     - ` อห้าปีก่อน⟨|⟩ ราคาประมา ` (wisesight:25)
     - ` กิ๊นนนนนนน⟨|⟩ ที่เหลือก ` (wisesight:41)
-2. Thai / Thai|Thai / word-only / before ` ง ` / after ` ␠ ` - 354 occurrences
+2. Thai / Thai|Thai / word-only / before ` ง ` / after ` ␠ ` - 355 occurrences
     - ` ไฮโซหรือไง⟨|⟩ ทำไงก็ขาย ` (wisesight:7)
     - ` าเกินครึ่ง⟨|⟩ ซื้อกาแฟซ ` (wisesight:7)
     - ` ัวรถมันแพง⟨|⟩ เด่วไปแต่ ` (wisesight:19)
     - ` ข้างนอกเอง⟨|⟩ มาทีหลังต ` (wisesight:19)
     - ` กันประท้วง⟨|⟩ ทุกที ถึง ` (wisesight:37)
-3. Thai / Thai|Thai / word-only / before ` า ` / after ` ␠ ` - 330 occurrences
+3. Thai / Thai|Thai / word-only / before ` า ` / after ` ␠ ` - 333 occurrences
     - ` ยเงินค่ายา⟨|⟩ พร้อมกับห ` (wisesight:7)
     - ` านอีกคนว่า⟨|⟩ มาคุยแทนพ ` (wisesight:7)
     - ` จะรำคาญเรา⟨|⟩ เลิกซื้อเ ` (wisesight:7)
@@ -959,25 +960,25 @@ The other 873 patterns, rolled up:
     - ` ายเบนซ์ค่ะ⟨|⟩ ดูแพงดูเฉ ` (wisesight:6)
     - ` รั้งแล้วนะ⟨|⟩ สาขานี้บร ` (wisesight:7)
     - ` ตีนป่าวล่ะ⟨|⟩ ปีใหม่เก็ ` (wisesight:12)
-6. Thai / Thai|Thai / word-only / before ` ก ` / after ` ␠ ` - 222 occurrences
-    - ` เปลี่ยนยาก⟨|⟩ แต่คนรุ่น ` (wisesight:18)
-    - ` จุกอก⟨|⟩ กันไป กลื ` (wisesight:21)
-    - ` ยังฟ้องอีก⟨|⟩ ต่อไปคงจะ ` (wisesight:37)
-    - ` อร์แข็งมาก⟨|⟩ ช่วงยูเทิ ` (wisesight:39)
-    - ` : อร่อยมาก⟨|⟩ ละสิ! ช : ` (wisesight:50)
-7. Thai / Thai|Thai / word-only / before ` ◌์ ` / after ` ␠ ` - 222 occurrences
+6. Thai / Thai|Thai / word-only / before ` ◌์ ` / after ` ␠ ` - 231 occurrences
     - ` แพงเว่อร์⟨|⟩ เบียร์ช้า ` (wisesight:2)
     - ` ่ทุบรถโชว์⟨|⟩ ถือป้ายปร ` (wisesight:37)
     - ` อเตอร์โชว์⟨|⟩ นัดรวมตัว ` (wisesight:37)
     - ` บียร์สิงห์⟨|⟩ เครือสิงห ` (wisesight:48)
     - ` รียลเวิลด์⟨|⟩ สำโรง ควร ` (wisesight:51)
-8. Thai / Thai|Thai / word-only / before ` ◌ี ` / after ` ␠ ` - 178 occurrences
+7. Thai / Thai|Thai / word-only / before ` ก ` / after ` ␠ ` - 222 occurrences
+    - ` เปลี่ยนยาก⟨|⟩ แต่คนรุ่น ` (wisesight:18)
+    - ` จุกอก⟨|⟩ กันไป กลื ` (wisesight:21)
+    - ` ยังฟ้องอีก⟨|⟩ ต่อไปคงจะ ` (wisesight:37)
+    - ` อร์แข็งมาก⟨|⟩ ช่วงยูเทิ ` (wisesight:39)
+    - ` : อร่อยมาก⟨|⟩ ละสิ! ช : ` (wisesight:50)
+8. Thai / Thai|Thai / word-only / before ` ◌ี ` / after ` ␠ ` - 179 occurrences
     - ` น่าจะขายดี⟨|⟩ ใช้เครื่อ ` (wisesight:19)
     - ` ังครบสามปี⟨|⟩ ตัวเราไม่ ` (wisesight:25)
     - ` ท้วง ทุกที⟨|⟩ ถึงจะรับผ ` (wisesight:37)
     - ` โมเดสไม่ดี⟨|⟩ ห่อตัว แบ ` (wisesight:45)
     - ` ใหม่ ทุกที⟨|⟩ ญ : อร่อย ` (wisesight:50)
-9. non-Thai / punctuation / word-only / before ` . ` / after ` ␠ ` - 172 occurrences
+9. non-Thai / punctuation / word-only / before ` . ` / after ` ␠ ` - 174 occurrences
     - ` ช้าง......⟨|⟩ กินแล้วอว ` (wisesight:40)
     - ` บตาย......⟨|⟩ เบียร์คนไ ` (wisesight:40)
     - ` ่ 12.10 น.⟨|⟩ ได้รับของ ` (wisesight:49)
@@ -989,7 +990,7 @@ The other 873 patterns, rolled up:
     - ` ราม่าไม่จบ⟨|⟩ เมียสาวโร ` (wisesight:23)
     - ` ยบร้อยครับ⟨|⟩ ไม่พอใจจร ` (wisesight:33)
     - ` ะรับผิดชอบ⟨|⟩ นี่เค้าถึ ` (wisesight:37)
-11. Thai / Thai|Thai / word-only / before ` ม ` / after ` ␠ ` - 163 occurrences
+11. Thai / Thai|Thai / word-only / before ` ม ` / after ` ␠ ` - 165 occurrences
     - ` ผ่าม⟨|⟩ พ้าม #แวะ ` (wisesight:11)
     - ` ใช้ที่แก้ม⟨|⟩ เกลี่ยยาก ` (wisesight:16)
     - ` ะตูม 5 ชาม⟨|⟩ เราคิดว่า ` (wisesight:49)
@@ -1001,25 +1002,25 @@ The other 873 patterns, rolled up:
     - ` กไม่เคยเจอ⟨|⟩ รึกุแดกแบ ` (wisesight:52)
     - ` ลอะอีกเหรอ⟨|⟩ เกลียดอ่ะ ` (wisesight:100)
     - ` ่ได้นอนหรอ⟨|⟩ แบบหืมคือ ` (wisesight:122)
-13. non-Thai / Thai|Latin-or-digit / word-only / before ` 0 ` / after ` ␠ ` - 153 occurrences
+13. non-Thai / Thai|Latin-or-digit / word-only / before ` 0 ` / after ` ␠ ` - 154 occurrences
     - ` ะไม่ถึง 50⟨|⟩ ขาย 120 😰 ` (wisesight:2)
     - ` 990,000⟨|⟩ น่าจะขายด ` (wisesight:19)
     - ` หล้าขาว 40⟨|⟩ ดีกรีอีก ` (wisesight:31)
     - ` างขวดละ120⟨|⟩ น้ำขวดละ5 ` (wisesight:36)
     - ` น้ำขวดละ50⟨|⟩ มะพร้าวลู ` (wisesight:36)
-14. Thai / Thai|Thai / word-only / before ` ๆ ` / after ` ␠ ` - 150 occurrences
-    - ` อเสียงแหบๆ⟨|⟩ แต่เธอเดิ ` (wisesight:7)
-    - ` ี่นี่จริงๆ⟨|⟩ ถามอะไรต้ ` (wisesight:7)
-    - ` ใช่ๆๆ⟨|⟩ ลิ้นเเทบข ` (wisesight:24)
-    - ` องคิดเล่นๆ⟨|⟩ เบียร์ช้า ` (wisesight:36)
-    - ` ต่คันใหญ่ๆ⟨|⟩ ขับไม่ถนั ` (wisesight:41)
-15. non-Thai / punctuation / word-only / before ` ) ` / after ` ␠ ` - 149 occurrences
+14. non-Thai / punctuation / word-only / before ` ) ` / after ` ␠ ` - 151 occurrences
     - ` แพงมากกกก)⟨|⟩ ฝังครบสาม ` (wisesight:25)
     - ` างออนไลน์)⟨|⟩ N7 - สำหร ` (wisesight:273)
     - ` นี้ครับ 1)⟨|⟩ โปรโมชั่น ` (wisesight:279)
     - ` ี้คร้าบ 2)⟨|⟩ โปรโมชั่น ` (wisesight:279)
     - ` 1.30 ช.ม.)⟨|⟩ เริ่ม 7 ธ ` (wisesight:279)
-16. Thai / Thai|Thai / word-only / before ` ◌้ ` / after ` ␠ ` - 138 occurrences
+15. Thai / Thai|Thai / word-only / before ` ๆ ` / after ` ␠ ` - 150 occurrences
+    - ` อเสียงแหบๆ⟨|⟩ แต่เธอเดิ ` (wisesight:7)
+    - ` ี่นี่จริงๆ⟨|⟩ ถามอะไรต้ ` (wisesight:7)
+    - ` ใช่ๆๆ⟨|⟩ ลิ้นเเทบข ` (wisesight:24)
+    - ` องคิดเล่นๆ⟨|⟩ เบียร์ช้า ` (wisesight:36)
+    - ` ต่คันใหญ่ๆ⟨|⟩ ขับไม่ถนั ` (wisesight:41)
+16. Thai / Thai|Thai / word-only / before ` ◌้ ` / after ` ␠ ` - 139 occurrences
     - ` ังไงไม่รู้⟨|⟩ สังเกตุหล ` (wisesight:7)
     - ` อะไรจัดให้⟨|⟩ บริการเลิ ` (wisesight:7)
     - ` ไงก็ไม่รู้⟨|⟩ คือพวกคนแ ` (wisesight:18)
@@ -1031,7 +1032,7 @@ The other 873 patterns, rolled up:
     - ` บีกอน ทีไร⟨|⟩ ต้องสั่งใ ` (wisesight:50)
     - ` กจากปากใคร⟨|⟩ มันก็ไม่ม ` (wisesight:66)
     - ` ุดก็บิโอเร⟨|⟩ กับ นีเวี ` (wisesight:83)
-18. Thai / Thai|Thai / word-only / before ` ว ` / after ` ␠ ` - 124 occurrences
+18. Thai / Thai|Thai / word-only / before ` ว ` / after ` ␠ ` - 125 occurrences
     - ` ้าจริงแล้ว⟨|⟩ เพราะสั่ง ` (wisesight:36)
     - ` ่ดี ห่อตัว⟨|⟩ แบบเย็นไม ` (wisesight:45)
     - ` จะใช่ในวัว⟨|⟩ นี้กินซกเ ` (wisesight:52)
@@ -1049,24 +1050,24 @@ The other 873 patterns, rolled up:
     - ` ไปยืมรถพี่⟨|⟩ พี่แม่งขั ` (wisesight:41)
     - ` องสั่งใหม่⟨|⟩ ทุกที ญ : ` (wisesight:50)
     - ` ษณากานิเย่⟨|⟩ มีความไม่ ` (wisesight:65)
-21. Thai / Thai|Thai / word-only / before ` ด ` / after ` ␠ ` - 110 occurrences
+21. Thai / Thai|Thai / word-only / before ` ด ` / after ` ␠ ` - 111 occurrences
     - `  Shop เปิด⟨|⟩ ไม่มี Aus ` (wisesight:13)
     - ` ยวมาเลยขาด⟨|⟩ ถ้าเกี่ยว ` (wisesight:57)
     - ` หุ้นลง5จุด⟨|⟩ กระบือรุ่ ` (wisesight:63)
     - ` นขึ้น15จุด⟨|⟩ มากกว่าลง ` (wisesight:63)
     - ` ่อวาน10จุด⟨|⟩ แบบนี้แปล ` (wisesight:63)
-22. non-Thai / Thai|Latin-or-digit / word-only / before ` ง ` / after ` ␠ ` - 107 occurrences
-    - ` วดละไม่ถึง⟨|⟩ 50 ขาย 12 ` (wisesight:2)
-    - ` นเลยคะ ทาง⟨|⟩ inbox ` (wisesight:28)
-    - ` eanser ของ⟨|⟩ Kiehl’s # ` (wisesight:35)
-    - ` ยมาด้วยแหง⟨|⟩ 555+ แต่ก ` (wisesight:66)
-    - ` มันถึง⟨|⟩ 29 😭 ` (wisesight:72)
-23. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` ␠ ` - 105 occurrences
+22. non-Thai / Thai|Latin-or-digit / word-only / before ` น ` / after ` ␠ ` - 108 occurrences
     - ` โดน⟨|⟩ smirnoff  ` (wisesight:34)
     - ` ควัน⟨|⟩ vape มันเ ` (wisesight:66)
     - ` เหี้ย ผ่าน⟨|⟩ etude เปิ ` (wisesight:89)
     - ` ็งมีนิสสัน⟨|⟩ titan อยู ` (wisesight:94)
     - ` ข้าได้ก่อน⟨|⟩ 11 โมง แล ` (wisesight:127)
+23. non-Thai / Thai|Latin-or-digit / word-only / before ` ง ` / after ` ␠ ` - 107 occurrences
+    - ` วดละไม่ถึง⟨|⟩ 50 ขาย 12 ` (wisesight:2)
+    - ` นเลยคะ ทาง⟨|⟩ inbox ` (wisesight:28)
+    - ` eanser ของ⟨|⟩ Kiehl’s # ` (wisesight:35)
+    - ` ยมาด้วยแหง⟨|⟩ 555+ แต่ก ` (wisesight:66)
+    - ` มันถึง⟨|⟩ 29 😭 ` (wisesight:72)
 24. non-Thai / Thai|Latin-or-digit / word-only / before ` 5 ` / after ` ␠ ` - 98 occurrences
     - ` และ 25⟨|⟩ ประเทศที่ ` (wisesight:13)
     - `  เปิดแล้ว5⟨|⟩ ถ้ามัวแต่ ` (wisesight:14)
@@ -1079,13 +1080,13 @@ The other 873 patterns, rolled up:
     - ` ่งปลั่งแบบ⟨|⟩ no make u ` (wisesight:122)
     - ` พงไปสำหรับ⟨|⟩ 390 ` (wisesight:136)
     - ` ไปเทียบกับ⟨|⟩ HRV ที่ผม ` (wisesight:151)
-26. non-Thai / Thai|Latin-or-digit / word-only / before ` 2 ` / after ` ␠ ` - 80 occurrences
+26. non-Thai / Thai|Latin-or-digit / word-only / before ` 2 ` / after ` ␠ ` - 81 occurrences
     - ` บรัช 4u2⟨|⟩ มันดูกระจ ` (wisesight:16)
     - ` ารอย่างละ2⟨|⟩ และบองคิด ` (wisesight:36)
     - ` ับ mazda 2⟨|⟩ คือล่มละ  ` (wisesight:92)
     - ` #dek62⟨|⟩ เป็นเด็ก  ` (wisesight:152)
     - ` x กูค้าง 2⟨|⟩ รอบแล้ว ` (wisesight:170)
-27. non-Thai / other / word-only / before ` e ` / after ` ␠ ` - 79 occurrences
+27. non-Thai / other / word-only / before ` e ` / after ` ␠ ` - 81 occurrences
     - ` เทศที่ The⟨|⟩ Face Shop ` (wisesight:13)
     - ` ่ The Face⟨|⟩ Shop เปิด ` (wisesight:13)
     - ` Jo malone⟨|⟩ wood sage ` (wisesight:85)
@@ -1110,15 +1111,15 @@ The other 873 patterns, rolled up:
     - ` แปด SG 2.1⟨|⟩ ล้าน ไทยเ ` (wisesight:162)
     - ` ินทอนมัน 1⟨|⟩ บาทอ่ะ555 ` (wisesight:242)
 
-The other 387 patterns, rolled up:
+The other 388 patterns, rolled up:
 
 | Script | Sub-category | Side | Patterns | Occurrences |
 |---|---|---|---|---|
-| non-Thai | Thai\|Latin-or-digit | word-only | 94 | 1288 |
+| non-Thai | Thai\|Latin-or-digit | word-only | 95 | 1294 |
 | non-Thai | emoji-or-symbol | word-only | 64 | 128 |
-| non-Thai | other | word-only | 65 | 515 |
-| non-Thai | punctuation | word-only | 117 | 984 |
-| Thai | Thai\|Thai | word-only | 47 | 604 |
+| non-Thai | other | word-only | 65 | 520 |
+| non-Thai | punctuation | word-only | 117 | 980 |
+| Thai | Thai\|Thai | word-only | 47 | 613 |
 
 ## Differences in the matrix inputs
 
