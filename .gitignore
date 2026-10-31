@@ -3,3 +3,4 @@
 *.node
 /npm
 /artifacts
+/binding.js

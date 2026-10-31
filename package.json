@@ -1,0 +1,36 @@
+{
+  "name": "thaiwrap",
+  "version": "0.0.0",
+  "description": "Fast Thai line wrapping for Node.js and Bun, powered by Rust",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/theerakarnm/thaiwrap.git" },
+  "main": "index.js",
+  "types": "binding.d.ts",
+  "exports": {
+    ".": { "types": "./binding.d.ts", "default": "./index.js" },
+    "./package.json": "./package.json"
+  },
+  "files": ["index.js", "platform.js", "binding.js", "binding.d.ts"],
+  "engines": { "node": ">= 22" },
+  "publishConfig": { "access": "public" },
+  "napi": {
+    "binaryName": "thaiwrap",
+    "packageName": "@thaiwrap/binding",
+    "targets": [
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc"
+    ]
+  },
+  "scripts": {
+    "build": "napi build --platform --release --manifest-path crates/thaiwrap-node/Cargo.toml --output-dir . --js binding.js --dts binding.d.ts",
+    "build:debug": "napi build --platform --manifest-path crates/thaiwrap-node/Cargo.toml --output-dir . --js binding.js --dts binding.d.ts",
+    "test": "bun test && node --test __test__/node-runner.mjs"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "3.10.9"
+  }
+}
