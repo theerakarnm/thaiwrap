@@ -8,6 +8,8 @@
 #![warn(clippy::pedantic)]
 
 mod lines;
+mod measure;
+mod segment;
 mod thai;
 
 use std::fmt;
