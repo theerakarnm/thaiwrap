@@ -2,7 +2,8 @@
 
 Fast Thai line wrapping for Node.js and Bun, powered by Rust.
 
-`thaiwrap` breaks Thai text into lines of a maximum length **at word boundaries**, so no Thai word is ever cut in half and no line starts with an orphan vowel or tone mark.
+`thaiwrap` breaks Thai text into lines of a maximum length **at word boundaries**, so Thai words are not cut in half; a word longer than the line is cut only where Thai rules allow.
+No line starts with an orphan vowel or tone mark.
 
 > **Status:** pre-release. The API below is the planned v0.1 surface and may change before the first published version.
 
@@ -68,11 +69,50 @@ Invalid input throws instead of crashing the process: a non-string `text` throws
 
 ### Options
 
-Options are being finalized for v0.1. Planned:
+| Option     | Default        | Description |
+| ---------- | -------------- | ----------- |
+| `measure`  | `"codeUnits"`  | How line length is counted: `"codeUnits"` or `"graphemes"`. See [Measuring length](#measuring-length). |
+| `overflow` | `"split"`      | What to do with a word longer than `maxLength`: `"split"` or `"keep"`. See [Long words](#long-words). |
 
-| Option    | Default        | Description |
-| --------- | -------------- | ----------- |
-| `measure` | `"codeUnits"`  | How line length is counted. See [Measuring length](#measuring-length). |
+## Line breaking rules
+
+### Spaces
+
+Spaces are break opportunities.
+They are trimmed at line edges and kept inside a line.
+A zero width space (U+200B) breaks like a space.
+A no-break space (NBSP) never breaks.
+
+### Line breaks
+
+`\n`, `\r\n`, `\r`, VT, FF, NEL, U+2028, and U+2029 always end a line.
+
+### Blank lines
+
+An input line with no visible characters becomes `""`.
+A wrapped piece with no visible characters is dropped, so `""` never appears inside one paragraph.
+Blank lines before the first and after the last visible line are dropped.
+Blank lines between visible lines are kept, not collapsed.
+
+```js
+wrapThai("", 10)            // []
+wrapThai("   ", 10)         // []
+wrapThai("\n\n", 10)        // []
+wrapThai("ก\n\nข", 10)      // ["ก", "", "ข"]
+wrapThai("\n\nก\n\n", 10)   // ["ก"]
+wrapThai("ก\n\n\nข", 10)    // ["ก", "", "", "ข"]
+```
+
+### Long words
+
+`overflow: "split"` (default) cuts a word longer than `maxLength` at grapheme boundaries that keep Thai vowels and tone marks with their consonant.
+`overflow: "keep"` puts the whole word on its own line.
+
+A unit that cannot be cut is placed alone on its line, even when it is longer than `maxLength`.
+For example, `ที่` is one grapheme of 3 code units, and `กา` cannot start a line with `า`.
+
+For Thai text, use a `maxLength` of 5 or more.
+Then a line is longer than `maxLength` only in rare cases, such as a word followed by repeated ๆ (`เท่าๆๆ` is one unit of 6 code units).
 
 ## Measuring length
 
@@ -111,21 +151,29 @@ Roughly 2-3x faster on Node and about 1.8x on Bun. The gain matters most for hig
 
 ## Platform support
 
-`thaiwrap` is a native Node-API addon built with [napi-rs](https://napi.rs). Prebuilt binaries are planned for:
+`thaiwrap` is a native Node-API addon built with [napi-rs](https://napi.rs). Prebuilt binaries are provided for:
 
 | OS      | Architectures       |
 | ------- | ------------------- |
-| Linux   | x64, arm64 (glibc)  |
+| Linux   | x64 (glibc), arm64 (glibc), x64 (musl) |
 | macOS   | x64, arm64          |
 | Windows | x64                 |
 
-Runtimes: Node.js 18+ and Bun.
+Runtimes: Node.js 22+ and Bun.
+On other platforms, loading the package throws an error that names your platform.
 
 Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebAssembly build may be added later.
 
+## Known limitations
+
+- Lone surrogates become U+FFFD.
+- Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.
+- Output can differ from `Intl.Segmenter` because the dictionary ships inside the package.
+- A split inside a long word can leave a single final consonant on a line (for example `สร้า` / `ง`).
+
 ## Development
 
-Requirements: Rust (stable), Node.js 18+, Bun.
+Requirements: Rust (stable), Node.js 22+, Bun.
 
 ```bash
 git clone https://github.com/theerakarnm/thaiwrap.git
