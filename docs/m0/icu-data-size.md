@@ -12,9 +12,9 @@ All spike code lives on branch `spike/icu-data-size` (commit `7d8a7a0`, never me
 | option | segmenter | .node bytes (darwin-arm64) | .node bytes (linux-arm64-gnu) | differences by category | eligible |
 | --- | --- | --- | --- | --- | --- |
 | compiled data (today) | `LineSegmenter` | 1,477,760 | not measured (podman storage broken) | reference | reference |
-| (a) Thai only | `LineSegmenter` | 569,584 (-908,176, -61.5%) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0 | yes |
-| (b) all dictionaries | `LineSegmenter` | 1,477,760 (same as compiled) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0 | yes |
-| (a) + CJK | `LineSegmenter` | 569,584 (same as (a)) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0 | yes |
+| (a) Thai only | `LineSegmenter` | 569,584 (-908,176, -61.5%) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 5 | yes |
+| (b) all dictionaries | `LineSegmenter` | 1,477,760 (same as compiled) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 0 | yes |
+| (a) + CJK | `LineSegmenter` | 569,584 (same as (a)) | not measured (podman storage broken) | Thai 0, Latin 0, digits 0, punctuation 0, emoji 0, CJK 0, Lao/Khmer/Burmese 5 | yes |
 
 "Eligible" means zero differences on Thai, Latin, digits, punctuation, and emoji (D17).
 Sizes are `stat -f %z thaiwrap.darwin-arm64.node` after `bun run build` (release: lto, codegen-units 1, strip).
