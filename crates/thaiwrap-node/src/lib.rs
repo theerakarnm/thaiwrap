@@ -70,12 +70,15 @@ fn read_max_length(env: &Env, value: &Unknown<'_>) -> Result<usize> {
         ));
     }
     let n = value.coerce_to_number()?.get_double()?;
-    max_length_from_f64(n).ok_or_else(|| {
-        range_error(
-            env,
-            &format!("maxLength must be a positive integer, got {}", js_number(n)),
-        )
-    })
+    if let Some(max_length) = max_length_from_f64(n) {
+        return Ok(max_length);
+    }
+    // The engine's own conversion, so the message shows exactly what JS prints (`1e+21`, not 1000...).
+    let shown = value.coerce_to_string()?.into_utf8()?.into_owned()?;
+    Err(range_error(
+        env,
+        &format!("maxLength must be a positive integer, got {shown}"),
+    ))
 }
 
 fn max_length_from_f64(n: f64) -> Option<usize> {
@@ -85,17 +88,6 @@ fn max_length_from_f64(n: f64) -> Option<usize> {
     // n is an integer in 1..=2^53-1, so the cast to u64 is exact.
     let n = n as u64;
     Some(usize::try_from(n).unwrap_or(usize::MAX))
-}
-
-/// Formats a number the way JS prints it in the cases we report (NaN, Infinity, integers, decimals).
-fn js_number(n: f64) -> String {
-    if n.is_nan() {
-        "NaN".to_owned()
-    } else if n.is_infinite() {
-        if n > 0.0 { "Infinity" } else { "-Infinity" }.to_owned()
-    } else {
-        n.to_string()
-    }
 }
 
 fn read_options(env: &Env, value: Option<&Unknown<'_>>) -> Result<WrapOptions> {
