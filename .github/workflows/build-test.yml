@@ -22,8 +22,8 @@ jobs:
       - if: contains(matrix.flags, '-x')
         uses: mlugg/setup-zig@v2
         # Without a version, setup-zig installs the latest release, which was 0.17.0 on 2026-10-31
-        # (https://ziglang.org/download/index.json). cargo-zigbuild added 0.17 support on 2026-10-03.
-        # Bump this deliberately, after checking cargo-zigbuild supports the new release.
+        # (https://ziglang.org/download/index.json). zig 0.17.0 with cargo-zigbuild 0.24.0 built the musl
+        # target locally on 2026-10-31. cargo-zigbuild does not pin zig, so bump zig deliberately.
         with: { version: 0.17.0 }
       - if: contains(matrix.flags, '-x')
         run: cargo install cargo-zigbuild --locked
