@@ -298,3 +298,81 @@ fn max_length_zero_should_be_an_error() {
         Err(WrapError::InvalidMaxLength)
     );
 }
+
+#[test]
+#[ignore = "prints observed output for 🔍 rows"]
+fn print_observed_rows() {
+    for (text, max, o) in [
+        ("สวัสดี! (ภาษาไทย)", 8, opts(DEFAULT.0, DEFAULT.1)),
+        ("ปี๒๕๖๗", 3, opts(DEFAULT.0, DEFAULT.1)),
+        ("แชท คัดลอก", 3, opts(DEFAULT.0, DEFAULT.1)),
+        ("ของดี ๆ มีเยอะ", 5, opts(DEFAULT.0, DEFAULT.1)),
+        ("กรุงเทพฯ เป็นเมืองหลวง", 8, opts(DEFAULT.0, DEFAULT.1)),
+        ("ผัก ผลไม้ ฯลฯ", 10, opts(DEFAULT.0, DEFAULT.1)),
+    ] {
+        println!("{text:?} {max} -> {:?}", lines(text, max, o));
+    }
+}
+
+#[test]
+fn observed_m2_exclamation_and_paren_should_match_recorded_output() {
+    let got = lines("สวัสดี! (ภาษาไทย)", 8, opts(DEFAULT.0, DEFAULT.1));
+    assert!(got
+        .iter()
+        .all(|l| !l.starts_with(|c: char| "ะาำๆฯ".contains(c))));
+    assert_eq!(got, vec!["สวัสดี!", "(ภาษาไทย", ")"]);
+}
+
+#[test]
+fn observed_m4_thai_digits_should_match_recorded_output() {
+    let got = lines("ปี๒๕๖๗", 3, opts(DEFAULT.0, DEFAULT.1));
+    assert!(got.iter().all(|l| {
+        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
+            && !l.ends_with(|c: char| "เแโใไ".contains(c))
+    }));
+    assert_eq!(got, vec!["ปี", "๒๕๖", "๗"]);
+}
+
+#[test]
+fn observed_m7_chat_should_match_recorded_output() {
+    let got = lines("แชท คัดลอก", 3, opts(DEFAULT.0, DEFAULT.1));
+    assert!(got.iter().all(|l| {
+        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
+            && !l.ends_with(|c: char| "เแโใไ".contains(c))
+    }));
+    assert_eq!(got, vec!["แชท", "คัด", "ลอก"]);
+}
+
+#[test]
+fn observed_t2_maiyamok_after_space_should_match_recorded_output() {
+    let got = lines("ของดี ๆ มีเยอะ", 5, opts(DEFAULT.0, DEFAULT.1));
+    assert!(got.iter().all(|l| {
+        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
+            && !l.ends_with(|c: char| "เแโใไ".contains(c))
+    }));
+    assert!(got.iter().all(|l| !l.starts_with('ๆ')));
+    assert!(got.contains(&"ดี ๆ"));
+    assert_eq!(got, vec!["ของ", "ดี ๆ", "มี", "เยอะ"]);
+}
+
+#[test]
+fn observed_t3_rest_should_match_recorded_output() {
+    let got = lines("กรุงเทพฯ เป็นเมืองหลวง", 8, opts(DEFAULT.0, DEFAULT.1));
+    assert!(got.iter().all(|l| {
+        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
+            && !l.ends_with(|c: char| "เแโใไ".contains(c))
+    }));
+    assert_eq!(got[0], "กรุงเทพฯ");
+    assert_eq!(got, vec!["กรุงเทพฯ", "เป็น", "เมือง", "หลวง"]);
+}
+
+#[test]
+fn observed_t4_paiyannoi_etc_should_match_recorded_output() {
+    let got = lines("ผัก ผลไม้ ฯลฯ", 10, opts(DEFAULT.0, DEFAULT.1));
+    assert!(got.iter().all(|l| {
+        !l.starts_with(|c: char| "ะาำๆฯ\u{e31}\u{e34}\u{e35}\u{e36}\u{e37}\u{e38}\u{e39}\u{e47}\u{e48}\u{e49}\u{e4a}\u{e4b}\u{e4c}".contains(c))
+            && !l.ends_with(|c: char| "เแโใไ".contains(c))
+    }));
+    assert!(got.iter().all(|l| !l.starts_with('ฯ')));
+    assert_eq!(got, vec!["ผัก ผล", "ไม้ ฯลฯ"]);
+}
