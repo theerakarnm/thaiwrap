@@ -1,0 +1,6 @@
+{
+  "name": "thaiwrap-bench",
+  "compatibility_date": "2026-10-31",
+  "routes": [{ "pattern": "thaiwrap.eukron.com", "custom_domain": true }],
+  "assets": { "directory": "./public" }
+}

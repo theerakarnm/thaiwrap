@@ -161,6 +161,12 @@ It also applies the Thai rules per grapheme.
 Against a plain word-break wrapper the gap was about 2.2-2.6x on Node 22, 1.5-1.8x on Node 24 and 2x on Bun.
 The gain matters most for high-volume work such as generating receipts, labels or PDFs in bulk.
 The table above is from an earlier prototype.
+The chart below shows the v0.1 numbers (Apple M1 Pro, average time per call, lower is better).
+
+![thaiwrap vs Intl.Segmenter benchmark: 3-6x faster on Node 22, Node 24 and Bun 1.4.4](assets/pictures/benchmark.png)
+
+More charts are on the [benchmark page](https://thaiwrap.eukron.com/benchmarks/).
+Full documentation is on the [docs site](https://thaiwrap.eukron.com/docs/) (source in [`site/`](site)).
 
 ## Platform support
 

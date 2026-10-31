@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>thaiwrap - Thai line wrapping for Node.js and Bun</title><meta name="description" content="Fast Thai line wrapping at word boundaries for Node.js and Bun, powered by Rust.">
+<link rel="stylesheet" href="/style.css"></head><body>
+<header class="nav"><div><a class="brand" href="/">thaiwrap</a><a href="/docs/">Docs</a><a href="/benchmarks/">Benchmarks</a><a href="https://github.com/theerakarnm/wrapthai">GitHub</a></div></header>
+<main><section class="hero"><h1>Thai line wrapping that respects words.</h1>
+<p class="lead">thaiwrap breaks Thai text into lines of a maximum length at word boundaries. Built in Rust, for Node.js and Bun.</p>
+<div class="cta"><a class="btn p" href="/docs/">Read the docs</a><a class="btn" href="/benchmarks/">See benchmarks</a></div>
+<pre>npm install thaiwrap
+# or
+bun add thaiwrap</pre></section>
+<h2>Why not slice every N characters?</h2>
+<p>Thai has no spaces between words. Slicing cuts words apart and leaves vowel and tone marks alone at the start of a line.</p>
+<div class="grid2"><div><h3 class="bad">Naive slice, 10 characters</h3><pre>["กระบวนการส",
+ "ื่อสาร ส่ง",
+ "มอบ และสร้",
+ "างคุณค่า"]</pre></div>
+<div><h3 class="ok">wrapThai(text, 10)</h3><pre>["กระบวนการ",
+ "สื่อสาร",
+ "ส่งมอบ และ",
+ "สร้าง",
+ "คุณค่า"]</pre></div></div>
+<pre>import { wrapThai } from "thaiwrap"
+wrapThai("กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า", 10)</pre>
+<h2>Features</h2>
+<div class="feat">
+<div><b>Word boundaries</b>ICU4X dictionary line segmenter, compiled into the addon. Same output on every runtime.</div>
+<div><b>Thai text rules</b>No line starts with a combining mark or ends with a leading vowel.</div>
+<div><b>Fast</b>About 3-6x faster than an Intl.Segmenter wrapper on Node and Bun. <a href="/benchmarks/">Details</a>.</div>
+<div><b>Safe</b>Bad input throws TypeError or RangeError. It never crashes the process.</div>
+<div><b>Two ways to measure</b>UTF-16 code units like .length, or graphemes for on-screen fit.</div>
+<div><b>Prebuilt binaries</b>Linux, macOS and Windows. No Rust toolchain needed.</div>
+</div><footer>MIT licensed. Pre-release (v0.x), the API may change. <a href="https://github.com/theerakarnm/wrapthai">Source on GitHub</a>.</footer></main></body></html>
