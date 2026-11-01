@@ -2,7 +2,7 @@
 use std::ops::Range;
 
 use crate::measure::measure;
-use crate::{lines, segment, thai, Overflow, WrapError, WrapOptions};
+use crate::{lines, segment, tcc, thai, Overflow, WrapError, WrapOptions};
 
 /// Wrap `text` into lines of at most `max_length`, breaking only where the segmenter
 /// and the Thai text rules allow.
@@ -126,34 +126,65 @@ impl Paragraph<'_> {
         last
     }
 
-    /// Cut one too-long unit at grapheme boundaries that pass the Thai rules, greedily.
-    /// A piece with no legal cut inside stays whole, even if it is longer than `max_length`.
+    /// Cut one too-long unit greedily. Inside Thai, cuts fall only at Thai Character Cluster
+    /// ends (see `tcc`), so `เกี่ยว` can be cut as `เกี่ย` + `ว` but never as `เกี่` + `ยว`.
+    /// Every cut is also a grapheme boundary allowed by the Thai rules. A piece between two
+    /// such cuts that is still longer than `max_length` falls back to all grapheme cuts inside
+    /// it, and a piece with no legal cut at all stays whole.
     fn split_overflow(&self, content: Range<usize>) -> Vec<Line> {
         let text = self.text;
         let Some(word) = text.get(content.clone()) else {
             return Vec::new();
         };
-        let cuts = segment::grapheme_boundaries(word)
-            .map(|b| content.start + b)
-            .filter(|&b| b > content.start && b < content.end && thai::allowed(text, b))
-            .chain(std::iter::once(content.end));
+        let mut graphemes = segment::grapheme_boundaries(word).peekable();
         let mut chunks: Vec<Line> = Vec::new();
         let mut piece_start = content.start;
-        for cut in cuts {
-            let width = self.measure(piece_start..cut);
-            match chunks.last_mut() {
-                Some(chunk) if chunk.len.saturating_add(width) <= self.max_length => {
-                    chunk.range.end = cut;
-                    chunk.len = chunk.len.saturating_add(width);
-                }
-                _ => chunks.push(Line {
-                    range: piece_start..cut,
-                    len: width,
-                }),
+        for end in tcc::cluster_ends(word) {
+            // Both lists are sorted, so one pass keeps the cluster ends that are grapheme boundaries.
+            while graphemes.next_if(|&g| g < end).is_some() {}
+            let cut = content.start.saturating_add(end);
+            let legal =
+                cut == content.end || (graphemes.peek() == Some(&end) && thai::allowed(text, cut));
+            if !legal {
+                continue;
             }
+            if self.measure(piece_start..cut) > self.max_length {
+                self.push_grapheme_cuts(&mut chunks, piece_start..cut);
+            }
+            self.push_cut(&mut chunks, content.start, cut);
             piece_start = cut;
         }
         chunks
+    }
+
+    /// The fallback of `split_overflow`: every legal grapheme cut inside `piece`.
+    fn push_grapheme_cuts(&self, chunks: &mut Vec<Line>, piece: Range<usize>) {
+        let Some(slice) = self.text.get(piece.clone()) else {
+            return;
+        };
+        for b in segment::grapheme_boundaries(slice) {
+            let cut = piece.start.saturating_add(b);
+            if cut > piece.start && cut < piece.end && thai::allowed(self.text, cut) {
+                self.push_cut(chunks, piece.start, cut);
+            }
+        }
+    }
+
+    /// Cut at `cut`: the text since the previous cut joins the last chunk if it fits, else it
+    /// starts a new one. `start` is where the unit begins.
+    fn push_cut(&self, chunks: &mut Vec<Line>, start: usize, cut: usize) {
+        let from = chunks.last().map_or(start, |chunk| chunk.range.end);
+        let width = self.measure(from..cut);
+        match chunks.last_mut() {
+            Some(chunk) if chunk.len.saturating_add(width) <= self.max_length => {
+                chunk.range.end = cut;
+                chunk.len = chunk.len.saturating_add(width);
+            }
+            _ => chunks.push(Line {
+                range: from..cut,
+                len: width,
+            }),
+        }
     }
 
     fn measure(&self, range: Range<usize>) -> usize {

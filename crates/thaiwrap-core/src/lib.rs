@@ -12,7 +12,6 @@ mod compare_segmenters;
 mod lines;
 mod measure;
 mod segment;
-#[cfg_attr(not(test), allow(dead_code))] // used by split_overflow from the next commit
 mod tcc;
 mod thai;
 mod wrap;
@@ -49,7 +48,9 @@ pub enum Measure {
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub enum Overflow {
-    /// Cut the word at grapheme boundaries allowed by the Thai text rules.
+    /// Cut the word where the Thai text rules allow: at Thai Character Cluster ends inside
+    /// Thai, at grapheme boundaries elsewhere, and at grapheme boundaries inside a cluster
+    /// that is longer than the maximum line length.
     #[default]
     Split,
     /// Put the whole word on its own line, even if it is too long.

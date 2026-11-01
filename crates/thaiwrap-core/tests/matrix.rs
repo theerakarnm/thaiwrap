@@ -111,6 +111,32 @@ fn split_should_cut_long_words_only_where_thai_rules_allow() {
 }
 
 #[test]
+fn split_should_cut_thai_only_at_cluster_ends() {
+    // A Wisesight line, measured in graphemes. Grapheme cuts alone give ชอบToyotaสั / กรุ่นเลย,
+    // cutting the cluster สัก after สั; TCC moves the cut to the cluster edge before สัก.
+    assert_eq!(
+        lines(
+            "ชอบToyotaสักรุ่นเลย",
+            10,
+            opts(Measure::Graphemes, Overflow::Split)
+        ),
+        ["ชอบToyota", "สักรุ่นเลย"]
+    );
+    // Another Wisesight line. v0.1 cut ธั / นวา inside the cluster ธัน.
+    assert_eq!(
+        default_lines("หมดเขต29ธันวาพี่เเอมไม่จำกัดเวลาด้วย", 10),
+        ["หมดเขต29", "ธันวาพี่", "เเอมไม่", "จำกัดเวลา", "ด้วย"]
+    );
+}
+
+#[test]
+fn split_should_fall_back_to_graphemes_inside_a_cluster_longer_than_max_length() {
+    // เปลี่ย is one cluster of 6 code units, longer than 3, so grapheme cuts come back
+    // (the same output as v0.1; this row guards the fallback).
+    assert_eq!(default_lines("เปลี่ยน", 3), ["เป", "ลี่", "ยน"]);
+}
+
+#[test]
 fn keep_should_leave_long_words_whole() {
     assert_eq!(
         lines(ACCEPTANCE, 4, opts(Measure::CodeUnits, Overflow::Keep)),

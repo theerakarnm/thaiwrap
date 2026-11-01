@@ -9,41 +9,67 @@
 //! Apache-2.0), where the first rule that matches wins. `__test__/tcc.mjs` is a regex port of
 //! the same file; the tests below compare against the fixtures it writes.
 
-use crate::thai;
+/// A set of characters as bits, so that testing a character against a rule step is one AND.
+/// The first four bits are the classes of `tcc_p.py`, the others one bit per character that a
+/// rule names on its own.
+type Set = u32;
 
-/// A character class in a TCC rule.
-#[derive(Clone, Copy)]
-enum Class {
-    /// A Thai consonant ก-ฮ (U+0E01-U+0E2E). It includes ฤ and ฦ and excludes ฯ.
-    Consonant,
-    /// A tone mark ่ ้ ๊ ๋ (U+0E48-U+0E4B).
-    Tone,
-    /// A leading vowel เ แ โ ใ ไ (U+0E40-U+0E44).
-    Leading,
-    /// ะ to ู (U+0E30-U+0E39), the `[ะ-ู]` range of rule 15.
-    Vowel,
-    /// One of the listed characters.
-    Any(&'static [char]),
+/// A Thai consonant ก-ฮ (U+0E01-U+0E2E). It includes ฤ and ฦ and excludes ฯ.
+const CONSONANT: Set = 1 << 0;
+/// A tone mark ่ ้ ๊ ๋ (U+0E48-U+0E4B).
+const TONE: Set = 1 << 1;
+/// A leading vowel เ แ โ ใ ไ (U+0E40-U+0E44).
+const LEADING: Set = 1 << 2;
+/// ะ to ู (U+0E30-U+0E39), the `[ะ-ู]` range of rule 15.
+const VOWEL: Set = 1 << 3;
+
+/// The bit of a character that a rule names on its own, 0 for any other character.
+const fn own_bit(c: char) -> Set {
+    match c {
+        'เ' => 1 << 4,
+        'แ' => 1 << 5,
+        'โ' => 1 << 6,
+        '็' => 1 << 7,
+        'า' => 1 << 8,
+        'ะ' => 1 << 9,
+        'ี' => 1 << 10,
+        'ย' => 1 << 11,
+        'ื' => 1 << 12,
+        'อ' => 1 << 13,
+        'ิ' => 1 << 14,
+        'ุ' => 1 << 15,
+        'ู' => 1 << 16,
+        '์' => 1 << 17,
+        'ั' => 1 << 18,
+        'ว' => 1 << 19,
+        'ร' => 1 << 20,
+        'ึ' => 1 << 21,
+        'ก' => 1 << 22,
+        'ห' => 1 << 23,
+        'ำ' => 1 << 24,
+        _ => 0,
+    }
 }
 
-impl Class {
-    fn has(self, c: char) -> bool {
-        match self {
-            Self::Consonant => matches!(c, '\u{0E01}'..='\u{0E2E}'),
-            Self::Tone => matches!(c, '\u{0E48}'..='\u{0E4B}'),
-            Self::Leading => thai::is_leading_vowel(c),
-            Self::Vowel => matches!(c, '\u{0E30}'..='\u{0E39}'),
-            Self::Any(set) => set.contains(&c),
-        }
-    }
+/// Every set `c` belongs to.
+const fn bits(c: char) -> Set {
+    let class = match c {
+        '\u{0E01}'..='\u{0E2E}' => CONSONANT,
+        '\u{0E48}'..='\u{0E4B}' => TONE,
+        '\u{0E40}'..='\u{0E44}' => LEADING,
+        '\u{0E30}'..='\u{0E39}' => VOWEL,
+        _ => 0,
+    };
+    class | own_bit(c)
 }
 
 /// One step of a rule.
 #[derive(Clone, Copy)]
 enum Step {
-    One(Class),
+    /// One character from the set.
+    One(Set),
     /// Optional and greedy, like regex `x?`.
-    Opt(Class),
+    Opt(Set),
     /// The optional silent final that `tcc_p.py` writes as `k`, `(cc?[ุูิ]?์)?`: a consonant
     /// cancelled by ์ (การันต์), as in `สินทร์` = `สิ` + `นทร์`.
     Silent,
@@ -53,13 +79,22 @@ enum Step {
 
 use Step::{Ahead, Opt, Silent};
 
-const C: Step = Step::One(Class::Consonant);
-const T: Step = Opt(Class::Tone);
-const fn ch(set: &'static [char]) -> Step {
-    Step::One(Class::Any(set))
+const C: Step = Step::One(CONSONANT);
+const T: Step = Opt(TONE);
+const fn set(chars: &[char]) -> Set {
+    let mut set = 0;
+    let mut i = 0;
+    while i < chars.len() {
+        set |= own_bit(chars[i]);
+        i += 1;
+    }
+    set
 }
-const fn opt(set: &'static [char]) -> Step {
-    Opt(Class::Any(set))
+const fn ch(chars: &[char]) -> Step {
+    Step::One(set(chars))
+}
+const fn opt(chars: &[char]) -> Step {
+    Opt(set(chars))
 }
 
 /// `tcc_p.py` `_RE_TCC`, in order; the comment is the original pattern.
@@ -95,7 +130,7 @@ const RULES: [&[Step]; 29] = [
     &[C, ch(&['ั']), T, ch(&['ว']), ch(&['ะ']), Silent],     // cัtวะk
     &[C, ch(&['ั', 'ื']), T, C, opt(&['ุ', 'ิ', 'ะ']), Silent], // c[ัื]tc[ุิะ]?k
     &[C, ch(&['ิ', 'ุ', 'ู']), ch(&['์'])],                     // c[ิุู]์
-    &[C, Step::One(Class::Vowel), T, Silent],               // c[ะ-ู]tk
+    &[C, Step::One(VOWEL), T, Silent],                      // c[ะ-ู]tk
     &[C, ch(&['ร']), ch(&['ร']), C, ch(&['์'])],             // cรรc์
     &[C, ch(&['็'])],                                        // c็
     &[C, T, opt(&['ะ', 'า', 'ำ']), Silent],                 // ct[ะาำ]?k
@@ -106,7 +141,7 @@ const RULES: [&[Step]; 29] = [
     &[ch(&['แ']), C, C, ch(&['็']), C],                      // แcc็c
     &[ch(&['แ']), C, C, C, ch(&['์'])],                      // แccc์
     &[ch(&['โ']), C, T, ch(&['ะ'])],                        // โctะ
-    &[Step::One(Class::Leading), C, T],                     // [เ-ไ]ct
+    &[Step::One(LEADING), C, T],                            // [เ-ไ]ct
     &[ch(&['ก']), ch(&['็'])],                               // ก็
     &[ch(&['อ']), ch(&['ึ'])],                               // อึ
     &[ch(&['ห']), ch(&['ึ'])],                               // หึ
@@ -121,8 +156,8 @@ const SILENT: [&[Step]; 4] = [
     &[C, ch(&['์'])],
 ];
 
-/// Number of characters `rule` matches at the start of `chars`.
-fn match_rule(chars: &[char], rule: &[Step]) -> Option<usize> {
+/// Number of characters `rule` matches at the start of `chars`, given as `bits` of each one.
+fn match_rule(chars: &[Set], rule: &[Step]) -> Option<usize> {
     let Some((step, rest)) = rule.split_first() else {
         return Some(0);
     };
@@ -134,9 +169,9 @@ fn match_rule(chars: &[char], rule: &[Step]) -> Option<usize> {
             .map(|m| m + n)
     };
     match *step {
-        Step::One(class) => first.filter(|&c| class.has(c)).and_then(|_| then(1)),
-        Opt(class) => first
-            .filter(|&c| class.has(c))
+        Step::One(set) => first.filter(|&c| c & set != 0).and_then(|_| then(1)),
+        Opt(set) => first
+            .filter(|&c| c & set != 0)
             .and_then(|_| then(1))
             .or_else(|| match_rule(chars, rest)),
         Silent => SILENT
@@ -144,37 +179,78 @@ fn match_rule(chars: &[char], rule: &[Step]) -> Option<usize> {
             .find_map(|shape| match_rule(chars, shape).and_then(then))
             .or_else(|| match_rule(chars, rest)),
         Ahead => first
-            .is_none_or(|c| Class::Consonant.has(c) || Class::Leading.has(c))
+            .is_none_or(|c| c & (CONSONANT | LEADING) != 0)
             .then(|| match_rule(chars, rest))
             .flatten(),
+    }
+}
+
+/// False if `rule` cannot match at the start of `chars`: it checks the required steps that
+/// open the rule, without trying the optional ones. Most clusters start with a consonant, and
+/// most rules fail at their second step (`ก` followed by `ร` fails every rule that needs a
+/// vowel mark there), so this skips most of the 29 rules without recursion.
+fn can_start(rule: &[Step], chars: &[Set]) -> bool {
+    rule.iter()
+        .map_while(|step| match step {
+            Step::One(set) => Some(set),
+            _ => None,
+        })
+        .zip(chars)
+        .all(|(set, c)| c & set != 0)
+}
+
+/// True if the first character of `chars` is a consonant that no rule extends, so it is a
+/// cluster on its own. This is the common case, for example `ก`, `ร`, `บ` in `กระบวน`, and it
+/// is decided without trying the rules. A rule can extend a consonant only with a vowel, a
+/// tone mark, ็ or ์ right after it, or, when a consonant follows, with a silent final that
+/// ends in ์ at most 4 characters from the start (`สินทร์`); anything else is a lone consonant.
+fn is_lone_consonant(chars: &[Set]) -> bool {
+    const SIGN: Set = own_bit('์');
+    let [first, tail @ ..] = chars else {
+        return false;
+    };
+    if first & CONSONANT == 0 {
+        return false;
+    }
+    match tail {
+        [] => true,
+        [next, after @ ..] => {
+            next & (TONE | VOWEL | own_bit('็') | SIGN) == 0
+                && (next & CONSONANT == 0 || after.iter().take(3).all(|&c| c & SIGN == 0))
+        }
     }
 }
 
 /// TCC cluster ends of `text` as byte offsets, ascending; the last one is `text.len()`.
 /// A character that no rule matches (for example a Latin letter, a digit, or ๆ) is a cluster
 /// on its own.
-pub(crate) fn cluster_ends(text: &str) -> Vec<usize> {
-    let chars: Vec<char> = text.chars().collect();
-    let mut ends = Vec::new();
-    let mut rest = chars.as_slice();
+pub(crate) fn cluster_ends(text: &str) -> impl Iterator<Item = usize> + '_ {
+    // One entry per char, so `text.len()` is an upper bound that avoids growing the vector.
+    let mut chars: Vec<Set> = Vec::with_capacity(text.len());
+    chars.extend(text.chars().map(bits));
+    let mut at = 0usize;
     let mut end = 0usize;
-    while !rest.is_empty() {
+    let mut tail = text;
+    std::iter::from_fn(move || {
+        let rest = chars.get(at..).filter(|rest| !rest.is_empty())?;
         // Every rule starts with a required character, so a match is never empty.
-        let n = RULES
-            .iter()
-            .find_map(|rule| match_rule(rest, rule))
-            .unwrap_or(1)
-            .max(1);
-        let Some((cluster, tail)) = rest.split_at_checked(n) else {
-            break;
+        let n = if is_lone_consonant(rest) {
+            1
+        } else {
+            // Every rule starts with a required character, so a match is never empty.
+            RULES
+                .iter()
+                .filter(|rule| can_start(rule, rest))
+                .find_map(|rule| match_rule(rest, rule))
+                .unwrap_or(1)
+                .max(1)
         };
-        end = cluster
-            .iter()
-            .fold(end, |e, c| e.saturating_add(c.len_utf8()));
-        ends.push(end);
-        rest = tail;
-    }
-    ends
+        let len: usize = tail.chars().take(n).map(char::len_utf8).sum();
+        tail = tail.get(len..)?;
+        at = at.saturating_add(n);
+        end = end.saturating_add(len);
+        Some(end)
+    })
 }
 
 #[cfg(test)]
@@ -184,7 +260,6 @@ mod tests {
     fn clusters(text: &str) -> Vec<&str> {
         let mut start = 0;
         cluster_ends(text)
-            .into_iter()
             .map(|end| {
                 let cluster = &text[start..end];
                 start = end;
@@ -239,7 +314,7 @@ mod tests {
 
     #[test]
     fn cluster_ends_should_be_empty_for_empty_text() {
-        assert_eq!(cluster_ends(""), Vec::<usize>::new());
+        assert_eq!(cluster_ends("").count(), 0);
     }
 
     #[test]
@@ -254,7 +329,6 @@ mod tests {
             assert_eq!(lines.lines().count(), reference.lines().count(), "{source}");
             for (n, (line, want)) in lines.lines().zip(reference.lines()).enumerate() {
                 let got: Vec<String> = cluster_ends(line)
-                    .into_iter()
                     .map(|end| line[..end].chars().count().to_string())
                     .collect();
                 assert_eq!(got.join(" "), want, "{source} line {}", n + 1);
