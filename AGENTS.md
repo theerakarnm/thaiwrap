@@ -129,7 +129,7 @@ These are correctness rules, not style preferences. Tests must cover each one.
    Break spaces (spaces and ZWSP) are break opportunities, not content.
    No-break spaces (U+00A0, U+2007, U+202F) are content.
 6. **A word longer than `maxLength`** is handled by the documented overflow strategy, never by slicing at an arbitrary position.
-   The default `split` cuts only at grapheme boundaries allowed by rules 1-3.
+   The default `split` cuts at Thai Character Cluster ends inside Thai and at grapheme boundaries elsewhere, only where rules 1-3 allow.
    A single unit that cannot be cut may exceed `maxLength`, alone on its line.
 7. **Blank lines.** An input line with no visible characters is `""`.
    A wrapped piece with no visible characters is dropped.
