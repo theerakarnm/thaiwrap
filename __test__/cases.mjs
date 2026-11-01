@@ -5,7 +5,7 @@ export const cases = [
   { name: 'acceptance', args: [ACCEPTANCE, 10], expected: ACCEPTANCE_LINES },
   { name: 'graphemes', args: [ACCEPTANCE, 10, { measure: 'graphemes' }], expected: ['กระบวนการ', 'สื่อสาร ส่ง', 'มอบ และ', 'สร้างคุณค่า'] },
   { name: 'overflow split cuts long words', args: [ACCEPTANCE, 4], expected: ['กระบ', 'วนกา', 'ร', 'สื่อ', 'สาร', 'ส่ง', 'มอบ', 'และ', 'สร้า', 'ง', 'คุณ', 'ค่า'] },
-  { name: 'overflow split keeps Thai clusters whole', args: ['ชอบToyotaสักรุ่นเลย', 10], expected: ['ชอบToyota', 'สักรุ่นเลย'] },
+  { name: 'overflow split keeps Thai clusters whole', args: ['หมดเขต29ธันวาพี่เเอมไม่จำกัดเวลาด้วย', 10], expected: ['หมดเขต29', 'ธันวาพี่', 'เเอมไม่', 'จำกัดเวลา', 'ด้วย'] },
   { name: 'overflow keep leaves long words whole', args: [ACCEPTANCE, 4, { overflow: 'keep' }], expected: ['กระบวนการ', 'สื่อสาร', 'ส่ง', 'มอบ', 'และ', 'สร้าง', 'คุณค่า'] },
   { name: 'unsplittable grapheme may exceed maxLength', args: ['ที่', 1], expected: ['ที่'] },
   { name: 'ZWJ emoji sequence stays whole', args: ['👨‍👩‍👧', 2], expected: ['👨‍👩‍👧'] },
