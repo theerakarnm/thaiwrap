@@ -5,7 +5,7 @@ import { join } from 'node:path'
 
 const rootDir = new URL('../', import.meta.url).pathname
 const npmDir = join(rootDir, 'npm')
-const licenseFiles = ['LICENSE', 'LICENSE-UNICODE']
+const licenseFiles = ['LICENSE', 'LICENSE-APACHE', 'LICENSE-UNICODE']
 const { license } = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf8'))
 
 for (const entry of readdirSync(npmDir, { withFileTypes: true })) {

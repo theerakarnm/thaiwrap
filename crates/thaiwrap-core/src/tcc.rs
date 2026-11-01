@@ -8,6 +8,7 @@
 //! `pythainlp/tokenize/tcc_p.py` (tag v5.4.0, commit 7f26adf5ce09c3d77c39ca2ef86f7138e9071088,
 //! Apache-2.0), where the first rule that matches wins. `__test__/tcc.mjs` is a regex port of
 //! the same file; the tests below compare against the fixtures it writes.
+//! The ported rule list is Apache-2.0, see `LICENSE-APACHE`.
 
 /// A set of characters as bits, so that testing a character against a rule step is one AND.
 /// The first four bits are the classes of `tcc_p.py`, the others one bit per character that a

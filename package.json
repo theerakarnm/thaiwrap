@@ -2,7 +2,7 @@
   "name": "thaiwrap",
   "version": "0.1.1",
   "description": "Fast Thai line wrapping for Node.js and Bun, powered by Rust",
-  "license": "MIT AND Unicode-3.0",
+  "license": "MIT AND Unicode-3.0 AND Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/theerakarnm/thaiwrap.git"
@@ -22,6 +22,7 @@
     "platform.js",
     "binding.js",
     "binding.d.ts",
+    "LICENSE-APACHE",
     "LICENSE-UNICODE"
   ],
   "engines": {

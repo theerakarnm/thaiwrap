@@ -18,7 +18,7 @@ jobs:
       - name: Crate contents
         run: |
           cargo package -p thaiwrap --list --locked > "$RUNNER_TEMP/crate-files.txt"
-          diff <(LC_ALL=C sort "$RUNNER_TEMP/crate-files.txt") <(printf '%s\n' .cargo_vcs_info.json Cargo.lock Cargo.toml Cargo.toml.orig LICENSE LICENSE-UNICODE README.md data/icu-thai.postcard src/compare_segmenters.rs src/lib.rs src/lines.rs src/measure.rs src/segment.rs src/tcc.rs src/thai.rs src/wrap.rs)
+          diff <(LC_ALL=C sort "$RUNNER_TEMP/crate-files.txt") <(printf '%s\n' .cargo_vcs_info.json Cargo.lock Cargo.toml Cargo.toml.orig LICENSE LICENSE-APACHE LICENSE-UNICODE README.md data/icu-thai.postcard src/compare_segmenters.rs src/lib.rs src/lines.rs src/measure.rs src/segment.rs src/tcc.rs src/thai.rs src/wrap.rs)
       - run: '! grep -rnw "unsafe" crates/*/src'
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
   msrv:

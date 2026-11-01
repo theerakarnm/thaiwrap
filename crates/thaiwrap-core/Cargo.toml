@@ -9,7 +9,7 @@ repository.workspace = true
 readme = "README.md"
 keywords = ["thai", "line-breaking", "word-wrap", "text", "unicode"]
 categories = ["text-processing", "internationalization"]
-include = ["src/**", "data/icu-thai.postcard", "Cargo.toml", "README.md", "LICENSE", "LICENSE-UNICODE"]
+include = ["src/**", "data/icu-thai.postcard", "Cargo.toml", "README.md", "LICENSE", "LICENSE-APACHE", "LICENSE-UNICODE"]
 
 [dependencies]
 icu_segmenter = { version = "=2.4.0", default-features = false, features = ["serde"] }

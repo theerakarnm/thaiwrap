@@ -261,4 +261,5 @@ The Node-API binding uses [napi-rs](https://napi.rs).
 
 [MIT](LICENSE).
 The native binary embeds Unicode data from ICU4X (CLDR and ICU), licensed under the [Unicode License v3](LICENSE-UNICODE).
+The Thai Character Cluster rules are adapted from PyThaiNLP under the [Apache License 2.0](LICENSE-APACHE).
 Test corpora under `corpus/` keep their own licenses.

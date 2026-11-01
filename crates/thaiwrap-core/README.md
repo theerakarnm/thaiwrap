@@ -26,3 +26,4 @@ Lao, Khmer and Burmese are not supported: the crate ships Thai dictionary data o
 
 MIT ([LICENSE](LICENSE)).
 The embedded Unicode data from ICU4X is under the Unicode License v3 ([LICENSE-UNICODE](LICENSE-UNICODE)).
+The Thai Character Cluster rules are adapted from PyThaiNLP under the [Apache License 2.0](LICENSE-APACHE).

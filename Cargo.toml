@@ -7,7 +7,7 @@ members = ["crates/thaiwrap-core", "crates/thaiwrap-node", "crates/bench-compare
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.88"
-license = "MIT AND Unicode-3.0"
+license = "MIT AND Unicode-3.0 AND Apache-2.0"
 repository = "https://github.com/theerakarnm/thaiwrap"
 
 [profile.release]
