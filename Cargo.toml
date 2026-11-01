@@ -1,7 +1,7 @@
 [workspace]
 # Resolver 3 prefers dependency versions compatible with rust-version (MSRV job).
 resolver = "3"
-members = ["crates/thaiwrap-core", "crates/thaiwrap-node"]
+members = ["crates/thaiwrap-core", "crates/thaiwrap-node", "crates/bench-compare"]
 
 [workspace.package]
 version = "0.1.0"

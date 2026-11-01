@@ -1,0 +1,36 @@
+[package]
+name = "bench-compare"
+version = "0.0.0"
+edition = "2021"
+publish = false
+description = "Benchmarks thaiwrap-core against other Thai segmenters wrapped by one shared greedy wrapper"
+license = "MIT"
+
+# Compared crates, pinned exactly. See NOTES.md for how each one is used.
+#
+# chamkho =1.5.0 is not a direct dependency: it ships only a `wordcut` binary target
+# (autolib = false, no [lib]), so Cargo cannot link it as a library. Its library part is
+# wordcut-engine, which we call with the same Thai dictionary and cluster rules the
+# chamkho CLI loads by default (dictionary copied to data/chamkho-words_th.txt).
+[dependencies]
+thaiwrap-core = { path = "../thaiwrap-core" }
+icu_segmenter = { version = "=2.4.0", default-features = false, features = ["compiled_data"] }
+wordcut-engine = "=1.2.2"
+nlpo3 = "=1.4.0"
+thaibreak = { version = "=1.5.0", default-features = false, features = ["embedded-dict"] }
+kham-core = "=0.8.2"
+
+[dev-dependencies]
+criterion = "=0.8.2"
+
+# Only the criterion target takes criterion flags such as --save-baseline.
+[lib]
+bench = false
+
+[[bin]]
+name = "dump-outputs"
+bench = false
+
+[[bench]]
+name = "compare"
+harness = false

@@ -5,3 +5,4 @@
 /artifacts
 /binding.js
 .DS_Store
+/bench/out
