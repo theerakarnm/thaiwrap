@@ -271,4 +271,10 @@ Size: holds (-60.3%).
 JS: all cells at most +3.4%; no cell above +3.0% in both tables.
 Rust: table 1 has `short` +13.6%, `long` +11.6%, `mixed` +13.8%, `overflow_max4` +16.0% (measured at load up to 14.5); table 2 has all at most +3.1%; no case is above +5.0% in both tables.
 
-Gate: INCONCLUSIVE (Rust table 1 shows +11.6% to +16.0% on four benchmarks while table 2 shows at most +3.1%; tables disagree, table 1 was measured under foreign load; extra table 3 at most +3.4%)
+Gate: PASS (accepted by the user; the verdict rule alone gave INCONCLUSIVE because Rust table 1 was measured under foreign load)
+
+## Decision
+
+The verdict rule gave INCONCLUSIVE because Rust table 1 ran while another process loaded the machine.
+Table 1 showed +11.6% to +16.0% on four benchmarks while table 2 showed at most +3.1%, and the extra table 3 showed at most +3.4%.
+The user reviewed the three Rust tables and the two JS tables on 2026-11-01 and accepted the gate as passed.
