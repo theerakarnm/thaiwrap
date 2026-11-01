@@ -12,6 +12,8 @@ mod compare_segmenters;
 mod lines;
 mod measure;
 mod segment;
+#[cfg_attr(not(test), allow(dead_code))] // used by split_overflow from the next commit
+mod tcc;
 mod thai;
 mod wrap;
 
