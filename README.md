@@ -190,6 +190,10 @@ Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebA
 - Lone surrogates become U+FFFD.
 - Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.
 - Output can differ from `Intl.Segmenter` because thaiwrap uses its own ICU4X dictionary and UAX #14 line breaking (for example it keeps `?` and `)` with the word before them).
+- Unsupported scripts: Lao, Khmer and Burmese.
+  The package ships Thai dictionary data only, so a run of Lao, Khmer or Burmese text between spaces is never broken at word boundaries.
+  It stays on one line when it fits.
+  When it is longer than `maxLength`, the default `overflow: "split"` cuts it at grapheme cluster boundaries, and `overflow: "keep"` leaves it whole on its own line.
 - A split inside a long word can leave a single final consonant on a line (for example `สร้า` / `ง`).
 - The same happens before punctuation that stays with the word.
   For example `wrapThai("ระบบเก็บเสียงดีมาก?", 10)` gives `["ระบบเก็บ", "เสียงดีมา", "ก?"]`.
@@ -255,4 +259,5 @@ The Node-API binding uses [napi-rs](https://napi.rs).
 ## License
 
 [MIT](LICENSE).
+The native binary embeds Unicode data from ICU4X (CLDR and ICU), licensed under the [Unicode License v3](LICENSE-UNICODE).
 Test corpora under `corpus/` keep their own licenses.
