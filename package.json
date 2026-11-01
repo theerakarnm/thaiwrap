@@ -44,7 +44,7 @@
   "scripts": {
     "build": "napi build --platform --release --manifest-path crates/thaiwrap-node/Cargo.toml --output-dir . --js binding.js --dts binding.d.ts",
     "build:debug": "napi build --platform --manifest-path crates/thaiwrap-node/Cargo.toml --output-dir . --js binding.js --dts binding.d.ts",
-    "test": "bun test && node --test __test__/node-runner.mjs",
+    "test": "bun test && node --test __test__/node-runner.mjs __test__/make-placeholders.test.mjs",
     "bench": "bun bench/index.mjs"
   },
   "devDependencies": {
