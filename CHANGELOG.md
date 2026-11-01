@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/theerakarnm/thaiwrap/compare/v0.1.0...v0.1.1) (2026-11-01)
+
+
+### Bug Fixes
+
+* harden release path for 0.1.1 ([a8852a4](https://github.com/theerakarnm/thaiwrap/commit/a8852a445541737d7775f2fdb387a504da051f3d))
+* **scripts:** refuse shell syntax in make-placeholders output ([afd467e](https://github.com/theerakarnm/thaiwrap/commit/afd467ec43a296d16b899bec37f0bc467dcf7f66))
+
 ## 0.1.0 (2026-10-31)
 
 
