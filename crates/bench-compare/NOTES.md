@@ -19,7 +19,7 @@ The measured closure is `tools.wrap(tool, text, max)`: one full wrap of the whol
 
 | Tool id | Crate (pinned) | Status | Construction | API used per paragraph |
 |---|---|---|---|---|
-| `thaiwrap-core` | path crate | included | `OnceLock` inside the crate; first call is in criterion warm-up | `thaiwrap_core::wrap(text, max, &WrapOptions::default())`, ranges mapped to owned `String`s like the napi binding |
+| `thaiwrap-core` | path crate | included | `OnceLock` inside the crate; first call is in criterion warm-up | `thaiwrap::wrap(text, max, &WrapOptions::default())`, ranges mapped to owned `String`s like the napi binding |
 | `icu-greedy` | `icu_segmenter =2.4.0` (`compiled_data`, no default features) | included | outside loop | `WordSegmenter::new_dictionary(WordBreakInvariantOptions::default())`, then `segment_str(para)` boundaries sliced into tokens |
 | `chamkho-greedy` | `chamkho =1.5.0` via `wordcut-engine =1.2.2` | included (see below) | outside loop | `Wordcut::new_with_cluster_re(load_dict(data/chamkho-words_th.txt), load_cluster_rules(thai_cluster_path()))`, then `segment_into_strings(para)` |
 | `nlpo3-greedy` | `nlpo3 =1.4.0` | included | outside loop | `NewmmTokenizer::new("data/words_th.txt")`, then `segment(para, false, false)` (safe mode off like PyThaiNLP's default, no rayon parallelism) |

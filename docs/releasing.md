@@ -77,4 +77,5 @@ Re-run the job; napi-rs skips versions that already exist.
 
 A crates.io version cannot be overwritten or deleted either.
 If `publish-crate` fails after npm published, re-run that job.
+If the version already shows on https://crates.io/crates/thaiwrap, the publish succeeded and no re-run is needed.
 If a bad version reached crates.io, run `cargo yank --version <version> thaiwrap` and ship the fix as a new version.

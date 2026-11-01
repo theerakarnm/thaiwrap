@@ -145,7 +145,7 @@ Use `measure: "graphemes"` when you fit text into a space on screen (closer to w
 ## How it works
 
 1. Break opportunities come from [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14), which finds Thai word boundaries and keeps punctuation with its word.
-   The segmenter is compiled into the native addon.
+   The segmenter and its dictionary data are embedded in the native addon.
 2. The Thai text rules remove break positions that would start a line with a combining mark or one of `ะ า ำ ๆ ฯ`, end it with a leading vowel, or fall next to a no-break character.
 3. Units are placed on the current line until the next unit would exceed `maxLength`, then a new line starts.
 4. Spaces at line edges are dropped.
@@ -218,7 +218,7 @@ cargo test --workspace
 bun run build && bun test
 ```
 
-Benchmarks: `cargo bench -p thaiwrap`, `bun run bench`, `node bench/index.mjs`.
+Benchmarks: `cargo bench -p thaiwrap`, `npm run bench` (Node), `npm run bench:bun` (Bun).
 
 ### Repository layout
 
@@ -226,6 +226,7 @@ Benchmarks: `cargo bench -p thaiwrap`, `bun run bench`, `node bench/index.mjs`.
 | ---------------------- | ------- |
 | `crates/thaiwrap-core` | Pure Rust segmentation and wrapping. All logic lives here. |
 | `crates/thaiwrap-node` | Thin napi-rs binding. Converts types, validates input, maps errors. |
+| `crates/bench-compare` | Bench-only crate that compares `thaiwrap` with other Thai segmenters. Never shipped. |
 | `__test__/`            | JS tests, run against the built addon. |
 | `corpus/`              | Test corpora, each with its own license. Never packaged. |
 | `site/`                | Source of the docs site. |
