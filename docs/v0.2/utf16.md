@@ -22,11 +22,13 @@ The core crate did not change, so no Rust benchmark was run.
 - Each run uses node v22.19.0, node v24.22.2 and bun 1.4.4. Per case: three alternating rounds, median reported.
 - Gate (user answer 3, D9): `long` change <= -15.0% on node v22.19.0 and node v24.22.2; `short` change <= +5.0% on node v22.19.0, node v24.22.2 and bun 1.4.4.
 - `mixed` and Bun `long` are reported, not gated.
+- Verdict rule: PASS only if every gated cell meets its gate in both tables; FAIL if a gated cell misses its gate in both tables; otherwise INCONCLUSIVE.
 - Start rule: the 1-minute load average must be <= 6 at the start.
+  Table 1 broke this rule (6.65 at start); it is kept because its numbers agree with table 2 and the gate verdict does not depend on it.
 
 ## Table 1 (measured at load 6.65 at start, 13.22 at end)
 
-Load was above 6 at the start of this table, and rose during the run because another process (Gemini) used about 470% CPU at the end.
+Load was above 6 at the start of this table (6.65, so the start rule was not met), and rose during the run because another process (Gemini) used about 470% CPU at the end.
 
 #### node v22.19.0
 

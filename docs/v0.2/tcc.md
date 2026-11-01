@@ -61,7 +61,7 @@ A sampling profile (`sample`) put about 75% of `cluster_ends` in `match_rule` an
 | 0 | Task 3 code as first written | 1844 us |
 | 1 | `cluster_ends` skips rules whose first class rejects the character; `ends` Vec gets its capacity up front | 1547 us |
 | 2 | `split_overflow` without the 3 intermediate Vecs: `cluster_ends` returns an iterator, merged on the fly with the grapheme boundaries; the grapheme fallback is computed only for a too-long cluster | 1520 us |
-| 3 | character classes as bit sets (one AND per step instead of `Class::has`); a rule is skipped when its first two required steps do not match; no second Vec for byte lengths; the char vector is pre-sized (it was reallocating) | 1085 us |
+| 3 | character classes as bit sets (one AND per step instead of `Class::has`); a rule is skipped when one of its leading required steps does not match; no second Vec for byte lengths; the char vector is pre-sized (it was reallocating) | 1085 us |
 | 4 | a consonant that no rule can extend is a one-character cluster without trying any rule (`is_lone_consonant`) | 925 us |
 
 Measured and rejected: precomputing the first set of each of the 29 rules (`FIRST` table) after attempt 4.
@@ -83,6 +83,7 @@ Reaching +5% needs `cluster_ends` for these 1200 words in about 40 us, against a
 ## Decision
 
 The gate failed: `overflow_max4` is +21.7% (766.22 us to 932.55 us).
+`mixed` also reads +10.2% in the table, but that is outlier noise (+1.2% by median in the re-run) and `mixed` never takes the overflow path.
 That benchmark only runs for words longer than maxLength, and the cost is about 0.14 us per split word.
 The user chose to accept it after one optimization pass (+141.1% down to +21.7%).
 A harder matcher rewrite was estimated at +10-12% at best, so it was not done.

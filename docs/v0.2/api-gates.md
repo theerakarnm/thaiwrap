@@ -4,8 +4,10 @@
 
 ### Method
 
-- Candidate: `wrapThaiBatch(texts, maxLength, options?)`, built in the working tree on top of `e38521f` (tip of `feat/v0.2`). The UTF-16 binding was skipped, so the export returns `string[][]` built from UTF-8 strings.
-- Case `batch-1000`: `wrapThaiBatch(TEXTS, 20)`. Case `loop-1000`: a JS loop calling `wrapThai(t, 20)` for each of the same 1,000 texts.
+- Candidate: `wrapThaiBatch(texts, maxLength, options?)`, built in the working tree on top of `e38521f` (tip of `feat/v0.2`).
+  The UTF-16 binding was skipped, so the export returns `string[][]` built from UTF-8 strings.
+- Case `batch-1000`: `wrapThaiBatch(TEXTS, 20)`.
+  Case `loop-1000`: a JS loop calling `wrapThai(t, 20)` for each of the same 1,000 texts.
 - `TEXTS` = the first 1,000 non-empty lines of `corpus/wisesight/lines.txt` (D10).
 - Both cases run inside ONE build: `node bench/gate-ab.mjs pairs . batch-1000:loop-1000`, run twice as two independent tables.
 - Each run uses node v22.19.0, node v24.22.2 and bun 1.4.4 (`bench/gate.mjs`, median of 21 timed batches per case; three alternating rounds, median reported).
@@ -119,10 +121,18 @@ Table 2, after:
 
 ### Method
 
-- Candidate: `wrapThaiRanges(text, maxLength, options?)`, built in the working tree on top of `389c5b2` (tip of `feat/v0.2`). The UTF-16 binding was skipped, so the text is read with `read_string` (UTF-8, lone surrogates become U+FFFD) and wrapped with `thaiwrap_core::wrap`. The new private helper `utf16_offsets` turns the byte ranges into flat UTF-16 offsets in one forward pass. The export returns a `Uint32Array`.
-- Smoke test before gating: `wrapThaiRanges(ACCEPTANCE, 10)` is `[0,9,9,16,17,27,27,32,32,38]` and `text.slice(r[2*i], r[2*i+1])` equals the `wrapThai` lines for the acceptance text and for 200 corpus lines (first 200 non-empty lines of `corpus/wisesight/lines.txt` at 20). Node 22 and Bun 1.4.4 gave the same result; the error class and message for `1,0`, `'x',0` and a bad `measure` equal those of `wrapThai`.
-- Cases (`bench/gate.mjs`): `ranges-short` is `wrapThaiRanges(SHORT, 10)` against `short`, which is `wrapThai(SHORT, 10)`. `ranges-long` is `wrapThaiRanges(LONG, 10)` against `long`. `ranges-loop-1000` is a JS loop of `wrapThaiRanges(t, 20)` over the 1,000 texts against `loop-1000`, a JS loop of `wrapThai(t, 20)` over the same texts.
-- Inputs (D10): `SHORT` is the acceptance text at 10. `LONG` is the acceptance text repeated 300 times at 10. `TEXTS` is the first 1,000 non-empty lines of `corpus/wisesight/lines.txt`.
+- Candidate: `wrapThaiRanges(text, maxLength, options?)`, built in the working tree on top of `389c5b2` (tip of `feat/v0.2`).
+  The UTF-16 binding was skipped, so the text is read with `read_string` (UTF-8, lone surrogates become U+FFFD) and wrapped with `thaiwrap_core::wrap`.
+  The new private helper `utf16_offsets` turns the byte ranges into flat UTF-16 offsets in one forward pass.
+  The export returns a `Uint32Array`.
+- Smoke test before gating: `wrapThaiRanges(ACCEPTANCE, 10)` is `[0,9,9,16,17,27,27,32,32,38]` and `text.slice(r[2*i], r[2*i+1])` equals the `wrapThai` lines for the acceptance text and for 200 corpus lines (first 200 non-empty lines of `corpus/wisesight/lines.txt` at 20).
+  Node 22 and Bun 1.4.4 gave the same result; the error class and message for `1,0`, `'x',0` and a bad `measure` equal those of `wrapThai`.
+- Cases (`bench/gate.mjs`): `ranges-short` is `wrapThaiRanges(SHORT, 10)` against `short`, which is `wrapThai(SHORT, 10)`.
+  `ranges-long` is `wrapThaiRanges(LONG, 10)` against `long`.
+  `ranges-loop-1000` is a JS loop of `wrapThaiRanges(t, 20)` over the 1,000 texts against `loop-1000`, a JS loop of `wrapThai(t, 20)` over the same texts.
+- Inputs (D10): `SHORT` is the acceptance text at 10.
+  `LONG` is the acceptance text repeated 300 times at 10.
+  `TEXTS` is the first 1,000 non-empty lines of `corpus/wisesight/lines.txt`.
 - All cases run inside ONE build: `node bench/gate-ab.mjs pairs . ranges-short:short ranges-long:long ranges-loop-1000:loop-1000`, run twice as two independent tables.
 - Each run uses node v22.19.0, node v24.22.2 and bun 1.4.4 (`bench/gate.mjs`, median of 21 timed batches per case; three alternating rounds, median reported).
 - Gate (user answer 4, D9): every pair change <= -20.0% on node v22.19.0, node v24.22.2 and bun 1.4.4 (9 cells).

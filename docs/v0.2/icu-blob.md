@@ -36,7 +36,7 @@ node v22.19.0
 
 | case | baseline ns | candidate ns | change |
 | --- | --- | --- | --- |
-| short | 3375 | 3441 | 1.9% |
+| short | 3375 | 3441 | 2.0% |
 | long | 854482 | 864009 | 1.1% |
 | mixed | 163791 | 161844 | -1.2% |
 
@@ -81,6 +81,7 @@ bun 1.4.4
 | long | 730383 | 740901 | 1.4% |
 | mixed | 145552 | 149273 | 2.6% |
 
+JS table 2 also ran while a foreign node process used 113% to 206% CPU (see s2b_before and s2b_after), the same process that loaded Rust table 1.
 All 18 cells are at most +3.4%.
 The only cell above +3.0% is Bun `short` in table 2 (+3.4%); in table 1 it is +0.7%.
 
@@ -90,7 +91,7 @@ The only cell above +3.0% is Bun `short` in table 2 (+3.4%); in table 1 it is +0
 
 | bench | baseline ns | candidate ns | change |
 | --- | --- | --- | --- |
-| short | 1992 | 2264 | +13.6% |
+| short | 1992 | 2264 | +13.7% |
 | long | 579820 | 647060 | +11.6% |
 | mixed | 124170 | 141350 | +13.8% |
 | overflow_max4 | 932680 | 1082000 | +16.0% |
@@ -100,7 +101,7 @@ The only cell above +3.0% is Bun `short` in table 2 (+3.4%); in table 1 it is +0
 
 | bench | baseline ns | candidate ns | change |
 | --- | --- | --- | --- |
-| short | 1981 | 2002 | +1.0% |
+| short | 1981 | 2002 | +1.1% |
 | long | 584050 | 583650 | -0.1% |
 | mixed | 121400 | 124070 | +2.2% |
 | overflow_max4 | 953170 | 960820 | +0.8% |
@@ -269,7 +270,7 @@ Before and after each timing step: `uptime`, then the top foreign processes by C
 
 Size: holds (-60.3%).
 JS: all cells at most +3.4%; no cell above +3.0% in both tables.
-Rust: table 1 has `short` +13.6%, `long` +11.6%, `mixed` +13.8%, `overflow_max4` +16.0% (measured at load up to 14.5); table 2 has all at most +3.1%; no case is above +5.0% in both tables.
+Rust: table 1 has `short` +13.7%, `long` +11.6%, `mixed` +13.8%, `overflow_max4` +16.0% (measured at load up to 14.5); table 2 has all at most +3.1%; no case is above +5.0% in both tables.
 
 Gate: PASS (accepted by the user; the verdict rule alone gave INCONCLUSIVE because Rust table 1 was measured under foreign load)
 
