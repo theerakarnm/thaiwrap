@@ -14,7 +14,7 @@ doctest = false
 bench = false
 
 [dependencies]
-thaiwrap-core = { path = "../thaiwrap-core" }
+thaiwrap = { path = "../thaiwrap-core" }
 napi = { version = "3", default-features = false, features = ["napi4"] }
 napi-derive = "3.7"
 

@@ -10,7 +10,7 @@ use icu_segmenter::options::WordBreakInvariantOptions;
 use icu_segmenter::{WordSegmenter, WordSegmenterBorrowed};
 use nlpo3::tokenizer::newmm::NewmmTokenizer;
 use nlpo3::tokenizer::tokenizer_trait::Tokenizer as _;
-use thaiwrap_core::WrapOptions;
+use thaiwrap::WrapOptions;
 use wordcut_engine::Wordcut;
 
 /// Boxed error for tool construction and wrapping.
@@ -19,7 +19,7 @@ pub type BoxError = Box<dyn Error + Send + Sync>;
 /// The compared tools, in report order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Tool {
-    /// `thaiwrap_core::wrap` with default options.
+    /// `thaiwrap::wrap` with default options.
     ThaiwrapCore,
     /// ICU4X dictionary word segmenter + greedy wrapper.
     IcuGreedy,
@@ -128,7 +128,7 @@ impl Tools {
     pub fn wrap(&self, tool: Tool, text: &str, max_length: usize) -> Result<Vec<String>, BoxError> {
         match tool {
             // Owned strings, like the napi binding returns, so every tool allocates its lines.
-            Tool::ThaiwrapCore => thaiwrap_core::wrap(text, max_length, &WrapOptions::default())?
+            Tool::ThaiwrapCore => thaiwrap::wrap(text, max_length, &WrapOptions::default())?
                 .into_iter()
                 .map(|r| {
                     text.get(r)
