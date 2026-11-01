@@ -45,10 +45,19 @@
     "build": "napi build --platform --release --manifest-path crates/thaiwrap-node/Cargo.toml --output-dir . --js binding.js --dts binding.d.ts",
     "build:debug": "napi build --platform --manifest-path crates/thaiwrap-node/Cargo.toml --output-dir . --js binding.js --dts binding.d.ts",
     "test": "bun test && node --test __test__/node-runner.mjs __test__/make-placeholders.test.mjs",
-    "bench": "bun bench/index.mjs"
+    "bench": "node bench/index.mjs",
+    "bench:bun": "bun bench/index.mjs",
+    "bench:quality": "node bench/bench-quality.mjs",
+    "bench:rust": "cargo bench -p bench-compare",
+    "bench:cold-start": "node bench/bench-cold-start.mjs",
+    "bench:memory": "node bench/bench-memory-run.mjs",
+    "bench:bundle-size": "node bench/bench-bundle-size.mjs"
   },
   "devDependencies": {
     "@napi-rs/cli": "3.10.9",
-    "mitata": "1.0.34"
+    "mitata": "1.0.34",
+    "thai-break": "1.5.0",
+    "thai-wordcut-ts": "1.0.2",
+    "wordcut": "0.9.1"
   }
 }
