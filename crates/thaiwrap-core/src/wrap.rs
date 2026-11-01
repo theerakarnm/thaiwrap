@@ -25,8 +25,8 @@ use crate::{lines, segment, tcc, thai, Overflow, WrapError, WrapOptions};
 ///
 /// # Errors
 ///
-/// [`WrapError::InvalidMaxLength`] if `max_length` is 0.
-/// [`WrapError::DataUnavailable`] if the built-in Unicode data cannot be loaded.
+/// - [`WrapError::InvalidMaxLength`] if `max_length` is 0.
+/// - [`WrapError::DataUnavailable`] if the built-in Unicode data cannot be loaded.
 pub fn wrap(
     text: &str,
     max_length: usize,

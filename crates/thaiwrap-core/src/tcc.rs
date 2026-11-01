@@ -237,7 +237,6 @@ pub(crate) fn cluster_ends(text: &str) -> impl Iterator<Item = usize> + '_ {
         let n = if is_lone_consonant(rest) {
             1
         } else {
-            // Every rule starts with a required character, so a match is never empty.
             RULES
                 .iter()
                 .filter(|rule| can_start(rule, rest))
