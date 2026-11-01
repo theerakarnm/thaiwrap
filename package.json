@@ -1,6 +1,6 @@
 {
   "name": "thaiwrap",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fast Thai line wrapping for Node.js and Bun, powered by Rust",
   "license": "MIT",
   "repository": {
