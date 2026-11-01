@@ -55,5 +55,6 @@ wrapThai(&quot;\n\nก\n\n&quot;, 10)   // [&quot;ก&quot;]</pre>
 <li>Lone surrogates become U+FFFD.</li>
 <li>Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.</li>
 <li>Output can differ from Intl.Segmenter, for example it keeps <code>?</code> and <code>)</code> with the word before them.</li>
+<li>Unsupported scripts: Lao, Khmer and Burmese. The package ships Thai dictionary data only, so a run of these scripts between spaces is never broken at word boundaries.</li>
 <li>A split inside a long word can leave a single final consonant on a line, for example <code>สร้า</code> / <code>ง</code>.</li></ul>
 </div></div><footer>MIT licensed, with the Unicode License v3 for the embedded ICU data and Apache-2.0 for the Thai Character Cluster rules. Pre-release (v0.x), the API may change. <a href="https://github.com/theerakarnm/wrapthai">Source on GitHub</a>.</footer></main></body></html>

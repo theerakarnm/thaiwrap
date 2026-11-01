@@ -16,10 +16,12 @@ The core crate did not change, so no Rust benchmark was run.
 
 ## Method
 
-- Baseline: `57cb8f2` (tip of `feat/v0.2`). Candidate: `d243298` (tip of `spike/utf16`).
+- Baseline: `57cb8f2` (tip of `feat/v0.2`).
+  Candidate: `d243298` (tip of `spike/utf16`).
 - Both were built with `git archive`, `bun install --frozen-lockfile` and `bun run build` in `/tmp/thaiwrap-gate`.
 - `node bench/gate-ab.mjs ab /tmp/thaiwrap-gate/base /tmp/thaiwrap-gate/cand short long mixed`, run twice as two independent tables.
-- Each run uses node v22.19.0, node v24.22.2 and bun 1.4.4. Per case: three alternating rounds, median reported.
+- Each run uses node v22.19.0, node v24.22.2 and bun 1.4.4.
+  Per case: three alternating rounds, median reported.
 - Gate (user answer 3, D9): `long` change <= -15.0% on node v22.19.0 and node v24.22.2; `short` change <= +5.0% on node v22.19.0, node v24.22.2 and bun 1.4.4.
 - `mixed` and Bun `long` are reported, not gated.
 - Verdict rule: PASS only if every gated cell meets its gate in both tables; FAIL if a gated cell misses its gate in both tables; otherwise INCONCLUSIVE.
@@ -130,9 +132,12 @@ Both builds were made at load 1.5 to 5.2.
 
 ## Reading
 
-- `long` on node v22.19.0: -10.7% and -10.9%. Gate is -15.0%.
-- `long` on node v24.22.2: -14.7% and -14.0%. Gate is -15.0%.
-- `short`: at most +3.2% (bun 1.4.4, +3.2% and +2.7%); negative on both Node versions. Gate is +5.0%.
+- `long` on node v22.19.0: -10.7% and -10.9%.
+  Gate is -15.0%.
+- `long` on node v24.22.2: -14.7% and -14.0%.
+  Gate is -15.0%.
+- `short`: at most +3.2% (bun 1.4.4, +3.2% and +2.7%); negative on both Node versions.
+  Gate is +5.0%.
 - Bun `long` is -2.5% and -2.6% (reported, not gated).
 - The `long` result is not within 1 point of the line on Node 22 in either table (about 4 points short).
 - On Node 24, table 1 (-14.7%) is within 1 point of the line; table 2 (-14.0%) is not.
@@ -141,4 +146,5 @@ The review of Task 12 listed two optional micro-optimizations that were NOT appl
 
 Gate: FAIL (long node v22.19.0 -10.7% / -10.9%, long node v24.22.2 -14.7% / -14.0%, both above -15.0%; short passes at -7.9%/-5.7% (v22), -8.2%/-8.2% (v24), +3.2%/+2.7% (bun))
 
-The change is not merged; it stays on branch `spike/utf16`. A UTF-16 path inside the core was not tried (D11).
+The change is not merged; it stays on branch `spike/utf16`.
+A UTF-16 path inside the core was not tried (D11).

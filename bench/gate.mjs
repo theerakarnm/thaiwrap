@@ -14,15 +14,21 @@ const TEXTS = readFileSync(new URL('../corpus/wisesight/lines.txt', import.meta.
   .filter(Boolean)
   .slice(0, 1000)
 
+function need(name) {
+  if (typeof lib[name] !== 'function') throw new Error(`${name} is not exported by this build; this case needs the unshipped exports (docs/v0.2/api-gates.md)`)
+  return lib[name]
+}
+
 const cases = {
   short: () => lib.wrapThai(SHORT, 10),
   long: () => lib.wrapThai(LONG, 10),
   mixed: () => lib.wrapThai(MIXED, 20),
   'loop-1000': () => { for (const t of TEXTS) lib.wrapThai(t, 20) },
-  'batch-1000': () => lib.wrapThaiBatch(TEXTS, 20),
-  'ranges-short': () => lib.wrapThaiRanges(SHORT, 10),
-  'ranges-long': () => lib.wrapThaiRanges(LONG, 10),
-  'ranges-loop-1000': () => { for (const t of TEXTS) lib.wrapThaiRanges(t, 20) },
+  // The cases below need exports that do not ship (see docs/v0.2/api-gates.md).
+  'batch-1000': () => need('wrapThaiBatch')(TEXTS, 20),
+  'ranges-short': () => need('wrapThaiRanges')(SHORT, 10),
+  'ranges-long': () => need('wrapThaiRanges')(LONG, 10),
+  'ranges-loop-1000': () => { const f = need('wrapThaiRanges'); for (const t of TEXTS) f(t, 20) },
 }
 
 // Median of 21 batches; a batch repeats the call until it takes at least 20 ms.
