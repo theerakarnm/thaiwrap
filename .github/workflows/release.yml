@@ -11,7 +11,7 @@ jobs:
       version: ${{ steps.rp.outputs.version }}
     steps:
       - id: rp
-        uses: googleapis/release-please-action@v5
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with: { config-file: release-please-config.json, manifest-file: .release-please-manifest.json }
 
   build-test:
@@ -27,17 +27,17 @@ jobs:
     env:
       NPM_CONFIG_ACCESS: public
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '24' } # no registry-url: it writes an .npmrc that expects NODE_AUTH_TOKEN
       # Trusted publishing needs npm >= 11.5.1.
       - run: node -e "const [a,b,c]=require('child_process').execSync('npm --version').toString().trim().split('.').map(Number); if (a<11||(a===11&&(b<5||(b===5&&c<1)))) { console.error('npm too old'); process.exit(1) }"
-      - uses: oven-sh/setup-bun@v2
-        with: { bun-version: latest }
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with: { bun-version: 1.4.4 } # pinned: this job holds publish authority
       - run: bun install --frozen-lockfile
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with: { path: artifacts, pattern: 'bindings-*', merge-multiple: true }
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with: { name: js-binding }
       - run: bunx napi create-npm-dirs
       - run: node scripts/write-platform-readmes.mjs
@@ -65,12 +65,12 @@ jobs:
     needs: [release-please, publish]
     runs-on: macos-15
     steps:
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with: { bun-version: latest }
       - run: |
           mkdir app && cd app && bun init -y >/dev/null
           for _ in 1 2 3 4 5; do bun add thaiwrap@${{ needs.release-please.outputs.version }} && exit 0; sleep 30; done; exit 1
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: macos-lockfile
           path: |
@@ -81,6 +81,6 @@ jobs:
     needs: lockfile-from-macos
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with: { name: macos-lockfile, path: app }
       - run: docker run --rm -v "$PWD/app":/app -w /app oven/bun:slim sh -c 'bun install --frozen-lockfile && bun -e "console.log(require(\"thaiwrap\").wrapThai(\"ก\",1))"'

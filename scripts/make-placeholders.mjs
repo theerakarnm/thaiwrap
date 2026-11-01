@@ -9,9 +9,18 @@ import { join } from 'node:path'
 const require = createRequire(import.meta.url)
 const root = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const { platformName } = require('../platform.js')
-const repo = new URL(root.repository.url.replace(/^git\+/, '')).pathname.replace(/^\//, '').replace(/\.git$/, '')
+const repoUrl = new URL(root.repository.url.replace(/^git\+/, ''))
+const repo = repoUrl.pathname.replace(/^\//, '').replace(/\.git$/, '')
 
 const names = [root.name, ...root.napi.targets.map((t) => `${root.napi.packageName}-${platformName(t)}`)]
+
+// The maintainer pastes the printed commands into a shell, so every interpolated value must be
+// plain owner/name or npm-name characters. URL parsing alone keeps `$(...)`, `;` and `|`.
+if (repoUrl.hostname !== 'github.com' || !/^[A-Za-z0-9][A-Za-z0-9._-]*\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(repo))
+  throw new Error(`package.json repository.url must point at a GitHub owner/name, got ${JSON.stringify(root.repository.url)}`)
+for (const name of names)
+  if (!/^(@[a-z0-9~-][a-z0-9._~-]*\/)?[a-z0-9~-][a-z0-9._~-]*$/.test(name)) throw new Error(`invalid npm package name ${JSON.stringify(name)}`)
+
 const dir = mkdtempSync(join(tmpdir(), 'thaiwrap-placeholders-'))
 const dirs = names.map((name) => {
   const pkgDir = join(dir, name.replace('/', '__'))
@@ -37,5 +46,5 @@ console.log('   npm login')
 for (const d of dirs) console.log(`   (cd "${d}" && npm publish --access public)`)
 console.log('\n2. Within 2 days before the first release, add a trusted publisher to each (npm >= 11.15).')
 console.log('   npm expires unvalidated trusted-publisher configurations after 48 hours; if you miss it, run these again:')
-for (const n of names) console.log(`   npm trust github ${n} --file release.yml --repo ${repo} --env npm --allow-publish`)
+for (const n of names) console.log(`   npm trust github "${n}" --file release.yml --repo ${repo} --env npm --allow-publish`)
 console.log('\n3. Only after the `npm trust` commands, run `npm logout` to remove the session token npm login stored in ~/.npmrc.')
