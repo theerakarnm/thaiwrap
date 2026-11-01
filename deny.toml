@@ -6,6 +6,15 @@ ignore = []
 allow = ["MIT", "Apache-2.0", "ISC", "Unicode-3.0"]
 confidence-threshold = 0.8
 
+# Scoped exception: wordcut-engine (the library behind chamkho, compared in
+# crates/bench-compare benchmarks only) is LGPL-2.1. It is reached exclusively
+# from the bench-only bench-compare crate and never from thaiwrap-core or
+# thaiwrap-node, so no shipped artifact links LGPL code. Remove this exception
+# if bench-compare ever leaves the repo.
+[[licenses.exceptions]]
+crate = "wordcut-engine"
+allow = ["LGPL-2.1"]
+
 [bans]
 multiple-versions = "warn"
 wildcards = "allow"

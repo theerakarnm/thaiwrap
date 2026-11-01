@@ -1,6 +1,6 @@
 
-:root{color-scheme:light dark;--bg:#fff;--fg:#14171a;--mut:#5b6670;--t:#e8590c;--r:#adb5bd;--line:#e3e6e9;--card:#f6f7f8}
-@media(prefers-color-scheme:dark){:root{--bg:#101214;--fg:#eceff1;--mut:#9aa5ad;--t:#ff8a3d;--r:#4a535a;--line:#262b2f;--card:#171a1d}}
+:root{color-scheme:light dark;--bg:#fff;--fg:#14171a;--mut:#5b6670;--t:#e8590c;--tx:#c2410c;--r:#adb5bd;--line:#e3e6e9;--card:#f6f7f8}
+@media(prefers-color-scheme:dark){:root{--bg:#101214;--fg:#eceff1;--mut:#9aa5ad;--t:#ff8a3d;--tx:#ff8a3d;--r:#4a535a;--line:#262b2f;--card:#171a1d}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Noto Sans Thai",sans-serif}
 main{max-width:880px;margin:0 auto;padding:48px 20px 64px}
 h1{font-size:2.2rem;margin:0 0 8px}h2{margin:44px 0 12px;font-size:1.3rem}
@@ -17,12 +17,12 @@ pre{background:var(--card);border:1px solid var(--line);border-radius:8px;paddin
 .bar.r i{left:auto;right:8px;color:var(--fg)}.bar.t i{color:var(--fg)}
 .x{font-weight:700;text-align:right}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}td:last-child,th:last-child{text-align:right}
-.note{color:var(--mut);font-size:.9rem}a{color:var(--t)}
+.note{color:var(--mut);font-size:.9rem}a{color:var(--tx)}
 @media(max-width:600px){.row{grid-template-columns:1fr 56px}.lbl{grid-column:1/-1}.bar.t i{left:8px;color:#fff}}
 
 header.nav{border-bottom:1px solid var(--line)}header.nav div{max-width:880px;margin:0 auto;padding:14px 20px;display:flex;gap:20px;align-items:center}
 header.nav .brand{font-weight:700;color:var(--fg);text-decoration:none;margin-right:auto}
-header.nav a{color:var(--mut);text-decoration:none}header.nav a:hover,header.nav a[aria-current]{color:var(--t)}
+header.nav a{color:var(--mut);text-decoration:none}header.nav a:hover,header.nav a[aria-current]{color:var(--tx)}
 .hero{padding:24px 0 8px}.hero h1{font-size:2.8rem;line-height:1.15}
 .cta{display:flex;gap:12px;margin:20px 0 28px;flex-wrap:wrap}
 .btn{padding:10px 18px;border-radius:8px;border:1px solid var(--line);text-decoration:none;color:var(--fg);font-weight:600}
@@ -38,3 +38,5 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:16px;color:v
 .docs>div{min-width:0}.docs td:last-child,.docs th:last-child{text-align:left}
 .grid2>div{display:flex;flex-direction:column}.grid2 pre{flex:1;margin-top:6px}
 .lead{margin-top:0}.hero{padding-top:8px}
+
+.callout{border-left:4px solid var(--t);background:var(--card);padding:10px 14px;border-radius:0 8px 8px 0;margin:16px 0}
