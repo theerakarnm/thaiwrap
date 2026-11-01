@@ -23,7 +23,7 @@ pub use wrap::wrap;
 /// How the length of a line is measured.
 ///
 /// ```
-/// use thaiwrap_core::{Measure, WrapOptions};
+/// use thaiwrap::{Measure, WrapOptions};
 /// assert_eq!(WrapOptions::default().measure, Measure::CodeUnits);
 /// let mut options = WrapOptions::default();
 /// options.measure = Measure::Graphemes;
@@ -42,7 +42,7 @@ pub enum Measure {
 /// What to do with a single word that is longer than the maximum line length.
 ///
 /// ```
-/// use thaiwrap_core::{Overflow, WrapOptions};
+/// use thaiwrap::{Overflow, WrapOptions};
 /// assert_eq!(WrapOptions::default().overflow, Overflow::Split);
 /// ```
 #[non_exhaustive]
@@ -60,7 +60,7 @@ pub enum Overflow {
 /// Options for [`wrap`].
 ///
 /// ```
-/// use thaiwrap_core::{Overflow, WrapOptions};
+/// use thaiwrap::{Overflow, WrapOptions};
 /// let mut options = WrapOptions::default();
 /// options.overflow = Overflow::Keep;
 /// assert_eq!(options.overflow, Overflow::Keep);
@@ -77,7 +77,7 @@ pub struct WrapOptions {
 /// Why [`wrap`] could not run.
 ///
 /// ```
-/// assert_eq!(thaiwrap_core::WrapError::InvalidMaxLength.to_string(), "max_length must be at least 1");
+/// assert_eq!(thaiwrap::WrapError::InvalidMaxLength.to_string(), "max_length must be at least 1");
 /// ```
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

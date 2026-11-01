@@ -1,7 +1,7 @@
-//! Node-API binding for thaiwrap-core: converts JS values, validates them, maps errors.
+//! Node-API binding for the thaiwrap crate: converts JS values, validates them, maps errors.
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
-use thaiwrap_core::{Measure, Overflow};
+use thaiwrap::{Measure, Overflow};
 
 /// Options for `wrapThai`. Every field is optional.
 #[napi(object)]
@@ -32,8 +32,7 @@ pub fn wrap_thai(
     let text = read_string(&env, &text, "text")?;
     let max_length = read_max_length(&env, &max_length)?;
     let options = to_core_options(&env, read_options(&env, options.as_ref())?)?;
-    let ranges =
-        thaiwrap_core::wrap(&text, max_length, &options).map_err(|e| core_error(&env, &e))?;
+    let ranges = thaiwrap::wrap(&text, max_length, &options).map_err(|e| core_error(&env, &e))?;
     ranges
         .into_iter()
         .map(|r| {
@@ -121,8 +120,8 @@ fn read_option(env: &Env, object: &Object<'_>, key: &str) -> Result<Option<Strin
     }
 }
 
-fn to_core_options(env: &Env, options: WrapOptions) -> Result<thaiwrap_core::WrapOptions> {
-    let mut core = thaiwrap_core::WrapOptions::default();
+fn to_core_options(env: &Env, options: WrapOptions) -> Result<thaiwrap::WrapOptions> {
+    let mut core = thaiwrap::WrapOptions::default();
     if let Some(value) = options.measure {
         core.measure = match value.as_str() {
             "codeUnits" => Measure::CodeUnits,
@@ -180,9 +179,9 @@ fn type_error(env: &Env, message: &str) -> Error {
 
 // maxLength is validated before the call, so InvalidMaxLength is a RangeError for completeness;
 // anything else is a broken build, not a wrong argument.
-fn core_error(env: &Env, error: &thaiwrap_core::WrapError) -> Error {
+fn core_error(env: &Env, error: &thaiwrap::WrapError) -> Error {
     match error {
-        thaiwrap_core::WrapError::InvalidMaxLength => range_error(env, &error.to_string()),
+        thaiwrap::WrapError::InvalidMaxLength => range_error(env, &error.to_string()),
         _ => Error::new(Status::GenericFailure, error.to_string()),
     }
 }

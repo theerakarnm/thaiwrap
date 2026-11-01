@@ -78,6 +78,6 @@ Same as `bench/lib/greedy.mjs`:
 
 ## Gotchas
 
-- `thaiwrap_core::wrap` returns `Vec<Range<usize>>`; the bench maps them to owned strings so all tools pay for line allocation.
+- `thaiwrap::wrap` returns `Vec<Range<usize>>`; the bench maps them to owned strings so all tools pay for line allocation.
 - `thaiwrap-core` trims ZWSP at line edges (rule 5), so its joined output has a few fewer ZWSP characters than the input; the greedy tools keep ZWSP inside tokens.
 - `bench-compare` does not set `rust-version`; it is not part of the MSRV contract of the published crates.

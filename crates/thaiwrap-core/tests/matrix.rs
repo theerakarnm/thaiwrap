@@ -1,4 +1,4 @@
-use thaiwrap_core::{wrap, Measure, Overflow, WrapError, WrapOptions};
+use thaiwrap::{wrap, Measure, Overflow, WrapError, WrapOptions};
 
 fn opts(measure: Measure, overflow: Overflow) -> WrapOptions {
     let mut o = WrapOptions::default();

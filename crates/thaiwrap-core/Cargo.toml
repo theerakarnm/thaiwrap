@@ -1,13 +1,15 @@
 [package]
-name = "thaiwrap-core"
+name = "thaiwrap"
 description = "Thai-aware line wrapping at word boundaries"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-publish = false
-include = ["src/**", "Cargo.toml"]
+readme = "README.md"
+keywords = ["thai", "line-breaking", "word-wrap", "text", "unicode"]
+categories = ["text-processing", "internationalization"]
+include = ["src/**", "data/icu-thai.postcard", "Cargo.toml", "README.md", "LICENSE", "LICENSE-UNICODE"]
 
 [dependencies]
 icu_segmenter = { version = "=2.4.0", default-features = false, features = ["serde"] }

@@ -1,7 +1,7 @@
 use std::hint::black_box;
 
 use criterion::{criterion_group, criterion_main, Criterion};
-use thaiwrap_core::{wrap, Measure, WrapOptions};
+use thaiwrap::{wrap, Measure, WrapOptions};
 
 const SHORT: &str = "กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า";
 const MIXED: &str = "ราคา 1,250.50 บาท ใช้ React กับ TypeScript 👍 สวัสดี! (ภาษาไทย) ";

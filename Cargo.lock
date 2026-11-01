@@ -59,7 +59,7 @@ dependencies = [
  "kham-core",
  "nlpo3",
  "thaibreak",
- "thaiwrap-core",
+ "thaiwrap",
  "wordcut-engine",
 ]
 
@@ -1211,7 +1211,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "thaiwrap-core"
+name = "thaiwrap"
 version = "0.1.0"
 dependencies = [
  "criterion",
@@ -1228,7 +1228,7 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
- "thaiwrap-core",
+ "thaiwrap",
 ]
 
 [[package]]

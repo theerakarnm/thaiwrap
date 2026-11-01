@@ -13,14 +13,14 @@ use crate::{lines, segment, tcc, thai, Overflow, WrapError, WrapOptions};
 /// [`Overflow::Keep`].
 ///
 /// ```
-/// use thaiwrap_core::{wrap, WrapOptions};
+/// use thaiwrap::{wrap, WrapOptions};
 /// let text = "กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า";
 /// let lines: Vec<&str> = wrap(text, 10, &WrapOptions::default())?
 ///     .into_iter()
 ///     .filter_map(|r| text.get(r))
 ///     .collect();
 /// assert_eq!(lines, ["กระบวนการ", "สื่อสาร", "ส่งมอบ และ", "สร้าง", "คุณค่า"]);
-/// # Ok::<(), thaiwrap_core::WrapError>(())
+/// # Ok::<(), thaiwrap::WrapError>(())
 /// ```
 ///
 /// # Errors

@@ -218,7 +218,7 @@ cargo test --workspace
 bun run build && bun test
 ```
 
-Benchmarks: `cargo bench -p thaiwrap-core`, `bun run bench`, `node bench/index.mjs`.
+Benchmarks: `cargo bench -p thaiwrap`, `bun run bench`, `node bench/index.mjs`.
 
 ### Repository layout
 
