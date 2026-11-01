@@ -1,3 +1,5 @@
+import { tccEnds } from './tcc.mjs'
+
 // Test oracle for Thai-letter, Thai-digit and space text only (see THAI_RUN in parity.mjs).
 // It breaks at word boundaries because Intl.Segmenter has no line granularity, so it differs
 // from thaiwrap's UAX #14 line breaks on punctuation, for example around "?" and ")".
@@ -32,8 +34,16 @@ function trimBreakSpaces(s) {
 }
 
 function splitOverflow(word, max, measure) {
-  const cuts = [...graphemes.segment(word)].map((g) => g.index).filter((i) => i > 0 && allowed(word, i))
-  cuts.push(word.length)
+  // Same rule as wrap.rs split_overflow: grapheme cuts that pass the Thai rules, kept only at
+  // TCC ends, except inside a piece that is still longer than max.
+  const legal = [...graphemes.segment(word)].map((g) => g.index).filter((i) => i > 0 && allowed(word, i))
+  const cuts = []
+  let from = 0
+  for (const end of [...tccEnds(word).filter((e) => legal.includes(e)), word.length]) {
+    if (len(word.slice(from, end), measure) > max) cuts.push(...legal.filter((g) => g > from && g < end))
+    cuts.push(end)
+    from = end
+  }
   const chunks = []
   let start = 0
   for (const cut of cuts) {
