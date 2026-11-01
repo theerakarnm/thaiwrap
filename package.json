@@ -51,7 +51,8 @@
     "bench:rust": "cargo bench -p bench-compare",
     "bench:cold-start": "node bench/bench-cold-start.mjs",
     "bench:memory": "node bench/bench-memory-run.mjs",
-    "bench:bundle-size": "node bench/bench-bundle-size.mjs"
+    "bench:bundle-size": "node bench/bench-bundle-size.mjs",
+    "bench:site": "node bench/scripts/build-site-page.mjs"
   },
   "devDependencies": {
     "@napi-rs/cli": "3.10.9",

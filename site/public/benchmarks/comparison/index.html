@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>thaiwrap benchmarks: full comparison with other Thai tools</title>
+<meta name="description" content="Speed, memory, install size, start-up time and Thai line rule checks for thaiwrap against Intl.Segmenter, wordcut, thai-break and Rust crates.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/benchmarks/comparison/comparison.css"></head><body class="wide-page">
+<header class="nav"><div><a class="brand" href="/">thaiwrap</a><a href="/docs/">Docs</a><a href="/benchmarks/" aria-current="page">Benchmarks</a><a href="https://github.com/theerakarnm/wrapthai">GitHub</a></div></header>
+<main>
+<nav class="toc" aria-label="On this page"><a href="#summary">Summary</a><a href="#tested">What we tested</a><a href="#see-it">See it</a><a href="#speed-js">Speed: Node</a><a href="#speed-rust">Speed: Rust</a><a href="#startup">Start-up</a><a href="#memory">Memory</a><a href="#size">Install size</a><a href="#quality">Quality</a><a href="#tradeoffs">Trade-offs</a><a href="#notes">Notes</a><a href="#method">Reproduce</a></nav>
+<section class="hero-b" id="summary"><p class="eyebrow">Full comparison</p><h1>thaiwrap against the other Thai tools</h1>
+<p class="lead">We wrapped a 50 page Thai document with 7 JavaScript set-ups and 6 Rust set-ups. We measured speed, memory, install size and start-up time. We also checked that every line follows the Thai typing rules.</p>
+<p class="meta-line">Apple M1 Pro (MacBookPro18,3), 8 cores, 16 GB RAM, arm64 &middot; macOS 26.6.2 &middot; Node v22.19.0 &middot; measured 2026-11-01 &middot; Full write-up: <a href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md">bench/RESULTS.md</a></p>
+<div class="vgrid">
+<div class="vcard"><h3>Speed</h3><span class="big">1.9x or more</span><p>faster than every other JS tool, in all 9 test setups. Whole 50 pages: 12.3 ms.</p><span class="badge win">Winner</span></div>
+<div class="vcard"><h3>Start-up</h3><span class="big">3.90 ms</span><p>to load and finish the first wrap. The others need 10.2 to 132 ms.</p><span class="badge win">Winner</span></div>
+<div class="vcard"><h3>Peak memory</h3><span class="big">107 MB</span><p>while wrapping 50 pages 300 times. The others peak at 158 to 230 MB.</p><span class="badge win">Winner</span></div>
+<div class="vcard"><h3>Thai line rules</h3><span class="big">0 problems</span><p>in 18,009 lines. The other tools break a rule on 0.1% to 0.6% of their lines. Only the reference wrap, which is 5.7x slower, also has none.</p><span class="badge win">Winner</span></div>
+<div class="vcard"><h3>Install size</h3><span class="big">843 KB</span><p>download (JS plus one native binary). Pure JS tools: 112 KB to 182 KB.</p><span class="badge mix">Trade-off</span></div>
+</div>
+<div class="callout howto"><b>How to read this page</b><ul>
+<li><b>Wrap</b> means: cut text into lines of at most <code>maxLength</code> characters, and never cut a Thai word in a bad place.</li>
+<li><b>Simple wrap</b> is one small function we wrote and gave to every tool that only finds word boundaries, so all tools fill lines the same way. Details in <a href="#notes">Notes</a>.</li>
+<li>For time, memory and size, <b>shorter bars are better</b>. Each bar is the median of 3 runs. The thin line on a bar runs from the fastest to the slowest run.</li>
+<li>Length is counted in UTF-16 code units, the same as JavaScript <code>.length</code>.</li>
+</ul></div></section><section id="tested"><div class="sechead"><h2 id="tested-h">What we tested</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#method">Source: RESULTS.md, Method</a></div><p class="intro">The same input went to every tool. Each tool was set up once before timing, so we time the wrapping and not the set-up.</p>
+<div class="fx"><div><b>Small: ~1 page</b><span>3,319 characters &middot; 9 KB</span></div><div><b>Medium: ~10 pages</b><span>28,942 characters &middot; 81 KB</span></div><div><b>Large: 50 pages</b><span>144,706 characters &middot; 405 KB</span></div></div>
+<p class="intro">The text mixes Thai prose, Thai digits, English words, numbers, punctuation and emoji. It also holds zero width spaces and no-break spaces, which real documents contain. Each test used three line lengths: 20, 40 and 80.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tool</th><th>Version</th><th>Kind</th><th>What it is</th></tr></thead><tbody><tr><td>thaiwrap <span class="tag ours">ours</span></td><td>0.1.1</td><td>ours</td><td>Wraps by itself: ICU4X dictionary + Thai line rules.</td></tr><tr><td>Intl.Segmenter + Thai rules</td><td>Node v22.19.0</td><td>baseline</td><td>The reference wrap used in the tests. Built in, no install.</td></tr><tr><td>Intl.Segmenter + simple wrap</td><td>Node v22.19.0</td><td>baseline</td><td>Built-in word finder plus the shared simple wrap.</td></tr><tr><td>wordcut</td><td>0.9.1</td><td>npm</td><td>The classic JS word breaker. Needs an init() call to load its dictionary.</td></tr><tr><td>thai-wordcut-ts</td><td>1.0.2</td><td>npm</td><td>Maintained fork of wordcut.</td></tr><tr><td>thai-break</td><td>1.5.0</td><td>npm</td><td>Newest. Measured two ways: words() plus simple wrap, and its own wrap().</td></tr><tr><td>ICU4X (icu_segmenter)</td><td>2.4.0</td><td>Rust</td><td>The word finder inside thaiwrap, without our Thai rules.</td></tr><tr><td>wordcut-engine</td><td>1.2.2</td><td>Rust</td><td>The library behind chamkho 1.5.0, used with chamkho's own dictionary.</td></tr><tr><td>nlpo3</td><td>1.4.0</td><td>Rust</td><td>PyThaiNLP newmm engine in Rust.</td></tr><tr><td>thaibreak</td><td>1.5.0</td><td>Rust</td><td>Same engine as the thai-break npm package.</td></tr><tr><td>kham-core</td><td>0.8.2</td><td>Rust</td><td>Small pure Rust segmenter.</td></tr></tbody></table></div>
+<p class="note">Not in the speed charts: the <b>nlpo3</b> npm package. It has no prebuilt binary and fails to install without a Rust toolchain, so the Rust crate is tested instead. See <a href="#notes">Notes</a>.</p></section><section id="see-it"><div class="sechead"><h2 id="see-it-h">See it with your own eyes</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#quality">Source: RESULTS.md, Quality</a></div><p class="intro">These are real runs of the real tools, not mock-ups. Each box is one output line. The small bar under a line shows how full it is.</p>
+<div class="demo"><h3 id="demo-basic">Example 1: the sentence from the README</h3><p class="intro">Most tools agree on this sentence. thai-break wrap() counts display columns, where tone and vowel marks take no room, so it fits more on a line. It also splits the word ส่งมอบ into ส่ง and มอบ on two lines.</p><p class="demo-text"><b>maxLength 10.</b> Input: กระบวนการสื่อสาร ส่งมอบ และสร้างคุณค่า</p><div class="demos"><div class="dcard ours"><div class="dhead"><b>thaiwrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:70.00"><code>สื่อสาร</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:100.00"><code>ส่งมอบ และ</code><span class="m"><small>10/10</small></span></div><div class="ln" style="--fill:50.00"><code>สร้าง</code><span class="m"><small>5/10</small></span></div><div class="ln" style="--fill:60.00"><code>คุณค่า</code><span class="m"><small>6/10</small></span></div></div><div class="dcard"><div class="dhead"><b>Intl.Segmenter + Thai rules</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:70.00"><code>สื่อสาร</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:100.00"><code>ส่งมอบ และ</code><span class="m"><small>10/10</small></span></div><div class="ln" style="--fill:50.00"><code>สร้าง</code><span class="m"><small>5/10</small></span></div><div class="ln" style="--fill:60.00"><code>คุณค่า</code><span class="m"><small>6/10</small></span></div></div><div class="dcard"><div class="dhead"><b>Intl.Segmenter + simple wrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:70.00"><code>สื่อสาร</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:100.00"><code>ส่งมอบ และ</code><span class="m"><small>10/10</small></span></div><div class="ln" style="--fill:50.00"><code>สร้าง</code><span class="m"><small>5/10</small></span></div><div class="ln" style="--fill:60.00"><code>คุณค่า</code><span class="m"><small>6/10</small></span></div></div><div class="dcard"><div class="dhead"><b>wordcut + simple wrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:70.00"><code>สื่อสาร</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:100.00"><code>ส่งมอบ และ</code><span class="m"><small>10/10</small></span></div><div class="ln" style="--fill:50.00"><code>สร้าง</code><span class="m"><small>5/10</small></span></div><div class="ln" style="--fill:60.00"><code>คุณค่า</code><span class="m"><small>6/10</small></span></div></div><div class="dcard"><div class="dhead"><b>thai-wordcut-ts + simple wrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:70.00"><code>สื่อสาร</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:100.00"><code>ส่งมอบ และ</code><span class="m"><small>10/10</small></span></div><div class="ln" style="--fill:50.00"><code>สร้าง</code><span class="m"><small>5/10</small></span></div><div class="ln" style="--fill:60.00"><code>คุณค่า</code><span class="m"><small>6/10</small></span></div></div><div class="dcard"><div class="dhead"><b>thai-break words() + simple wrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:70.00"><code>สื่อสาร</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:100.00"><code>ส่งมอบ และ</code><span class="m"><small>10/10</small></span></div><div class="ln" style="--fill:50.00"><code>สร้าง</code><span class="m"><small>5/10</small></span></div><div class="ln" style="--fill:60.00"><code>คุณค่า</code><span class="m"><small>6/10</small></span></div></div><div class="dcard"><div class="dhead"><b>thai-break wrap()</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>กระบวนการ</code><span class="m"><small>9/10</small></span></div><div class="ln" style="--fill:80.00"><code>สื่อสาร ส่ง</code><span class="m"><small>8/10</small></span></div><div class="ln" style="--fill:70.00"><code>มอบ และ</code><span class="m"><small>7/10</small></span></div><div class="ln" style="--fill:80.00"><code>สร้างคุณค่า</code><span class="m"><small>8/10</small></span></div><p class="note" style="margin:6px 0 0;font-size:.75rem">Counts display columns: tone and vowel marks are zero wide.</p></div></div></div><div class="demo"><h3 id="demo-rules">Example 2: a line must not start with ๆ</h3><p class="intro">A real 77 character excerpt of the fixture. A plain word finder does not know that ๆ repeats the word before it, so it can start a line with it. The bar under each line shows how full the line is. Red means a Thai rule was broken.</p><p class="demo-text"><b>maxLength 20.</b> Input: เพื่อติดตามความคืบหน้าของโครงการและแก้ไขปัญหาที่เกิดขึ้น เด็กๆ เล่นเท่าๆๆ กัน</p><div class="demos"><div class="dcard ours"><div class="dhead"><b>thaiwrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>เพื่อติดตามความคืบ</code><span class="m"><small>18/20</small></span></div><div class="ln" style="--fill:85.00"><code>หน้าของโครงการและ</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:85.00"><code>แก้ไขปัญหาที่เกิด</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:75.00"><code>ขึ้น เด็กๆ เล่น</code><span class="m"><small>15/20</small></span></div><div class="ln" style="--fill:50.00"><code>เท่าๆๆ กัน</code><span class="m"><small>10/20</small></span></div></div><div class="dcard"><div class="dhead"><b>Intl.Segmenter + Thai rules</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:90.00"><code>เพื่อติดตามความคืบ</code><span class="m"><small>18/20</small></span></div><div class="ln" style="--fill:85.00"><code>หน้าของโครงการและ</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:85.00"><code>แก้ไขปัญหาที่เกิด</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:75.00"><code>ขึ้น เด็กๆ เล่น</code><span class="m"><small>15/20</small></span></div><div class="ln" style="--fill:50.00"><code>เท่าๆๆ กัน</code><span class="m"><small>10/20</small></span></div></div><div class="dcard"><div class="dhead"><b>Intl.Segmenter + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:90.00"><code>เพื่อติดตามความคืบ</code><span class="m"><small>18/20</small></span></div><div class="ln" style="--fill:85.00"><code>หน้าของโครงการและ</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:85.00"><code>แก้ไขปัญหาที่เกิด</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:100.00"><code>ขึ้น เด็กๆ เล่นเท่าๆ</code><span class="m"><small>20/20</small></span></div><div class="ln bad" style="--fill:25.00"><code>ๆ กัน</code><span class="m"><small>5/20</small><span class="tag bad">starts with ๆ</span></span></div></div><div class="dcard"><div class="dhead"><b>wordcut + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:90.00"><code>เพื่อติดตามความคืบ</code><span class="m"><small>18/20</small></span></div><div class="ln" style="--fill:85.00"><code>หน้าของโครงการและ</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:85.00"><code>แก้ไขปัญหาที่เกิด</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:90.00"><code>ขึ้น เด็กๆ เล่นเท่</code><span class="m"><small>18/20</small></span></div><div class="ln bad" style="--fill:35.00"><code>าๆๆ กัน</code><span class="m"><small>7/20</small><span class="tag bad">starts with า</span></span></div></div><div class="dcard"><div class="dhead"><b>thai-wordcut-ts + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:90.00"><code>เพื่อติดตามความคืบ</code><span class="m"><small>18/20</small></span></div><div class="ln" style="--fill:85.00"><code>หน้าของโครงการและ</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:85.00"><code>แก้ไขปัญหาที่เกิด</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:90.00"><code>ขึ้น เด็กๆ เล่นเท่</code><span class="m"><small>18/20</small></span></div><div class="ln bad" style="--fill:35.00"><code>าๆๆ กัน</code><span class="m"><small>7/20</small><span class="tag bad">starts with า</span></span></div></div><div class="dcard"><div class="dhead"><b>thai-break words() + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:90.00"><code>เพื่อติดตามความคืบ</code><span class="m"><small>18/20</small></span></div><div class="ln" style="--fill:85.00"><code>หน้าของโครงการและ</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:85.00"><code>แก้ไขปัญหาที่เกิด</code><span class="m"><small>17/20</small></span></div><div class="ln" style="--fill:95.00"><code>ขึ้น เด็กๆ เล่นเท่า</code><span class="m"><small>19/20</small></span></div><div class="ln bad" style="--fill:30.00"><code>ๆๆ กัน</code><span class="m"><small>6/20</small><span class="tag bad">starts with ๆ</span></span></div></div><div class="dcard"><div class="dhead"><b>thai-break wrap()</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:100.00"><code>เพื่อติดตามความคืบหน้าของ</code><span class="m"><small>20/20</small></span></div><div class="ln" style="--fill:95.00"><code>โครงการและแก้ไขปัญหาที่</code><span class="m"><small>19/20</small></span></div><div class="ln" style="--fill:95.00"><code>เกิดขึ้น เด็กๆ เล่นเท่าๆๆ</code><span class="m"><small>19/20</small></span></div><div class="ln" style="--fill:10.00"><code>กัน</code><span class="m"><small>2/20</small></span></div><p class="note" style="margin:6px 0 0;font-size:.75rem">Counts display columns: tone and vowel marks are zero wide.</p></div></div></div><div class="demo"><h3 id="demo-long">Example 3: a word longer than the line</h3><p class="intro">A 34 letter English word and maxLength 20. thaiwrap cuts it at a safe place. A tool that never cuts words leaves a line that is too long. Amber means too long.</p><p class="demo-text"><b>maxLength 20.</b> Input: ทดสอบ supercalifragilisticexpialidocious ต่อไป</p><div class="demos"><div class="dcard ours"><div class="dhead"><b>thaiwrap</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln" style="--fill:100.00"><code>supercalifragilistic</code><span class="m"><small>20/20</small></span></div><div class="ln" style="--fill:100.00"><code>expialidocious ต่อไป</code><span class="m"><small>20/20</small></span></div></div><div class="dcard"><div class="dhead"><b>Intl.Segmenter + Thai rules</b><span class="tag ok">no problems</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln" style="--fill:100.00"><code>supercalifragilistic</code><span class="m"><small>20/20</small></span></div><div class="ln" style="--fill:100.00"><code>expialidocious ต่อไป</code><span class="m"><small>20/20</small></span></div></div><div class="dcard"><div class="dhead"><b>Intl.Segmenter + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln over" style="--fill:100.00"><code>supercalifragilisticexpialidocious</code><span class="m"><small>34/20</small><span class="tag warn">too long</span></span></div><div class="ln" style="--fill:25.00"><code>ต่อไป</code><span class="m"><small>5/20</small></span></div></div><div class="dcard"><div class="dhead"><b>wordcut + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln over" style="--fill:100.00"><code>supercalifragilisticexpialidocious</code><span class="m"><small>34/20</small><span class="tag warn">too long</span></span></div><div class="ln" style="--fill:25.00"><code>ต่อไป</code><span class="m"><small>5/20</small></span></div></div><div class="dcard"><div class="dhead"><b>thai-wordcut-ts + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln over" style="--fill:100.00"><code>supercalifragilisticexpialidocious</code><span class="m"><small>34/20</small><span class="tag warn">too long</span></span></div><div class="ln" style="--fill:25.00"><code>ต่อไป</code><span class="m"><small>5/20</small></span></div></div><div class="dcard"><div class="dhead"><b>thai-break words() + simple wrap</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln over" style="--fill:100.00"><code>supercalifragilisticexpialidocious</code><span class="m"><small>34/20</small><span class="tag warn">too long</span></span></div><div class="ln" style="--fill:25.00"><code>ต่อไป</code><span class="m"><small>5/20</small></span></div></div><div class="dcard"><div class="dhead"><b>thai-break wrap()</b><span class="tag bad">1 problem</span></div><div class="ln" style="--fill:25.00"><code>ทดสอบ</code><span class="m"><small>5/20</small></span></div><div class="ln over" style="--fill:100.00"><code>supercalifragilisticexpialidocious</code><span class="m"><small>34/20</small><span class="tag warn">too long</span></span></div><div class="ln" style="--fill:20.00"><code>ต่อไป</code><span class="m"><small>4/20</small></span></div><p class="note" style="margin:6px 0 0;font-size:.75rem">Counts display columns: tone and vowel marks are zero wide.</p></div></div></div>
+<p class="note">Rule breaks are rare per line, so a short excerpt may show only one. The totals over all 18,009 lines are in <a href="#quality">Quality</a>.</p></section><section id="speed-js"><div class="sechead"><h2 id="speed-js-h">Speed in Node.js</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#speed---js-layer-node-22-lower-ms-is-better">Source: RESULTS.md, Speed - JS layer (Node 22, lower ms is better)</a></div><p class="intro">Time to wrap the whole document once. Shorter is better. Choose a document size and a line length to compare.</p>
+<div class="chart" id="chart-js" data-size="large" data-ml="40" data-scale="lin">
+<div class="ctl">
+<div><span class="cap">Document size</span><div class="seg" role="group" aria-label="Document size"><button type="button" data-set="size" data-value="small" aria-pressed="false">Small (~1 page)</button><button type="button" data-set="size" data-value="medium" aria-pressed="false">Medium (~10 pages)</button><button type="button" data-set="size" data-value="large" aria-pressed="true">Large (50 pages)</button></div></div>
+<div><span class="cap">Max line length (maxLength)</span><div class="seg" role="group" aria-label="Max line length"><button type="button" data-set="ml" data-value="20" aria-pressed="false">20</button><button type="button" data-set="ml" data-value="40" aria-pressed="false">40</button><button type="button" data-set="ml" data-value="80" aria-pressed="false">80</button></div></div>
+<div><span class="cap">Bar scale</span><div class="seg" role="group" aria-label="Bar scale"><button type="button" data-set="scale" data-value="lin" aria-pressed="true">Linear</button><button type="button" data-set="scale" data-value="log" aria-pressed="false">Log</button></div></div>
+</div>
+<div class="legend"><span><i class="sw t"></i>thaiwrap</span><span><i class="sw"></i>other tools</span><span><i class="sw sd"></i>fastest to slowest of the 3 runs</span></div>
+<div class="view" data-size="small" data-ml="20" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.79;--log:16.31;--lo-lin:2.78;--hi-lin:2.89;--lo-log:16.21;--hi-log:17.13">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.272 ms</b><span>baseline</span><span>3,671 ops/s &middot; 34.2 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.18;--log:30.78;--lo-lin:5.03;--hi-lin:5.37;--lo-log:30.09;--hi-log:31.59">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.506 ms</b><span>1.9x slower</span><span>1,977 ops/s &middot; 18.4 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:12.19;--log:50.78;--lo-lin:11.59;--hi-lin:12.20;--lo-log:49.61;--hi-log:50.81">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.19 ms</b><span>4.4x slower</span><span>841 ops/s &middot; 7.8 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.61;--log:58.02;--lo-lin:16.44;--hi-lin:19.52;--lo-log:57.77;--hi-log:61.79">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.62 ms</b><span>5.9x slower</span><span>617 ops/s &middot; 5.7 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:17.03;--log:58.60;--lo-lin:16.68;--hi-lin:17.09;--lo-log:58.12;--hi-log:58.69">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.66 ms</b><span>6.1x slower</span><span>602 ops/s &middot; 5.6 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:88.91;--log:97.25;--lo-lin:88.69;--hi-lin:92.33;--lo-log:97.19;--hi-log:98.13">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>8.68 ms</b><span>32x slower</span><span>115 ops/s &middot; 1.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:95.07;--log:98.82;--lo-lin:83.15;--hi-lin:100.00;--lo-log:95.68;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.28 ms</b><span>34x slower</span><span>108 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<div class="view" data-size="small" data-ml="40" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.55;--log:16.72;--lo-lin:2.44;--hi-lin:2.60;--lo-log:15.73;--hi-log:17.15">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.266 ms</b><span>baseline</span><span>3,763 ops/s &middot; 35.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:4.85;--log:31.30;--lo-lin:4.52;--hi-lin:5.01;--lo-log:29.73;--hi-log:32.07">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.505 ms</b><span>1.9x slower</span><span>1,980 ops/s &middot; 18.4 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:11.24;--log:50.39;--lo-lin:10.74;--hi-lin:11.37;--lo-log:49.35;--hi-log:50.65">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.17 ms</b><span>4.4x slower</span><span>854 ops/s &middot; 7.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:15.17;--log:57.20;--lo-lin:14.87;--hi-lin:17.38;--lo-log:56.75;--hi-log:60.29">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.58 ms</b><span>6.0x slower</span><span>632 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:15.39;--log:57.52;--lo-lin:14.58;--hi-lin:15.62;--lo-log:56.30;--hi-log:57.87">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.60 ms</b><span>6.0x slower</span><span>624 ops/s &middot; 5.8 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:91.25;--log:97.92;--lo-lin:77.76;--hi-lin:100.00;--lo-log:94.29;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.51 ms</b><span>36x slower</span><span>105 ops/s &middot; 1.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:92.12;--log:98.14;--lo-lin:81.56;--hi-lin:93.75;--lo-log:95.37;--hi-log:98.53">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.60 ms</b><span>36x slower</span><span>104 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<div class="view" data-size="small" data-ml="80" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.69;--log:16.11;--lo-lin:2.69;--hi-lin:2.79;--lo-log:16.09;--hi-log:16.91">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.248 ms</b><span>baseline</span><span>4,025 ops/s &middot; 37.5 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.37;--log:32.15;--lo-lin:5.13;--hi-lin:5.53;--lo-log:31.06;--hi-log:32.82">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.496 ms</b><span>2.0x slower</span><span>2,017 ops/s &middot; 18.8 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:12.20;--log:51.18;--lo-lin:12.05;--hi-lin:13.03;--lo-log:50.90;--hi-log:52.70">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.13 ms</b><span>4.5x slower</span><span>888 ops/s &middot; 8.3 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.82;--log:58.62;--lo-lin:16.58;--hi-lin:18.03;--lo-log:58.30;--hi-log:60.24">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.55 ms</b><span>6.2x slower</span><span>644 ops/s &middot; 6.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:17.12;--log:59.05;--lo-lin:16.94;--hi-lin:17.36;--lo-log:58.80;--hi-log:59.36">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.58 ms</b><span>6.4x slower</span><span>633 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:95.37;--log:98.90;--lo-lin:93.54;--hi-lin:97.43;--lo-log:98.45;--hi-log:99.40">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>8.80 ms</b><span>35x slower</span><span>114 ops/s &middot; 1.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:98.65;--log:99.68;--lo-lin:97.42;--hi-lin:100.00;--lo-log:99.39;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.10 ms</b><span>37x slower</span><span>110 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<div class="view" data-size="medium" data-ml="20" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.61;--log:16.77;--lo-lin:2.51;--hi-lin:2.63;--lo-log:15.83;--hi-log:16.96">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>2.52 ms</b><span>baseline</span><span>398 ops/s &middot; 32.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.09;--log:32.02;--lo-lin:4.74;--hi-lin:5.15;--lo-log:30.40;--hi-log:32.26">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>4.90 ms</b><span>1.9x slower</span><span>204 ops/s &middot; 16.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:10.43;--log:48.39;--lo-lin:10.43;--hi-lin:12.03;--lo-log:48.38;--hi-log:51.65">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>10.0 ms</b><span>4.0x slower</span><span>100 ops/s &middot; 8.2 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:14.62;--log:56.09;--lo-lin:14.47;--hi-lin:16.66;--lo-log:55.87;--hi-log:59.08">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>14.1 ms</b><span>5.6x slower</span><span>71 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.01;--log:58.16;--lo-lin:15.44;--hi-lin:17.06;--lo-log:57.34;--hi-log:59.62">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>15.4 ms</b><span>6.1x slower</span><span>65 ops/s &middot; 5.4 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:83.34;--log:95.84;--lo-lin:76.40;--hi-lin:85.68;--lo-log:93.85;--hi-log:96.47">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>80.2 ms</b><span>32x slower</span><span>12 ops/s &middot; 1.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:91.29;--log:97.92;--lo-lin:82.66;--hi-lin:100.00;--lo-log:95.65;--hi-log:100.00">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>87.9 ms</b><span>35x slower</span><span>11 ops/s &middot; 0.9 MB/s</span></div></div></div></div>
+<div class="view" data-size="medium" data-ml="40" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.70;--log:16.28;--lo-lin:2.67;--hi-lin:2.99;--lo-log:16.07;--hi-log:18.63">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>2.34 ms</b><span>baseline</span><span>427 ops/s &middot; 35.3 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.17;--log:31.36;--lo-lin:4.99;--hi-lin:5.70;--lo-log:30.52;--hi-log:33.59">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>4.49 ms</b><span>1.9x slower</span><span>223 ops/s &middot; 18.4 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:11.63;--log:50.13;--lo-lin:11.41;--hi-lin:12.74;--lo-log:49.69;--hi-log:52.25">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>10.1 ms</b><span>4.3x slower</span><span>99 ops/s &middot; 8.2 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.10;--log:57.67;--lo-lin:15.95;--hi-lin:17.58;--lo-log:57.45;--hi-log:59.70">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>14.0 ms</b><span>6.0x slower</span><span>72 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.26;--log:57.90;--lo-lin:16.15;--hi-lin:17.64;--lo-log:57.74;--hi-log:59.79">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>14.1 ms</b><span>6.0x slower</span><span>71 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:91.43;--log:97.92;--lo-lin:86.76;--hi-lin:92.97;--lo-log:96.71;--hi-log:98.31">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>79.3 ms</b><span>34x slower</span><span>13 ops/s &middot; 1.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:95.77;--log:99.00;--lo-lin:91.49;--hi-lin:100.00;--lo-log:97.94;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>83.0 ms</b><span>35x slower</span><span>12 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<div class="view" data-size="medium" data-ml="80" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.73;--log:16.50;--lo-lin:2.68;--hi-lin:2.91;--lo-log:16.08;--hi-log:17.94">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>2.32 ms</b><span>baseline</span><span>430 ops/s &middot; 35.6 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.42;--log:32.41;--lo-lin:5.05;--hi-lin:5.91;--lo-log:30.76;--hi-log:34.41">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>4.62 ms</b><span>2.0x slower</span><span>217 ops/s &middot; 17.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:11.79;--log:50.41;--lo-lin:11.63;--hi-lin:12.47;--lo-log:50.09;--hi-log:51.71">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>10.0 ms</b><span>4.3x slower</span><span>100 ops/s &middot; 8.2 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.30;--log:57.93;--lo-lin:16.11;--hi-lin:17.65;--lo-log:57.66;--hi-log:59.77">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>13.9 ms</b><span>6.0x slower</span><span>72 ops/s &middot; 6.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.34;--log:57.99;--lo-lin:16.09;--hi-lin:17.03;--lo-log:57.63;--hi-log:58.94">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>13.9 ms</b><span>6.0x slower</span><span>72 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:90.60;--log:97.71;--lo-lin:85.82;--hi-lin:94.70;--lo-log:96.45;--hi-log:98.74">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>77.1 ms</b><span>33x slower</span><span>13 ops/s &middot; 1.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:96.32;--log:99.13;--lo-lin:95.88;--hi-lin:100.00;--lo-log:99.02;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>82.0 ms</b><span>35x slower</span><span>12 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<div class="view" data-size="large" data-ml="20" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:3.18;--log:16.82;--lo-lin:3.17;--hi-lin:3.41;--lo-log:16.72;--hi-log:18.51">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>12.3 ms</b><span>baseline</span><span>81 ops/s &middot; 33.6 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.95;--log:31.94;--lo-lin:5.75;--hi-lin:5.99;--lo-log:31.11;--hi-log:32.08">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>23.1 ms</b><span>1.9x slower</span><span>43 ops/s &middot; 18.0 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:13.49;--log:51.68;--lo-lin:13.25;--hi-lin:14.24;--lo-log:51.24;--hi-log:52.99">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>52.3 ms</b><span>4.2x slower</span><span>19 ops/s &middot; 7.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:17.97;--log:58.60;--lo-lin:17.17;--hi-lin:18.45;--lo-log:57.49;--hi-log:59.23">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>69.7 ms</b><span>5.7x slower</span><span>14 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:18.05;--log:58.71;--lo-lin:17.87;--hi-lin:21.31;--lo-log:58.46;--hi-log:62.71">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>70.0 ms</b><span>5.7x slower</span><span>14 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:94.75;--log:98.70;--lo-lin:94.62;--hi-lin:99.20;--lo-log:98.67;--hi-log:99.81">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>368 ms</b><span>30x slower</span><span>3 ops/s &middot; 1.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:99.61;--log:99.91;--lo-lin:94.34;--hi-lin:100.00;--lo-log:98.60;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>386 ms</b><span>31x slower</span><span>3 ops/s &middot; 1.1 MB/s</span></div></div></div></div>
+<div class="view" data-size="large" data-ml="40"><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.87;--log:17.36;--lo-lin:2.73;--hi-lin:3.02;--lo-log:16.14;--hi-log:18.53">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>12.3 ms</b><span>baseline</span><span>81 ops/s &middot; 33.7 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.43;--log:32.17;--lo-lin:5.04;--hi-lin:5.64;--lo-log:30.44;--hi-log:33.05">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>23.2 ms</b><span>1.9x slower</span><span>43 ops/s &middot; 17.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:13.16;--log:52.79;--lo-lin:12.48;--hi-lin:13.24;--lo-log:51.54;--hi-log:52.93">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>56.3 ms</b><span>4.6x slower</span><span>18 ops/s &middot; 7.4 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.45;--log:57.98;--lo-lin:16.30;--hi-lin:17.40;--lo-log:57.76;--hi-log:59.29">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>70.4 ms</b><span>5.7x slower</span><span>14 ops/s &middot; 5.9 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:17.30;--log:59.16;--lo-lin:16.34;--hi-lin:18.39;--lo-log:57.82;--hi-log:60.57">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>74.0 ms</b><span>6.0x slower</span><span>14 ops/s &middot; 5.6 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:88.11;--log:97.05;--lo-lin:86.40;--hi-lin:92.28;--lo-log:96.60;--hi-log:98.13">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>377 ms</b><span>31x slower</span><span>3 ops/s &middot; 1.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:93.88;--log:98.53;--lo-lin:85.08;--hi-lin:100.00;--lo-log:96.24;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>401 ms</b><span>33x slower</span><span>2 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<div class="view" data-size="large" data-ml="80" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:2.69;--log:16.11;--lo-lin:2.69;--hi-lin:2.70;--lo-log:16.09;--hi-log:16.15">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>11.5 ms</b><span>baseline</span><span>87 ops/s &middot; 36.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:5.36;--log:32.07;--lo-lin:5.09;--hi-lin:5.38;--lo-log:30.90;--hi-log:32.19">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>22.9 ms</b><span>2.0x slower</span><span>44 ops/s &middot; 18.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:12.49;--log:51.72;--lo-lin:11.72;--hi-lin:13.70;--lo-log:50.25;--hi-log:53.87">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>53.3 ms</b><span>4.6x slower</span><span>19 ops/s &middot; 7.8 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:16.62;--log:58.35;--lo-lin:15.22;--hi-lin:16.86;--lo-log:56.32;--hi-log:58.69">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>71.0 ms</b><span>6.2x slower</span><span>14 ops/s &middot; 5.8 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:17.22;--log:59.17;--lo-lin:17.02;--hi-lin:17.24;--lo-log:58.91;--hi-log:59.21">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>73.5 ms</b><span>6.4x slower</span><span>14 ops/s &middot; 5.6 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:87.76;--log:96.97;--lo-lin:83.56;--hi-lin:90.50;--lo-log:95.83;--hi-log:97.68">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>375 ms</b><span>33x slower</span><span>3 ops/s &middot; 1.1 MB/s</span></div></div>
+<div class="brow" role="listitem" style="--lin:96.69;--log:99.22;--lo-lin:93.50;--hi-lin:100.00;--lo-log:98.44;--hi-log:100.00">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>413 ms</b><span>36x slower</span><span>2 ops/s &middot; 1.0 MB/s</span></div></div></div></div>
+<p class="note logonly">Log scale: each bar is placed by the logarithm of its time, so a bar twice as long is many times slower. Use it to compare the small values. The numbers on the right are always exact.</p>
+</div>
+<h3>Time grows in step with the document</h3>
+<p class="intro">Same tests at maxLength 40, with both axes on a log scale. Every tool grows about in proportion to the text, and thaiwrap stays the lowest line.</p>
+<svg class="lc" viewBox="0 0 760 340" role="img" aria-labelledby="lc-t lc-d"><title id="lc-t">Time to wrap versus document size</title><desc id="lc-d">Both axes are logarithmic. All tools grow roughly in proportion to the document size. thaiwrap is the lowest line.</desc><line class="grid" x1="58" x2="550" y1="296" y2="296"/><text x="50" y="300" text-anchor="end">0.1 ms</text><line class="grid" x1="58" x2="550" y1="226" y2="226"/><text x="50" y="230" text-anchor="end">1 ms</text><line class="grid" x1="58" x2="550" y1="156" y2="156"/><text x="50" y="160" text-anchor="end">10 ms</text><line class="grid" x1="58" x2="550" y1="86" y2="86"/><text x="50" y="90" text-anchor="end">100 ms</text><line class="grid" x1="58" x2="550" y1="16" y2="16"/><text x="50" y="20" text-anchor="end">1,000 ms</text><line class="grid" x1="58" x2="58" y1="16" y2="296"/><text x="58" y="312" text-anchor="middle">~1 page</text><text x="58" y="326" text-anchor="middle">3,319 chars</text><line class="grid" x1="340.24600147913895" x2="340.24600147913895" y1="16" y2="296"/><text x="340.24600147913895" y="312" text-anchor="middle">~10 pages</text><text x="340.24600147913895" y="326" text-anchor="middle">28,942 chars</text><line class="grid" x1="550" x2="550" y1="16" y2="296"/><text x="550" y="312" text-anchor="middle">50 pages</text><text x="550" y="326" text-anchor="middle">144,706 chars</text><path class="s0" d="M58.0,266.3L340.2,200.1L550.0,149.7"/><circle class="s0" cx="58.0" cy="266.3" r="4.5"/><circle class="s0" cx="340.2" cy="200.1" r="4.5"/><circle class="s0" cx="550.0" cy="149.7" r="4.5"/><path class="s1" d="M58.0,212.1L340.2,145.9L550.0,96.7"/><circle class="s1" cx="58.0" cy="212.1" r="3.5"/><circle class="s1" cx="340.2" cy="145.9" r="3.5"/><circle class="s1" cx="550.0" cy="96.7" r="3.5"/><path class="s2" d="M58.0,246.8L340.2,180.4L550.0,130.4"/><circle class="s2" cx="58.0" cy="246.8" r="3.5"/><circle class="s2" cx="340.2" cy="180.4" r="3.5"/><circle class="s2" cx="550.0" cy="130.4" r="3.5"/><path class="s3" d="M58.0,157.5L340.2,91.7L550.0,43.7"/><circle class="s3" cx="58.0" cy="157.5" r="3.5"/><circle class="s3" cx="340.2" cy="91.7" r="3.5"/><circle class="s3" cx="550.0" cy="43.7" r="3.5"/><path class="s4" d="M58.0,157.2L340.2,93.1L550.0,45.7"/><circle class="s4" cx="58.0" cy="157.2" r="3.5"/><circle class="s4" cx="340.2" cy="93.1" r="3.5"/><circle class="s4" cx="550.0" cy="45.7" r="3.5"/><path class="s5" d="M58.0,221.2L340.2,155.8L550.0,103.5"/><circle class="s5" cx="58.0" cy="221.2" r="3.5"/><circle class="s5" cx="340.2" cy="155.8" r="3.5"/><circle class="s5" cx="550.0" cy="103.5" r="3.5"/><path class="s6" d="M58.0,211.6L340.2,145.6L550.0,95.2"/><circle class="s6" cx="58.0" cy="211.6" r="3.5"/><circle class="s6" cx="340.2" cy="145.6" r="3.5"/><circle class="s6" cx="550.0" cy="95.2" r="3.5"/><line class="lead" x1="555" x2="558" y1="43.7" y2="43.7"/><text class="lab" x="562" y="47.7">wordcut + simple wrap</text><line class="lead" x1="555" x2="558" y1="45.7" y2="57.7"/><text class="lab" x="562" y="61.7">thai-wordcut-ts + simple wrap</text><line class="lead" x1="555" x2="558" y1="95.2" y2="95.2"/><text class="lab" x="562" y="99.2">thai-break wrap()</text><line class="lead" x1="555" x2="558" y1="96.7" y2="109.2"/><text class="lab" x="562" y="113.2">Intl.Segmenter + Thai rules</text><line class="lead" x1="555" x2="558" y1="103.5" y2="123.2"/><text class="lab" x="562" y="127.2">thai-break words() + simple wrap</text><line class="lead" x1="555" x2="558" y1="130.4" y2="137.2"/><text class="lab" x="562" y="141.2">Intl.Segmenter + simple wrap</text><line class="lead" x1="555" x2="558" y1="149.7" y2="151.2"/><text class="lab" x="562" y="155.2">thaiwrap</text></svg>
+<details><summary>Show the numbers behind this chart</summary><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tool</th><th>Small (ms)</th><th>Medium (ms)</th><th>Large (ms)</th></tr></thead><tbody><tr><td>thaiwrap</td><td>0.266</td><td>2.34</td><td>12.3</td></tr><tr><td>Intl.Segmenter + Thai rules</td><td>1.58</td><td>14.0</td><td>70.4</td></tr><tr><td>Intl.Segmenter + simple wrap</td><td>0.505</td><td>4.49</td><td>23.2</td></tr><tr><td>wordcut + simple wrap</td><td>9.51</td><td>83.0</td><td>401</td></tr><tr><td>thai-wordcut-ts + simple wrap</td><td>9.60</td><td>79.3</td><td>377</td></tr><tr><td>thai-break words() + simple wrap</td><td>1.17</td><td>10.1</td><td>56.3</td></tr><tr><td>thai-break wrap()</td><td>1.60</td><td>14.1</td><td>74.0</td></tr></tbody></table></div></details>
+<details><summary>Show exact numbers for all 9 setups</summary><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tool</th><th>Small 20</th><th>Small 40</th><th>Small 80</th><th>Medium 20</th><th>Medium 40</th><th>Medium 80</th><th>Large 20</th><th>Large 40</th><th>Large 80</th></tr></thead><tbody><tr><td>thaiwrap</td><td>0.272 <small>0.271 to 0.282</small></td><td>0.266 <small>0.254 to 0.271</small></td><td>0.248 <small>0.248 to 0.257</small></td><td>2.52 <small>2.41 to 2.54</small></td><td>2.34 <small>2.32 to 2.59</small></td><td>2.32 <small>2.28 to 2.47</small></td><td>12.3 <small>12.3 to 13.2</small></td><td>12.3 <small>11.7 to 12.9</small></td><td>11.5 <small>11.5 to 11.5</small></td></tr><tr><td>Intl.Segmenter + Thai rules</td><td>1.62 <small>1.60 to 1.90</small></td><td>1.58 <small>1.55 to 1.81</small></td><td>1.58 <small>1.56 to 1.60</small></td><td>14.1 <small>13.9 to 16.0</small></td><td>14.0 <small>13.8 to 15.2</small></td><td>13.9 <small>13.7 to 15.0</small></td><td>69.7 <small>66.6 to 71.6</small></td><td>70.4 <small>69.7 to 74.4</small></td><td>71.0 <small>65.0 to 72.0</small></td></tr><tr><td>Intl.Segmenter + simple wrap</td><td>0.506 <small>0.491 to 0.524</small></td><td>0.505 <small>0.471 to 0.522</small></td><td>0.496 <small>0.473 to 0.510</small></td><td>4.90 <small>4.57 to 4.95</small></td><td>4.49 <small>4.33 to 4.94</small></td><td>4.62 <small>4.30 to 5.03</small></td><td>23.1 <small>22.3 to 23.2</small></td><td>23.2 <small>21.6 to 24.1</small></td><td>22.9 <small>21.7 to 23.0</small></td></tr><tr><td>wordcut + simple wrap</td><td>9.28 <small>8.11 to 9.76</small></td><td>9.51 <small>8.10 to 10.4</small></td><td>9.10 <small>8.99 to 9.23</small></td><td>80.2 <small>73.6 to 82.5</small></td><td>83.0 <small>79.3 to 86.7</small></td><td>82.0 <small>81.6 to 85.1</small></td><td>386 <small>366 to 388</small></td><td>401 <small>364 to 428</small></td><td>413 <small>399 to 427</small></td></tr><tr><td>thai-wordcut-ts + simple wrap</td><td>8.68 <small>8.65 to 9.01</small></td><td>9.60 <small>8.50 to 9.77</small></td><td>8.80 <small>8.63 to 8.99</small></td><td>87.9 <small>79.6 to 96.3</small></td><td>79.3 <small>75.2 to 80.6</small></td><td>77.1 <small>73.0 to 80.6</small></td><td>368 <small>367 to 385</small></td><td>377 <small>369 to 395</small></td><td>375 <small>357 to 387</small></td></tr><tr><td>thai-break words() + simple wrap</td><td>1.19 <small>1.13 to 1.19</small></td><td>1.17 <small>1.12 to 1.18</small></td><td>1.13 <small>1.11 to 1.20</small></td><td>10.0 <small>10.0 to 11.6</small></td><td>10.1 <small>9.89 to 11.0</small></td><td>10.0 <small>9.89 to 10.6</small></td><td>52.3 <small>51.4 to 55.3</small></td><td>56.3 <small>53.4 to 56.6</small></td><td>53.3 <small>50.1 to 58.5</small></td></tr><tr><td>thai-break wrap()</td><td>1.66 <small>1.63 to 1.67</small></td><td>1.60 <small>1.52 to 1.63</small></td><td>1.55 <small>1.53 to 1.66</small></td><td>15.4 <small>14.9 to 16.4</small></td><td>14.1 <small>14.0 to 15.3</small></td><td>13.9 <small>13.7 to 14.5</small></td><td>70.0 <small>69.3 to 82.7</small></td><td>74.0 <small>69.8 to 78.6</small></td><td>73.5 <small>72.7 to 73.6</small></td></tr></tbody></table></div></details>
+<p class="callout">Best other tool on the full document: <b>23.2 ms</b> against thaiwrap's <b>12.3 ms</b>. The slowest takes <b>401 ms</b>.</p></section><section id="speed-rust"><div class="sechead"><h2 id="speed-rust-h">Speed in Rust</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#speed---rust-core-criterion-ms-per-full-fixture-wrap">Source: RESULTS.md, Speed - Rust core (criterion, ms per full-fixture wrap)</a></div><p class="intro">The same test one level down, without Node. thaiwrap-core is compared with other Rust crates, each followed by the same simple wrap.</p>
+<div class="chart" id="chart-rust" data-size="large" data-ml="40" data-scale="lin">
+<div class="ctl">
+<div><span class="cap">Document size</span><div class="seg" role="group" aria-label="Document size"><button type="button" data-set="size" data-value="small" aria-pressed="false">Small (~1 page)</button><button type="button" data-set="size" data-value="medium" aria-pressed="false">Medium (~10 pages)</button><button type="button" data-set="size" data-value="large" aria-pressed="true">Large (50 pages)</button></div></div>
+<div><span class="cap">Max line length (maxLength)</span><div class="seg" role="group" aria-label="Max line length"><button type="button" data-set="ml" data-value="20" aria-pressed="false">20</button><button type="button" data-set="ml" data-value="40" aria-pressed="false">40</button><button type="button" data-set="ml" data-value="80" aria-pressed="false">80</button></div></div>
+<div><span class="cap">Bar scale</span><div class="seg" role="group" aria-label="Bar scale"><button type="button" data-set="scale" data-value="lin" aria-pressed="true">Linear</button><button type="button" data-set="scale" data-value="log" aria-pressed="false">Log</button></div></div>
+</div>
+<div class="legend"><span><i class="sw t"></i>thaiwrap</span><span><i class="sw"></i>other tools</span><span><i class="sw sd"></i>fastest to slowest of the 3 runs</span></div>
+<div class="view" data-size="small" data-ml="20" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:15.33;--log:29.70;--lo-lin:13.89;--hi-lin:17.34;--lo-log:25.99;--hi-log:34.32">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.216 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:15.45;--log:29.98;--lo-lin:14.28;--hi-lin:15.49;--lo-log:27.04;--hi-log:30.09">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.218 ms</b><span>1.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:32.03;--log:57.32;--lo-lin:30.71;--hi-lin:36.73;--lo-log:55.74;--hi-log:62.45">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.451 ms</b><span>2.1x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:37.55;--log:63.28;--lo-lin:36.68;--hi-lin:38.95;--lo-log:62.40;--hi-log:64.65">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.529 ms</b><span>2.4x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:41.18;--log:66.74;--lo-lin:40.85;--hi-lin:100.00;--lo-log:66.44;--hi-log:100.00">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.580 ms</b><span>2.7x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:46.21;--log:71.06;--lo-lin:42.55;--hi-lin:46.59;--lo-log:67.96;--hi-log:71.36">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.651 ms</b><span>3.0x slower</span></div></div></div></div>
+<div class="view" data-size="small" data-ml="40" hidden><div class="bars" role="list"><div class="brow" role="listitem" style="--lin:20.86;--log:34.08;--lo-lin:19.15;--hi-lin:21.20;--lo-log:30.47;--hi-log:34.76">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.212 ms</b><span>9% faster</span></div></div>
+<div class="brow ours" role="listitem" style="--lin:22.91;--log:38.01;--lo-lin:18.56;--hi-lin:30.41;--lo-log:29.15;--hi-log:49.94">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.233 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:44.56;--log:66.00;--lo-lin:41.93;--hi-lin:55.76;--lo-log:63.44;--hi-log:75.43">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.453 ms</b><span>1.9x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:51.49;--log:72.08;--lo-lin:49.69;--hi-lin:56.01;--lo-log:70.59;--hi-log:75.62">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.524 ms</b><span>2.2x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:57.66;--log:76.84;--lo-lin:55.43;--hi-lin:100.00;--lo-log:75.18;--hi-log:100.00">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.586 ms</b><span>2.5x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:61.89;--log:79.82;--lo-lin:60.75;--hi-lin:63.83;--lo-log:79.04;--hi-log:81.12">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.629 ms</b><span>2.7x slower</span></div></div></div></div>
+<div class="view" data-size="small" data-ml="80" hidden><div class="bars" role="list"><div class="brow" role="listitem" style="--lin:18.68;--log:32.03;--lo-lin:17.45;--hi-lin:20.96;--lo-log:29.26;--hi-log:36.70">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.204 ms</b><span>5% faster</span></div></div>
+<div class="brow ours" role="listitem" style="--lin:19.58;--log:33.93;--lo-lin:16.95;--hi-lin:28.63;--lo-log:28.08;--hi-log:49.33">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.214 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:40.59;--log:63.47;--lo-lin:38.90;--hi-lin:48.58;--lo-log:61.74;--hi-log:70.75">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.444 ms</b><span>2.1x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:47.37;--log:69.73;--lo-lin:46.01;--hi-lin:49.09;--lo-log:68.55;--hi-log:71.17">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.518 ms</b><span>2.4x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:53.49;--log:74.65;--lo-lin:51.26;--hi-lin:100.00;--lo-log:72.92;--hi-log:100.00">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.585 ms</b><span>2.7x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:55.07;--log:75.83;--lo-lin:54.86;--hi-lin:58.85;--lo-log:75.67;--hi-log:78.52">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>0.603 ms</b><span>2.8x slower</span></div></div></div></div>
+<div class="view" data-size="medium" data-ml="20" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:23.84;--log:35.86;--lo-lin:21.39;--hi-lin:27.03;--lo-log:31.01;--hi-log:41.47">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>2.02 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:24.44;--log:36.96;--lo-lin:22.39;--hi-lin:24.48;--lo-log:33.04;--hi-log:37.03">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>2.07 ms</b><span>1.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:52.12;--log:70.85;--lo-lin:49.21;--hi-lin:100.00;--lo-log:68.28;--hi-log:100.00">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>4.41 ms</b><span>2.2x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:61.06;--log:77.93;--lo-lin:59.42;--hi-lin:62.34;--lo-log:76.71;--hi-log:78.86">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.17 ms</b><span>2.6x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:66.40;--log:81.68;--lo-lin:64.70;--hi-lin:83.51;--lo-log:80.52;--hi-log:91.94">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.62 ms</b><span>2.8x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:77.21;--log:88.43;--lo-lin:69.61;--hi-lin:83.29;--lo-log:83.79;--hi-log:91.82">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>6.53 ms</b><span>3.2x slower</span></div></div></div></div>
+<div class="view" data-size="medium" data-ml="40" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:22.94;--log:34.50;--lo-lin:21.14;--hi-lin:24.39;--lo-log:30.84;--hi-log:37.22">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.90 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:23.85;--log:36.21;--lo-lin:22.06;--hi-lin:26.34;--lo-log:32.75;--hi-log:40.63">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.98 ms</b><span>1.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:53.12;--log:71.85;--lo-lin:50.29;--hi-lin:63.98;--lo-log:69.42;--hi-log:80.12">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>4.41 ms</b><span>2.3x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:61.73;--log:78.53;--lo-lin:59.14;--hi-lin:65.96;--lo-log:76.63;--hi-log:81.49">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.12 ms</b><span>2.7x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:67.14;--log:82.27;--lo-lin:63.89;--hi-lin:100.00;--lo-log:80.07;--hi-log:100.00">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.57 ms</b><span>2.9x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:76.18;--log:87.89;--lo-lin:73.07;--hi-lin:94.30;--lo-log:86.04;--hi-log:97.39">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>6.32 ms</b><span>3.3x slower</span></div></div></div></div>
+<div class="view" data-size="medium" data-ml="80" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:24.09;--log:34.84;--lo-lin:22.51;--hi-lin:24.24;--lo-log:31.73;--hi-log:35.11">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.85 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:24.98;--log:36.49;--lo-lin:23.22;--hi-lin:25.42;--lo-log:33.16;--hi-log:37.30">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>1.92 ms</b><span>1.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:56.48;--log:73.85;--lo-lin:54.04;--hi-lin:100.00;--lo-log:71.82;--hi-log:100.00">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>4.33 ms</b><span>2.3x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:65.71;--log:80.78;--lo-lin:64.10;--hi-lin:68.80;--lo-log:79.64;--hi-log:82.88">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.04 ms</b><span>2.7x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:72.27;--log:85.13;--lo-lin:68.80;--hi-lin:78.50;--lo-log:82.88;--hi-log:88.92">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.54 ms</b><span>3.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:77.16;--log:88.13;--lo-lin:72.60;--hi-lin:88.77;--lo-log:85.34;--hi-log:94.55">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>5.92 ms</b><span>3.2x slower</span></div></div></div></div>
+<div class="view" data-size="large" data-ml="20" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:21.19;--log:32.85;--lo-lin:19.85;--hi-lin:21.55;--lo-log:30.00;--hi-log:33.58">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.72 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:22.56;--log:35.54;--lo-lin:20.78;--hi-lin:22.89;--lo-log:32.00;--hi-log:36.19">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>10.3 ms</b><span>1.1x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:48.85;--log:68.99;--lo-lin:46.31;--hi-lin:100.00;--lo-log:66.68;--hi-log:100.00">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>22.4 ms</b><span>2.3x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:56.97;--log:75.65;--lo-lin:55.00;--hi-lin:57.46;--lo-log:74.12;--hi-log:76.02">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>26.1 ms</b><span>2.7x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:62.02;--log:79.32;--lo-lin:59.10;--hi-lin:64.50;--lo-log:77.23;--hi-log:81.02">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>28.4 ms</b><span>2.9x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:66.73;--log:82.49;--lo-lin:58.48;--hi-lin:76.46;--lo-log:76.78;--hi-log:88.38">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>30.6 ms</b><span>3.1x slower</span></div></div></div></div>
+<div class="view" data-size="large" data-ml="40"><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:19.05;--log:31.65;--lo-lin:17.68;--hi-lin:19.72;--lo-log:28.57;--hi-log:33.08">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.51 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:20.32;--log:34.31;--lo-lin:18.52;--hi-lin:22.42;--lo-log:30.48;--hi-log:38.37">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>10.1 ms</b><span>1.1x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:44.41;--log:66.54;--lo-lin:42.13;--hi-lin:100.00;--lo-log:64.37;--hi-log:100.00">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>22.2 ms</b><span>2.3x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:50.43;--log:71.78;--lo-lin:49.82;--hi-lin:53.75;--lo-log:71.28;--hi-log:74.41">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>25.2 ms</b><span>2.6x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:57.04;--log:76.86;--lo-lin:53.11;--hi-lin:60.11;--lo-log:73.92;--hi-log:79.02">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>28.5 ms</b><span>3.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:59.50;--log:78.60;--lo-lin:53.28;--hi-lin:93.54;--lo-log:74.05;--hi-log:97.25">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>29.7 ms</b><span>3.1x slower</span></div></div></div></div>
+<div class="view" data-size="large" data-ml="80" hidden><div class="bars" role="list"><div class="brow ours" role="listitem" style="--lin:18.46;--log:31.03;--lo-lin:17.27;--hi-lin:18.98;--lo-log:28.30;--hi-log:32.15">
+<div class="bname"><b>thaiwrap-core</b><span>ours, Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>9.31 ms</b><span>baseline</span></div></div>
+<div class="brow" role="listitem" style="--lin:20.32;--log:34.93;--lo-lin:17.83;--hi-lin:22.43;--lo-log:29.61;--hi-log:38.97">
+<div class="bname"><b>ICU4X + simple wrap</b><span>Rust, no Thai rules</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>10.2 ms</b><span>1.1x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:43.63;--log:66.14;--lo-lin:41.85;--hi-lin:85.60;--lo-log:64.44;--hi-log:93.65">
+<div class="bname"><b>chamkho engine + simple wrap</b><span>Rust, wordcut-engine</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>22.0 ms</b><span>2.4x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:49.85;--log:71.58;--lo-lin:49.12;--hi-lin:50.55;--lo-log:70.98;--hi-log:72.15">
+<div class="bname"><b>thaibreak + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>25.1 ms</b><span>2.7x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:56.17;--log:76.45;--lo-lin:52.67;--hi-lin:56.78;--lo-log:73.83;--hi-log:76.89">
+<div class="bname"><b>nlpo3 (newmm) + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>28.3 ms</b><span>3.0x slower</span></div></div>
+<div class="brow" role="listitem" style="--lin:59.88;--log:79.07;--lo-lin:52.13;--hi-lin:100.00;--lo-log:73.41;--hi-log:100.00">
+<div class="bname"><b>kham-core + simple wrap</b><span>Rust</span></div>
+<div class="btrack" aria-hidden="true"><div class="bfill"></div><div class="bsd"></div></div>
+<div class="bval"><b>30.2 ms</b><span>3.2x slower</span></div></div></div></div>
+<p class="note logonly">Log scale: each bar is placed by the logarithm of its time, so a bar twice as long is many times slower. Use it to compare the small values. The numbers on the right are always exact.</p>
+</div>
+<details><summary>Show exact numbers for all 9 setups</summary><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tool</th><th>Small 20</th><th>Small 40</th><th>Small 80</th><th>Medium 20</th><th>Medium 40</th><th>Medium 80</th><th>Large 20</th><th>Large 40</th><th>Large 80</th></tr></thead><tbody><tr><td>thaiwrap-core</td><td>0.216 <small>0.196 to 0.244</small></td><td>0.233 <small>0.189 to 0.309</small></td><td>0.214 <small>0.185 to 0.313</small></td><td>2.02 <small>1.81 to 2.29</small></td><td>1.90 <small>1.75 to 2.02</small></td><td>1.85 <small>1.73 to 1.86</small></td><td>9.72 <small>9.10 to 9.89</small></td><td>9.51 <small>8.83 to 9.85</small></td><td>9.31 <small>8.71 to 9.57</small></td></tr><tr><td>ICU4X + simple wrap</td><td>0.218 <small>0.201 to 0.218</small></td><td>0.212 <small>0.195 to 0.216</small></td><td>0.204 <small>0.191 to 0.229</small></td><td>2.07 <small>1.89 to 2.07</small></td><td>1.98 <small>1.83 to 2.18</small></td><td>1.92 <small>1.78 to 1.95</small></td><td>10.3 <small>9.53 to 10.5</small></td><td>10.1 <small>9.25 to 11.2</small></td><td>10.2 <small>8.99 to 11.3</small></td></tr><tr><td>chamkho engine + simple wrap</td><td>0.451 <small>0.433 to 0.517</small></td><td>0.453 <small>0.426 to 0.567</small></td><td>0.444 <small>0.426 to 0.532</small></td><td>4.41 <small>4.16 to 8.46</small></td><td>4.41 <small>4.17 to 5.31</small></td><td>4.33 <small>4.14 to 7.67</small></td><td>22.4 <small>21.2 to 45.9</small></td><td>22.2 <small>21.0 to 49.9</small></td><td>22.0 <small>21.1 to 43.2</small></td></tr><tr><td>nlpo3 (newmm) + simple wrap</td><td>0.580 <small>0.575 to 1.41</small></td><td>0.586 <small>0.564 to 1.02</small></td><td>0.585 <small>0.561 to 1.09</small></td><td>5.62 <small>5.47 to 7.06</small></td><td>5.57 <small>5.30 to 8.30</small></td><td>5.54 <small>5.28 to 6.02</small></td><td>28.4 <small>27.1 to 29.6</small></td><td>28.5 <small>26.5 to 30.0</small></td><td>28.3 <small>26.6 to 28.6</small></td></tr><tr><td>thaibreak + simple wrap</td><td>0.529 <small>0.517 to 0.549</small></td><td>0.524 <small>0.505 to 0.570</small></td><td>0.518 <small>0.503 to 0.537</small></td><td>5.17 <small>5.03 to 5.27</small></td><td>5.12 <small>4.91 to 5.47</small></td><td>5.04 <small>4.92 to 5.28</small></td><td>26.1 <small>25.2 to 26.4</small></td><td>25.2 <small>24.9 to 26.8</small></td><td>25.1 <small>24.8 to 25.5</small></td></tr><tr><td>kham-core + simple wrap</td><td>0.651 <small>0.599 to 0.656</small></td><td>0.629 <small>0.618 to 0.649</small></td><td>0.603 <small>0.600 to 0.644</small></td><td>6.53 <small>5.89 to 7.05</small></td><td>6.32 <small>6.06 to 7.82</small></td><td>5.92 <small>5.57 to 6.81</small></td><td>30.6 <small>26.8 to 35.1</small></td><td>29.7 <small>26.6 to 46.7</small></td><td>30.2 <small>26.3 to 50.4</small></td></tr></tbody></table></div></details>
+<p class="callout">The Thai line rules cost almost nothing. Across the 9 setups thaiwrap-core runs from <b>9% faster</b> to <b>10% slower</b> than raw ICU4X word finding plus the simple wrap (9.51 ms against 10.1 ms on the full document), which is about the size of the noise. Calling it from Node adds about <b>2.78 ms</b> for converting strings across the JS boundary.</p></section><section id="startup"><div class="sechead"><h2 id="startup-h">Start-up time</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#cold-start-fresh-process-median-of-15">Source: RESULTS.md, Cold start (fresh process, median of 15)</a></div><p class="intro">A fresh process, the median of 15 runs. This is what a script or a serverless function pays before its first wrap.</p>
+<div class="legend"><span><i class="sw load"></i>load the module</span><span><i class="sw init"></i>one-time init</span><span><i class="sw first"></i>first call</span></div>
+<div class="bars" role="list"><div class="brow ours" role="listitem">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:2.68%"></i><i class="init" style="width:0.00%"></i><i class="first" style="width:0.28%"></i></div>
+<div class="bval"><b>3.90 ms</b><span>load 3.54 ms &middot; first call 0.363 ms</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:0.00%"></i><i class="init" style="width:0.00%"></i><i class="first" style="width:7.71%"></i></div>
+<div class="bval"><b>10.2 ms</b><span>load 0 ms &middot; first call 10.2 ms</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:0.00%"></i><i class="init" style="width:0.00%"></i><i class="first" style="width:7.75%"></i></div>
+<div class="bval"><b>10.2 ms</b><span>load 0 ms &middot; first call 10.2 ms</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:4.35%"></i><i class="init" style="width:0.00%"></i><i class="first" style="width:7.31%"></i></div>
+<div class="bval"><b>15.4 ms</b><span>load 5.74 ms &middot; first call 9.64 ms</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:4.36%"></i><i class="init" style="width:0.00%"></i><i class="first" style="width:13.54%"></i></div>
+<div class="bval"><b>23.6 ms</b><span>load 5.74 ms &middot; first call 17.8 ms</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:6.78%"></i><i class="init" style="width:0.00%"></i><i class="first" style="width:69.20%"></i></div>
+<div class="bval"><b>100 ms</b><span>load 8.93 ms &middot; first call 91.2 ms</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="stack" aria-hidden="true"><i class="load" style="width:8.19%"></i><i class="init" style="width:90.93%"></i><i class="first" style="width:0.88%"></i></div>
+<div class="bval"><b>132 ms</b><span>load 10.8 ms &middot; init 120 ms &middot; first call 1.16 ms</span></div></div></div>
+<p class="note">wordcut must parse its dictionary in <code>init()</code>. thai-wordcut-ts loads it on the first call. thaiwrap has the data compiled in, so there is no file to read.</p></section><section id="memory"><div class="sechead"><h2 id="memory-h">Memory</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#peak-memory-large-fixture-300-wraps-maxlength-40">Source: RESULTS.md, Peak memory (large fixture, 300 wraps, maxLength 40)</a></div><p class="intro">Highest resident memory of the whole process while wrapping the 50 page document 300 times at maxLength 40.</p>
+<div class="legend"><span><i class="sw base"></i>bare Node process</span><span><i class="sw t"></i>extra memory used by thaiwrap</span><span><i class="sw"></i>extra memory used by others</span></div>
+<div class="bars" role="list"><div class="brow ours" role="listitem">
+<div class="bname"><b>thaiwrap</b><span>ours, Rust native addon</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:37.51%"></i><i class="extra" style="width:9.13%"></i></div>
+<div class="bval"><b>107 MB</b><span>+21 MB over bare Node</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-break wrap()</b><span>npm, pure JS, its own wrap</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:37.92%"></i><i class="extra" style="width:30.82%"></i></div>
+<div class="bval"><b>158 MB</b><span>+71 MB over bare Node</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>wordcut + simple wrap</b><span>npm, pure JS</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:37.35%"></i><i class="extra" style="width:33.84%"></i></div>
+<div class="bval"><b>164 MB</b><span>+78 MB over bare Node</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>Intl.Segmenter + Thai rules</b><span>built in, our test reference wrap</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:36.99%"></i><i class="extra" style="width:40.52%"></i></div>
+<div class="bval"><b>178 MB</b><span>+93 MB over bare Node</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>Intl.Segmenter + simple wrap</b><span>built in</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:37.57%"></i><i class="extra" style="width:48.41%"></i></div>
+<div class="bval"><b>198 MB</b><span>+111 MB over bare Node</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-break words() + simple wrap</b><span>npm, pure JS</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:37.45%"></i><i class="extra" style="width:56.00%"></i></div>
+<div class="bval"><b>215 MB</b><span>+129 MB over bare Node</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-wordcut-ts + simple wrap</b><span>npm, pure JS</span></div>
+<div class="stack" aria-hidden="true"><i class="base" style="width:37.40%"></i><i class="extra" style="width:62.60%"></i></div>
+<div class="bval"><b>230 MB</b><span>+144 MB over bare Node</span></div></div></div></section><section id="size"><div class="sechead"><h2 id="size-h">Install size</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#bundle--install-size">Source: RESULTS.md, Bundle / install size</a></div><p class="intro">What you download and what lands on disk. thaiwrap ships one small JS package and a native binary for your platform only.</p>
+<div class="legend"><span><i class="sw load"></i>download (top bar)</span><span><i class="sw"></i>on disk (bottom bar)</span></div>
+<div class="bars" role="list"><div class="brow" role="listitem">
+<div class="bname"><b>Intl.Segmenter</b><span>built into the runtime</span></div>
+<div class="pair" aria-hidden="true"><div class="stack"><i class="dl" style="width:0.00%"></i></div><div class="stack"><i class="un" style="width:0.00%"></i></div></div>
+<div class="bval"><b>0 KB download</b><span>0 KB on disk</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-wordcut-ts</b><span>npm, pure JS, also runs in a browser</span></div>
+<div class="pair" aria-hidden="true"><div class="stack"><i class="dl" style="width:7.46%"></i></div><div class="stack"><i class="un" style="width:32.35%"></i></div></div>
+<div class="bval"><b>112 KB download</b><span>484 KB on disk</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>wordcut</b><span>npm, pure JS, also runs in a browser</span></div>
+<div class="pair" aria-hidden="true"><div class="stack"><i class="dl" style="width:7.50%"></i></div><div class="stack"><i class="un" style="width:31.87%"></i></div></div>
+<div class="bval"><b>112 KB download</b><span>477 KB on disk</span></div></div>
+<div class="brow" role="listitem">
+<div class="bname"><b>thai-break</b><span>npm, pure JS, also runs in a browser</span></div>
+<div class="pair" aria-hidden="true"><div class="stack"><i class="dl" style="width:12.19%"></i></div><div class="stack"><i class="un" style="width:26.46%"></i></div></div>
+<div class="bval"><b>182 KB download</b><span>396 KB on disk</span></div></div>
+<div class="brow ours" role="listitem">
+<div class="bname"><b>thaiwrap</b><span>JS 12 KB + native binary 830 KB, your platform only</span></div>
+<div class="pair" aria-hidden="true"><div class="stack"><i class="dl" style="width:56.34%"></i></div><div class="stack"><i class="un" style="width:100.00%"></i></div></div>
+<div class="bval"><b>843 KB download</b><span>1.5 MB on disk</span></div></div></div>
+<p class="note">The native binary cannot run in a browser. The pure JS tools can. If you ship to browsers, that is the trade-off.</p></section><section id="quality"><div class="sechead"><h2 id="quality-h">Quality: do the lines follow Thai rules?</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#quality">Source: RESULTS.md, Quality</a></div><p class="intro">We checked every line of every output (18,009 lines per tool) against five rules. Green is zero problems.</p>
+<div class="rules">
+<div><b>1. No tone or vowel mark at the start</b><span>A mark must stay with its consonant.</span><span class="ex">้ ่ ั ิ ี ุ ู</span></div>
+<div><b>2. No leading vowel at the end</b><span>เ แ โ ใ ไ belong to the consonant after them.</span><span class="ex">เ แ โ ใ ไ</span></div>
+<div><b>3. Nothing from ะ า ำ ๆ ฯ at the start</b><span>These close the word before them.</span><span class="ex">ะ า ำ ๆ ฯ</span></div>
+<div><b>4. Fit in maxLength</b><span>Unless one unit cannot be cut.</span><span class="ex">20 / 40 / 80</span></div>
+<div><b>5. Lose no text</b><span>Join the lines and you get the input back.</span><span class="ex">no gaps</span></div></div><div class="tbl-wrap"><table class="heat"><thead><tr><th>Tool</th><th>Longer than maxLength</th><th>Starts with a vowel or tone mark</th><th>Starts with ะ า ำ ๆ ฯ</th><th>Ends with a leading vowel เ แ โ ใ ไ</th><th>Text lost</th><th>Lines checked</th><th>Lines with a problem</th></tr></thead><tbody>
+<tr class="grp"><th colspan="8">JavaScript (Node)</th></tr><tr class="ours"><td>thaiwrap</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>18,009</td><td>0%</td></tr><tr><td>Intl.Segmenter + Thai rules</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>17,987</td><td>0%</td></tr><tr><td>Intl.Segmenter + simple wrap</td><td class="nz" style="--sev:0.35">10</td><td class="z" title="none">0</td><td class="nz" style="--sev:0.22">4</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>17,781</td><td><0.1%</td></tr><tr><td>wordcut + simple wrap</td><td class="nz" style="--sev:0.33">9</td><td class="nz" style="--sev:0.22">4</td><td class="nz" style="--sev:0.31">8</td><td class="nz" style="--sev:0.16">2</td><td class="z" title="none">0</td><td>17,805</td><td>0.1%</td></tr><tr><td>thai-wordcut-ts + simple wrap</td><td class="nz" style="--sev:0.33">9</td><td class="nz" style="--sev:0.22">4</td><td class="nz" style="--sev:0.31">8</td><td class="nz" style="--sev:0.16">2</td><td class="z" title="none">0</td><td>17,805</td><td>0.1%</td></tr><tr><td>thai-break words() + simple wrap</td><td class="nz" style="--sev:0.60">30</td><td class="z" title="none">0</td><td class="nz" style="--sev:1.00">82</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>17,829</td><td>0.6%</td></tr><tr><td>thai-break wrap()</td><td class="nz" style="--sev:0.72">42</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>14,725</td><td>0.3%</td></tr>
+<tr class="grp"><th colspan="8">Rust crates</th></tr><tr class="ours"><td>thaiwrap-core</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>18,009</td><td>0%</td></tr><tr><td>ICU4X + simple wrap</td><td class="nz" style="--sev:0.33">9</td><td class="z" title="none">0</td><td class="nz" style="--sev:0.99">81</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>17,768</td><td>0.5%</td></tr><tr><td>chamkho engine + simple wrap</td><td class="nz" style="--sev:0.33">9</td><td class="z" title="none">0</td><td class="nz" style="--sev:0.67">37</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>18,302</td><td>0.3%</td></tr><tr><td>nlpo3 (newmm) + simple wrap</td><td class="nz" style="--sev:0.33">9</td><td class="z" title="none">0</td><td class="nz" style="--sev:0.67">37</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>18,303</td><td>0.3%</td></tr><tr><td>thaibreak + simple wrap</td><td class="nz" style="--sev:0.60">30</td><td class="z" title="none">0</td><td class="nz" style="--sev:1.00">82</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>17,829</td><td>0.6%</td></tr><tr><td>kham-core + simple wrap</td><td class="nz" style="--sev:0.33">9</td><td class="z" title="none">0</td><td class="nz" style="--sev:0.71">41</td><td class="z" title="none">0</td><td class="z" title="none">0</td><td>17,861</td><td>0.3%</td></tr></tbody></table></div>
+<p class="note">thai-break counts width in display columns, so its "longer than maxLength" is measured in its own unit. Counted in UTF-16 units, its lines can be longer than the limit. That is by design.</p>
+<details><summary>About "cut inside a word" (why the numbers look high)</summary>
+<p>We also checked where each line break falls against a reference word list. Grey bars use PyThaiNLP newmm. Blue bars use ICU word breaks. Each bar is the share of line breaks that fall inside a reference word.</p>
+<p>The two lists disagree. newmm keeps many compounds whole, such as ข้อเสนอแนะ, where ICU splits them. So about 19% of thaiwrap's breaks fall inside a newmm word, but only 1% inside an ICU word. It is a difference of dictionary, not a bug. As a check, nlpo3 (which is newmm in Rust) has only 1% against newmm.</p>
+<div style="margin-top:12px"><div class="mini"><span class="nm">thaiwrap</span><div class="btrack"><div class="bfill" style="width:19.41%"></div></div><span>19% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:0.51%"></div></div><span>1% ICU</span></div>
+<div class="mini"><span class="nm">Intl.Segmenter + Thai rules</span><div class="btrack"><div class="bfill" style="width:19.62%"></div></div><span>20% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:0.06%"></div></div><span>0% ICU</span></div>
+<div class="mini"><span class="nm">Intl.Segmenter + simple wrap</span><div class="btrack"><div class="bfill" style="width:19.87%"></div></div><span>20% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:0.00%"></div></div><span>0% ICU</span></div>
+<div class="mini"><span class="nm">wordcut + simple wrap</span><div class="btrack"><div class="bfill" style="width:17.84%"></div></div><span>18% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:3.48%"></div></div><span>3% ICU</span></div>
+<div class="mini"><span class="nm">thai-wordcut-ts + simple wrap</span><div class="btrack"><div class="bfill" style="width:17.84%"></div></div><span>18% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:3.48%"></div></div><span>3% ICU</span></div>
+<div class="mini"><span class="nm">thai-break words() + simple wrap</span><div class="btrack"><div class="bfill" style="width:16.87%"></div></div><span>17% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:2.59%"></div></div><span>3% ICU</span></div>
+<div class="mini"><span class="nm">thai-break wrap()</span><div class="btrack"><div class="bfill" style="width:16.05%"></div></div><span>16% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:2.45%"></div></div><span>2% ICU</span></div>
+<div class="mini"><span class="nm">thaiwrap-core</span><div class="btrack"><div class="bfill" style="width:19.41%"></div></div><span>19% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:0.51%"></div></div><span>1% ICU</span></div>
+<div class="mini"><span class="nm">ICU4X + simple wrap</span><div class="btrack"><div class="bfill" style="width:20.52%"></div></div><span>21% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:0.95%"></div></div><span>1% ICU</span></div>
+<div class="mini"><span class="nm">chamkho engine + simple wrap</span><div class="btrack"><div class="bfill" style="width:0.86%"></div></div><span>1% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:2.22%"></div></div><span>2% ICU</span></div>
+<div class="mini"><span class="nm">nlpo3 (newmm) + simple wrap</span><div class="btrack"><div class="bfill" style="width:0.57%"></div></div><span>1% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:1.95%"></div></div><span>2% ICU</span></div>
+<div class="mini"><span class="nm">thaibreak + simple wrap</span><div class="btrack"><div class="bfill" style="width:16.87%"></div></div><span>17% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:2.59%"></div></div><span>3% ICU</span></div>
+<div class="mini"><span class="nm">kham-core + simple wrap</span><div class="btrack"><div class="bfill" style="width:0.89%"></div></div><span>1% newmm</span></div>
+<div class="mini alt"><span class="nm"></span><div class="btrack"><div class="bfill" style="width:1.69%"></div></div><span>2% ICU</span></div></div>
+<div class="legend"><span><i class="sw base" style="background:var(--r)"></i>inside a newmm word</span><span><i class="sw load"></i>inside an ICU word</span></div></details></section><section id="tradeoffs"><div class="sechead"><h2 id="tradeoffs-h">Where thaiwrap wins, and where it does not</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#wins--losses-summary">Source: RESULTS.md, Wins / losses summary</a></div>
+<div class="two"><div class="win"><h3>Wins</h3><ul>
+<li>Fastest in all 9 JS setups. On the full document it is 1.9x to 33x faster than the other tools.</li>
+<li>Within 10% of raw ICU4X in every setup (the Thai rules are almost free), and 2.3x to 3.1x faster than the other Rust crates.</li>
+<li>Smallest start-up (3.90 ms) and lowest peak memory (107 MB).</li>
+<li>No Thai rule problems in 18,009 lines, and no line longer than the limit.</li>
+<li>Cuts overlong words at safe places and has options for how to measure length.</li></ul></div>
+<div class="lose"><h3>Trade-offs</h3><ul>
+<li>A native binary: 843 KB to download, and not usable in a browser.</li>
+<li>ICU4X splits compounds more finely than PyThaiNLP newmm. If you need newmm compatible word boundaries, it differs.</li>
+<li>About 2.78 ms per 50 pages goes to moving strings between JS and Rust.</li>
+<li>One machine, three runs each. Numbers will differ on your hardware, ratios should not.</li></ul></div></div></section><section id="notes"><div class="sechead"><h2 id="notes-h">Notes and fairness</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#notes-and-exclusions">Source: RESULTS.md, Notes and exclusions</a></div>
+<details><summary>The shared simple wrap</summary><p>Tools that only find words use one greedy function: fill each line with as many words as fit, never cut a word, keep a space only where the input had one, drop zero width spaces, keep blank lines between paragraphs. Length is in UTF-16 units. It has no rule for ะ า ำ ๆ ฯ or leading vowels. That is what the Quality table measures. A no-break space is treated like a normal space by this function.</p></details>
+<details><summary>Why nlpo3 on npm is not in the speed charts</summary><p><code>npm i nlpo3</code> runs <code>cargo-cp-artifact</code>, which is not installed, and would need a Rust toolchain anyway. There is no prebuilt binary. The Rust crate is tested in the Rust charts.</p></details>
+<details><summary>chamkho and its license</summary><p>chamkho 1.5.0 ships only a command line program. The test links its engine, wordcut-engine, with chamkho's own dictionary. wordcut-engine is LGPL-2.1, so <code>deny.toml</code> has a narrow exception for it. It is only used by the benchmark crate, never by thaiwrap.</p></details>
+<details><summary>thai-break and the unit of width</summary><p>thai-break counts display columns and treats tone and vowel marks as zero wide. The same number means a longer line than in thaiwrap, which counts UTF-16 units. Both are valid choices.</p></details>
+<details><summary>Measurement details</summary><p>JS speed: 3 rounds, each in a fresh Node process; the value shown is the median of the 3 round means and the thin line is the fastest to slowest round. Rust speed: 3 criterion runs (warm-up 500 ms, 2 s of measurement, 50 samples); the value shown is the median of the 3 median estimates. The machine was not idle: macOS system services used CPU during the runs, which is why the range is shown. Start-up: median of 15 fresh processes. Memory: one process per tool, 300 wraps. Reference word breaks: PyThaiNLP 5.4.0 newmm. Single machine, not guaranteed idle.</p></details></section><section id="method"><div class="sechead"><h2 id="method-h">Run it yourself</h2><a class="src" href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md#how-to-reproduce">Source: RESULTS.md, How to reproduce</a></div>
+<pre>bun install
+bun run build
+node bench/index.mjs                 # JS speed, 3 rounds
+node bench/bench-cold-start.mjs
+node bench/bench-memory-run.mjs
+node bench/bench-bundle-size.mjs
+node bench/bench-quality.mjs         # needs uv (PyThaiNLP reference)
+cargo bench -p bench-compare --bench compare -- --save-baseline r1   # also r2, r3
+node bench/scripts/build-site-page.mjs   # rebuilds this page</pre>
+<p class="note">Everything here is in the repository: the data and tables are in <a href="https://github.com/theerakarnm/wrapthai/blob/main/bench/RESULTS.md">bench/RESULTS.md</a>, the earlier first round results are on the <a href="/benchmarks/">Benchmarks</a> page.</p></section>
+<footer>MIT licensed. Pre-release (v0.x), the API may change. Generated by <code>bench/scripts/build-site-page.mjs</code> from the benchmark outputs. <a href="https://github.com/theerakarnm/wrapthai">Source on GitHub</a>.</footer>
+</main>
+<script>(function(){
+for (const chart of document.querySelectorAll('.chart')) {
+  const state = { size: chart.dataset.size, ml: chart.dataset.ml, scale: chart.dataset.scale }
+  const apply = () => {
+    chart.dataset.scale = state.scale
+    for (const v of chart.querySelectorAll('.view')) v.hidden = !(v.dataset.size === state.size && v.dataset.ml === state.ml)
+    for (const b of chart.querySelectorAll('[data-set]')) b.setAttribute('aria-pressed', String(state[b.dataset.set] === b.dataset.value))
+  }
+  chart.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-set]')
+    if (!b) return
+    state[b.dataset.set] = b.dataset.value
+    apply()
+  })
+  apply()
+}
+})()</script></body></html>
