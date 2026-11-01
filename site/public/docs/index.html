@@ -32,7 +32,7 @@ const lines = wrapThai(&quot;กระบวนการสื่อสาร �
 <pre>wrapThai(&quot;&quot;, 10)            // []
 wrapThai(&quot;ก\n\nข&quot;, 10)      // [&quot;ก&quot;, &quot;&quot;, &quot;ข&quot;]
 wrapThai(&quot;\n\nก\n\n&quot;, 10)   // [&quot;ก&quot;]</pre>
-<h3>Long words</h3><p><code>overflow: "split"</code> cuts a long word at grapheme boundaries that keep vowels and tone marks with their consonant. <code>"keep"</code> puts the whole word on its own line. A unit that cannot be cut sits alone on its line, even if longer than maxLength. For Thai text, use a maxLength of 5 or more.</p>
+<h3>Long words</h3><p><code>overflow: "split"</code> cuts a long word between Thai Character Clusters, the smallest groups of Thai letters that cannot be split apart (for example <code>เกี่ยว</code> is <code>เกี่ย</code> + <code>ว</code>). Outside Thai, and inside a single cluster that is longer than maxLength, it cuts at grapheme boundaries. Every cut still keeps Thai vowels and tone marks with their consonant. <code>"keep"</code> puts the whole word on its own line. A unit that cannot be cut sits alone on its line, even if longer than maxLength. For Thai text, use a maxLength of 5 or more.</p>
 <h2 id="measuring">Measuring length</h2>
 <p>By default, length is counted like <code>String.prototype.length</code> (UTF-16 code units). Vowel and tone marks above or below a consonant count as one unit each. The same input at 10:</p>
 <pre>// codeUnits (default)

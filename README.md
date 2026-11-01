@@ -114,7 +114,7 @@ wrapThai("ก\n\n\nข", 10)    // ["ก", "", "", "ข"]
 
 ### Long words
 
-`overflow: "split"` (default) cuts a word longer than `maxLength` between Thai Character Clusters, the smallest groups of Thai letters that are read together (for example `เกี่ยว` is `เกี่ย` + `ว`).
+`overflow: "split"` (default) cuts a word longer than `maxLength` between Thai Character Clusters, the smallest groups of Thai letters that cannot be split apart (for example `เกี่ยว` is `เกี่ย` + `ว`).
 Outside Thai, and inside a single cluster that is longer than `maxLength`, it cuts at grapheme boundaries.
 Every cut still keeps Thai vowels and tone marks with their consonant.
 `overflow: "keep"` puts the whole word on its own line.
@@ -249,7 +249,7 @@ See [SECURITY.md](SECURITY.md).
 ## Acknowledgements
 
 Word boundaries come from [ICU4X](https://github.com/unicode-org/icu4x).
-Long Thai words are split with the Thai Character Cluster rules of Theeramunkong et al. ("Character cluster based Thai information retrieval", IRAL 2000), as listed in [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp) `tcc_p.py` (Apache-2.0).
+Long Thai words are split with the Thai Character Cluster rules of Theeramunkong et al. ("Character cluster based Thai information retrieval", IRAL 2000), as extended in [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp) `tcc_p.py` (Apache-2.0).
 The Node-API binding uses [napi-rs](https://napi.rs).
 
 ## License
