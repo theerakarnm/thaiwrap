@@ -21,6 +21,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup toolchain install 1.88 --profile minimal && cargo +1.88 check --workspace --locked
+  icu-data:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup toolchain install
+      - id: version
+        run: echo "icu=$(grep -A1 '^name = "icu_segmenter"$' Cargo.lock | sed -n 's/^version = "\(.*\)"$/\1/p')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/icu4x-datagen
+          key: icu4x-datagen-${{ steps.version.outputs.icu }}
+      - run: cargo install icu4x-datagen --version ${{ steps.version.outputs.icu }} --locked --root ~/icu4x-datagen
+      - run: ICU4X_DATAGEN=~/icu4x-datagen/bin/icu4x-datagen node scripts/gen-icu-data.mjs
+      # The committed blob must be exactly what datagen of the locked ICU4X version writes.
+      - run: git diff --exit-code crates/thaiwrap-core/data
   build-test:
     uses: ./.github/workflows/build-test.yml
   parity:
