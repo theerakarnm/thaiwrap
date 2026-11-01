@@ -43,8 +43,11 @@ function nsPerCall(fn) {
   return samples.sort((a, b) => a - b)[10]
 }
 
+const names = process.argv.slice(2)
+const unknown = names.filter((name) => !cases[name])
+if (unknown.length > 0) throw new Error(`unknown case ${unknown.join(', ')}`)
+
 const runtime = typeof Bun === 'undefined' ? `node ${process.version}` : `bun ${Bun.version}`
-for (const name of process.argv.slice(2)) {
-  if (!cases[name]) throw new Error(`unknown case ${name}`)
+for (const name of names) {
   console.log(JSON.stringify({ name, runtime, ns: nsPerCall(cases[name]) }))
 }

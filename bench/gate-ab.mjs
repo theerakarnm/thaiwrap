@@ -33,6 +33,10 @@ for (const rt of RUNTIMES) {
     }
   } else if (mode === 'pairs') {
     const [dir, ...pairs] = args
+    for (const p of pairs) {
+      const [a, b, ...rest] = p.split(':')
+      if (!a || !b || rest.length > 0 || a === b) throw new Error(`pairs needs <new>:<old> with two different cases, got ${p}`)
+    }
     const names = [...new Set(pairs.flatMap((p) => p.split(':')))]
     for (let i = 0; i < 3; i++) for (const r of run(rt, resolve(dir), names)) add(r.name, r)
     console.log(`\n${label}\n\n| new | old | new ns | old ns | change |\n| --- | --- | --- | --- | --- |`)
