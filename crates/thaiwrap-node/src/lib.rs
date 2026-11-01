@@ -32,8 +32,8 @@ pub fn wrap_thai(
     let text = read_string(&env, &text, "text")?;
     let max_length = read_max_length(&env, &max_length)?;
     let options = to_core_options(&env, read_options(&env, options.as_ref())?)?;
-    let ranges = thaiwrap_core::wrap(&text, max_length, &options)
-        .map_err(|e| range_error(&env, &e.to_string()))?;
+    let ranges =
+        thaiwrap_core::wrap(&text, max_length, &options).map_err(|e| core_error(&env, &e))?;
     ranges
         .into_iter()
         .map(|r| {
@@ -175,6 +175,15 @@ fn type_error(env: &Env, message: &str) -> Error {
     match env.throw_type_error(message, None) {
         Ok(()) => Error::from_status(Status::PendingException),
         Err(e) => e,
+    }
+}
+
+// maxLength is validated before the call, so InvalidMaxLength is a RangeError for completeness;
+// anything else is a broken build, not a wrong argument.
+fn core_error(env: &Env, error: &thaiwrap_core::WrapError) -> Error {
+    match error {
+        thaiwrap_core::WrapError::InvalidMaxLength => range_error(env, &error.to_string()),
+        _ => Error::new(Status::GenericFailure, error.to_string()),
     }
 }
 

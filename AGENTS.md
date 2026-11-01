@@ -106,7 +106,7 @@ A change is not done until `fmt`, `clippy`, `cargo test` and `bun test` all pass
 
 ### Dependencies
 
-- Allowed in the core: `icu_segmenter` and the ICU4X crates it needs. Nothing else without approval.
+- Allowed in the core: `icu_segmenter`, `icu_provider_blob`, `icu_provider` (`sync`), and the ICU4X crates they need. Nothing else without approval.
 - Allowed in the binding: `napi`, `napi-derive`, `napi-build`.
 - Dev-dependencies (`criterion`, `proptest`) are fine.
 - Before adding any dependency, stop and ask. Explain what it does, its size, and why std or the existing crates are not enough.

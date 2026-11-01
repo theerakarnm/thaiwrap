@@ -26,6 +26,7 @@ use crate::{lines, segment, tcc, thai, Overflow, WrapError, WrapOptions};
 /// # Errors
 ///
 /// [`WrapError::InvalidMaxLength`] if `max_length` is 0.
+/// [`WrapError::DataUnavailable`] if the built-in Unicode data cannot be loaded.
 pub fn wrap(
     text: &str,
     max_length: usize,
@@ -33,6 +34,9 @@ pub fn wrap(
 ) -> Result<Vec<Range<usize>>, WrapError> {
     if max_length == 0 {
         return Err(WrapError::InvalidMaxLength);
+    }
+    if segment::segmenters().is_none() {
+        return Err(WrapError::DataUnavailable);
     }
     let mut out = Vec::new();
     for para in lines::split_lines(text) {

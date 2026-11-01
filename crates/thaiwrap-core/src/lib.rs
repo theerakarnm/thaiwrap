@@ -84,12 +84,18 @@ pub struct WrapOptions {
 pub enum WrapError {
     /// `max_length` was 0.
     InvalidMaxLength,
+    /// The built-in Unicode data could not be loaded. It is compiled into the library, so
+    /// this means the build is broken; please report it.
+    DataUnavailable,
 }
 
 impl fmt::Display for WrapError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidMaxLength => f.write_str("max_length must be at least 1"),
+            Self::DataUnavailable => {
+                f.write_str("thaiwrap could not load its built-in Unicode data")
+            }
         }
     }
 }

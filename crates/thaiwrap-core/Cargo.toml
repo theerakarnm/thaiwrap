@@ -10,11 +10,17 @@ publish = false
 include = ["src/**", "Cargo.toml"]
 
 [dependencies]
-icu_segmenter = { version = "=2.4.0", default-features = false, features = ["compiled_data"] }
+icu_segmenter = { version = "=2.4.0", default-features = false, features = ["serde"] }
+icu_provider_blob = "=2.4.0"
+# sync makes the data cart an Arc, so the cached segmenters are Send + Sync even when the
+# compiled_data dev-dependency turns on icu_provider/alloc (D20).
+icu_provider = { version = "=2.4.0", default-features = false, features = ["sync"] }
 
 [dev-dependencies]
 proptest = "=1.12.0"
 criterion = "=0.8.2"
+# Compiled ICU4X data, only as a test oracle for the embedded blob (and for compare_segmenters).
+icu_segmenter = { version = "=2.4.0", default-features = false, features = ["compiled_data"] }
 
 [[bench]]
 name = "wrap"
