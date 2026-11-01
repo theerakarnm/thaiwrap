@@ -9,6 +9,9 @@ import test from 'node:test'
 
 const root = new URL('..', import.meta.url)
 
+// The script prints the real OS path, which uses backslashes on Windows.
+const crateDirIn = (stdout) => stdout.match(/\(cd "([^"]+[\\/]crate-thaiwrap)" && cargo publish\)/)?.[1]
+
 function runWithRepositoryUrl(url, inspect = () => {}) {
   const dir = mkdtempSync(join(tmpdir(), 'thaiwrap-placeholders-test-'))
   try {
@@ -41,7 +44,7 @@ test('make-placeholders writes a crate placeholder and prints quoted crates.io c
   let readme
   let hasLib
   const { status, stdout } = runWithRepositoryUrl('git+https://github.com/theerakarnm/thaiwrap.git', ({ stdout }) => {
-    const crateDir = stdout.match(/\(cd "([^"]+\/crate-thaiwrap)" && cargo publish\)/)?.[1]
+    const crateDir = crateDirIn(stdout)
     assert.ok(crateDir, 'the cargo publish command names the crate placeholder directory')
     cargoToml = readFileSync(join(crateDir, 'Cargo.toml'), 'utf8')
     readme = readFileSync(join(crateDir, 'README.md'), 'utf8')
@@ -54,6 +57,11 @@ test('make-placeholders writes a crate placeholder and prints quoted crates.io c
   assert.match(readme, /Placeholder, do not use\./)
   assert.ok(hasLib)
   assert.match(stdout, /owner theerakarnm, repository thaiwrap, workflow release\.yml, environment crates-io/)
+})
+
+test('the crate directory matcher accepts POSIX and Windows paths', () => {
+  assert.equal(crateDirIn('(cd "/tmp/x/crate-thaiwrap" && cargo publish)'), '/tmp/x/crate-thaiwrap')
+  assert.equal(crateDirIn('(cd "D:\\a\\_temp\\x\\crate-thaiwrap" && cargo publish)'), 'D:\\a\\_temp\\x\\crate-thaiwrap')
 })
 
 test('make-placeholders refuses a repository.url carrying shell syntax', () => {
