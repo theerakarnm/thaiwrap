@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/theerakarnm/thaiwrap/compare/v0.1.1...v0.2.0) (2026-11-05)
+
+
+### Features
+
+* thaiwrap v0.2 ([d8f14e7](https://github.com/theerakarnm/thaiwrap/commit/d8f14e7e741c27efba961cc131af6dac51bc2b1a))
+
+
+### Bug Fixes
+
+* reject unknown and identical gate cases before timing ([c3a5bf1](https://github.com/theerakarnm/thaiwrap/commit/c3a5bf18ae236294fa43e9e254dbfef89a97ba6c))
+
 ## [0.1.1](https://github.com/theerakarnm/thaiwrap/compare/v0.1.0...v0.1.1) (2026-11-01)
 
 
