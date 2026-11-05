@@ -1,12 +1,12 @@
 //! Snapshot of wrapping output over the corpora.
 //!
 //! A change in ICU4X data or in the wrapping algorithm shows up as a diff of the snapshot files.
-//! Regenerate with `THAIWRAP_UPDATE_SNAPSHOT=1 cargo test -p thaiwrap-core --test corpus_snapshot --release`.
+//! Regenerate with `THAIWRAP_UPDATE_SNAPSHOT=1 cargo test -p thaiwrap --test corpus_snapshot --release`.
 
 use std::fmt::Write as _;
 use std::fs;
 
-use thaiwrap_core::{wrap, Measure, Overflow, WrapOptions};
+use thaiwrap::{wrap, Measure, Overflow, WrapOptions};
 
 fn configs() -> Vec<(&'static str, usize, WrapOptions)> {
     let mut graphemes = WrapOptions::default();

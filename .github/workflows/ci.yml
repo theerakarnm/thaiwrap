@@ -14,6 +14,11 @@ jobs:
       - run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
       - run: cargo test --workspace --locked --release
       - run: cargo bench --workspace --no-run --locked
+      - run: cargo publish -p thaiwrap --dry-run --locked
+      - name: Crate contents
+        run: |
+          cargo package -p thaiwrap --list --locked > "$RUNNER_TEMP/crate-files.txt"
+          diff <(LC_ALL=C sort "$RUNNER_TEMP/crate-files.txt") <(printf '%s\n' .cargo_vcs_info.json Cargo.lock Cargo.toml Cargo.toml.orig LICENSE LICENSE-APACHE LICENSE-UNICODE README.md data/icu-thai.postcard src/compare_segmenters.rs src/lib.rs src/lines.rs src/measure.rs src/segment.rs src/tcc.rs src/thai.rs src/wrap.rs)
       - run: '! grep -rnw "unsafe" crates/*/src'
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
   msrv:
@@ -21,6 +26,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup toolchain install 1.88 --profile minimal && cargo +1.88 check --workspace --locked
+  icu-data:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup toolchain install
+      - id: version
+        run: echo "icu=$(grep -A1 '^name = "icu_segmenter"$' Cargo.lock | sed -n 's/^version = "\(.*\)"$/\1/p')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/icu4x-datagen
+          key: icu4x-datagen-${{ steps.version.outputs.icu }}
+      - run: cargo install icu4x-datagen --version ${{ steps.version.outputs.icu }} --locked --root ~/icu4x-datagen
+      - run: ICU4X_DATAGEN=~/icu4x-datagen/bin/icu4x-datagen node scripts/gen-icu-data.mjs
+      # The committed blob must be exactly what datagen of the locked ICU4X version writes.
+      - run: git diff --exit-code crates/thaiwrap-core/data
   build-test:
     uses: ./.github/workflows/build-test.yml
   parity:

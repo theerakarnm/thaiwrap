@@ -48,6 +48,26 @@ jobs:
       - run: npm publish
         env: { NPM_CONFIG_TAG: "${{ contains(needs.release-please.outputs.version, '-') && 'next' || 'latest' }}" }
 
+  publish-crate:
+    # Never publish to crates.io when the release build or tests failed, and only after npm
+    # published the same version, so the two registries cannot disagree about it.
+    needs: [release-please, build-test, publish]
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-24.04
+    environment: crates-io
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup toolchain install
+      # Trusted publishing: a 30-minute crates.io token from GitHub OIDC, revoked when the job ends.
+      - uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
+        id: auth
+      - run: cargo publish -p thaiwrap --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+
   smoke-from-registry:
     needs: [release-please, publish]
     strategy:

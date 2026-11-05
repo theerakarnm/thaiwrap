@@ -12,6 +12,7 @@ mod compare_segmenters;
 mod lines;
 mod measure;
 mod segment;
+mod tcc;
 mod thai;
 mod wrap;
 
@@ -22,7 +23,7 @@ pub use wrap::wrap;
 /// How the length of a line is measured.
 ///
 /// ```
-/// use thaiwrap_core::{Measure, WrapOptions};
+/// use thaiwrap::{Measure, WrapOptions};
 /// assert_eq!(WrapOptions::default().measure, Measure::CodeUnits);
 /// let mut options = WrapOptions::default();
 /// options.measure = Measure::Graphemes;
@@ -41,13 +42,15 @@ pub enum Measure {
 /// What to do with a single word that is longer than the maximum line length.
 ///
 /// ```
-/// use thaiwrap_core::{Overflow, WrapOptions};
+/// use thaiwrap::{Overflow, WrapOptions};
 /// assert_eq!(WrapOptions::default().overflow, Overflow::Split);
 /// ```
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub enum Overflow {
-    /// Cut the word at grapheme boundaries allowed by the Thai text rules.
+    /// Cut the word where the Thai text rules allow: at Thai Character Cluster ends inside
+    /// Thai, at grapheme boundaries elsewhere, and at grapheme boundaries inside a cluster
+    /// that is longer than the maximum line length.
     #[default]
     Split,
     /// Put the whole word on its own line, even if it is too long.
@@ -57,7 +60,7 @@ pub enum Overflow {
 /// Options for [`wrap`].
 ///
 /// ```
-/// use thaiwrap_core::{Overflow, WrapOptions};
+/// use thaiwrap::{Overflow, WrapOptions};
 /// let mut options = WrapOptions::default();
 /// options.overflow = Overflow::Keep;
 /// assert_eq!(options.overflow, Overflow::Keep);
@@ -74,19 +77,25 @@ pub struct WrapOptions {
 /// Why [`wrap`] could not run.
 ///
 /// ```
-/// assert_eq!(thaiwrap_core::WrapError::InvalidMaxLength.to_string(), "max_length must be at least 1");
+/// assert_eq!(thaiwrap::WrapError::InvalidMaxLength.to_string(), "max_length must be at least 1");
 /// ```
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WrapError {
     /// `max_length` was 0.
     InvalidMaxLength,
+    /// The built-in Unicode data could not be loaded. It is compiled into the library, so
+    /// this means the build is broken; please report it.
+    DataUnavailable,
 }
 
 impl fmt::Display for WrapError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidMaxLength => f.write_str("max_length must be at least 1"),
+            Self::DataUnavailable => {
+                f.write_str("thaiwrap could not load its built-in Unicode data")
+            }
         }
     }
 }

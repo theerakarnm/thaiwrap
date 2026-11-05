@@ -1,0 +1,7 @@
+สวัสดี! (ภาษาไทย)
+"quoted" 'single' «guillemets» “curly” ‘quotes’
+a...b…c -- d — e
+[brackets] {braces} <angle> (parens)
+end. Next? Yes! Maybe; or: not,
+https://example.com/path?q=1&r=2#frag
+user@example.com, a/b\c|d~e^f

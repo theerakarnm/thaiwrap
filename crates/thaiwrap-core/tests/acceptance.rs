@@ -1,4 +1,4 @@
-use thaiwrap_core::{wrap, WrapOptions};
+use thaiwrap::{wrap, WrapOptions};
 
 #[test]
 fn acceptance_should_wrap_at_words_with_default_options() {

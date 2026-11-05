@@ -2,14 +2,17 @@
 // maintainer pastes its printed commands into a shell.
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
 
 const root = new URL('..', import.meta.url)
 
-function runWithRepositoryUrl(url) {
+// The script prints the real OS path, which uses backslashes on Windows.
+const crateDirIn = (stdout) => stdout.match(/\(cd "([^"]+[\\/]crate-thaiwrap)" && cargo publish\)/)?.[1]
+
+function runWithRepositoryUrl(url, inspect = () => {}) {
   const dir = mkdtempSync(join(tmpdir(), 'thaiwrap-placeholders-test-'))
   try {
     mkdirSync(join(dir, 'scripts'))
@@ -23,6 +26,7 @@ function runWithRepositoryUrl(url) {
       env: { ...process.env, TMPDIR: dir },
       encoding: 'utf8',
     })
+    inspect(result)
     return result
   } finally {
     rmSync(dir, { recursive: true, force: true })
@@ -35,14 +39,39 @@ test('make-placeholders prints npm trust commands for the real repository', () =
   assert.match(stdout, /npm trust github "thaiwrap" --file release\.yml --repo theerakarnm\/thaiwrap --env npm/)
 })
 
+test('make-placeholders writes a crate placeholder and prints quoted crates.io commands', () => {
+  let cargoToml
+  let readme
+  let hasLib
+  const { status, stdout } = runWithRepositoryUrl('git+https://github.com/theerakarnm/thaiwrap.git', ({ stdout }) => {
+    const crateDir = crateDirIn(stdout)
+    assert.ok(crateDir, 'the cargo publish command names the crate placeholder directory')
+    cargoToml = readFileSync(join(crateDir, 'Cargo.toml'), 'utf8')
+    readme = readFileSync(join(crateDir, 'README.md'), 'utf8')
+    hasLib = existsSync(join(crateDir, 'src/lib.rs'))
+  })
+  assert.equal(status, 0)
+  assert.match(cargoToml, /^name = "thaiwrap"$/m)
+  assert.match(cargoToml, /^version = "0\.0\.0"$/m)
+  assert.match(cargoToml, /^repository = "https:\/\/github\.com\/theerakarnm\/thaiwrap"$/m)
+  assert.match(readme, /Placeholder, do not use\./)
+  assert.ok(hasLib)
+  assert.match(stdout, /owner theerakarnm, repository thaiwrap, workflow release\.yml, environment crates-io/)
+})
+
+test('the crate directory matcher accepts POSIX and Windows paths', () => {
+  assert.equal(crateDirIn('(cd "/tmp/x/crate-thaiwrap" && cargo publish)'), '/tmp/x/crate-thaiwrap')
+  assert.equal(crateDirIn('(cd "D:\\a\\_temp\\x\\crate-thaiwrap" && cargo publish)'), 'D:\\a\\_temp\\x\\crate-thaiwrap')
+})
+
 test('make-placeholders refuses a repository.url carrying shell syntax', () => {
   const { status, stdout } = runWithRepositoryUrl('git+https://github.com/theerakarnm/thaiwrap.git$(touch$IFS/pwned)')
   assert.notEqual(status, 0)
-  assert.doesNotMatch(stdout, /npm trust/)
+  assert.doesNotMatch(stdout, /npm trust|cargo publish/)
 })
 
 test('make-placeholders refuses a repository that is not on GitHub', () => {
   const { status, stdout } = runWithRepositoryUrl('git+https://gitlab.com/theerakarnm/thaiwrap.git')
   assert.notEqual(status, 0)
-  assert.doesNotMatch(stdout, /npm trust/)
+  assert.doesNotMatch(stdout, /npm trust|cargo publish/)
 })

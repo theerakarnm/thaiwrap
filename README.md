@@ -114,7 +114,9 @@ wrapThai("ก\n\n\nข", 10)    // ["ก", "", "", "ข"]
 
 ### Long words
 
-`overflow: "split"` (default) cuts a word longer than `maxLength` at grapheme boundaries that keep Thai vowels and tone marks with their consonant.
+`overflow: "split"` (default) cuts a word longer than `maxLength` between Thai Character Clusters, the smallest groups of Thai letters that cannot be split apart (for example `เกี่ยว` is `เกี่ย` + `ว`).
+Outside Thai, and inside a single cluster that is longer than `maxLength`, it cuts at grapheme boundaries.
+Every cut still keeps Thai vowels and tone marks with their consonant.
 `overflow: "keep"` puts the whole word on its own line.
 
 A unit that cannot be cut is placed alone on its line, even when it is longer than `maxLength`.
@@ -143,7 +145,7 @@ Use `measure: "graphemes"` when you fit text into a space on screen (closer to w
 ## How it works
 
 1. Break opportunities come from [ICU4X](https://github.com/unicode-org/icu4x)'s dictionary-based line segmenter (Unicode UAX #14), which finds Thai word boundaries and keeps punctuation with its word.
-   The segmenter is compiled into the native addon.
+   The segmenter and its dictionary data are embedded in the native addon.
 2. The Thai text rules remove break positions that would start a line with a combining mark or one of `ะ า ำ ๆ ฯ`, end it with a leading vowel, or fall next to a no-break character.
 3. Units are placed on the current line until the next unit would exceed `maxLength`, then a new line starts.
 4. Spaces at line edges are dropped.
@@ -188,6 +190,10 @@ Not supported yet: browsers and edge runtimes such as Cloudflare Workers. A WebA
 - Lone surrogates become U+FFFD.
 - Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.
 - Output can differ from `Intl.Segmenter` because thaiwrap uses its own ICU4X dictionary and UAX #14 line breaking (for example it keeps `?` and `)` with the word before them).
+- Unsupported scripts: Lao, Khmer and Burmese.
+  The package ships Thai dictionary data only, so a run of Lao, Khmer or Burmese text between spaces is never broken at word boundaries.
+  It stays on one line when it fits.
+  When it is longer than `maxLength`, the default `overflow: "split"` cuts it at grapheme cluster boundaries, and `overflow: "keep"` leaves it whole on its own line.
 - A split inside a long word can leave a single final consonant on a line (for example `สร้า` / `ง`).
 - The same happens before punctuation that stays with the word.
   For example `wrapThai("ระบบเก็บเสียงดีมาก?", 10)` gives `["ระบบเก็บ", "เสียงดีมา", "ก?"]`.
@@ -212,7 +218,7 @@ cargo test --workspace
 bun run build && bun test
 ```
 
-Benchmarks: `cargo bench -p thaiwrap-core`, `bun run bench`, `node bench/index.mjs`.
+Benchmarks: `cargo bench -p thaiwrap`, `npm run bench` (Node), `npm run bench:bun` (Bun).
 
 ### Repository layout
 
@@ -220,6 +226,7 @@ Benchmarks: `cargo bench -p thaiwrap-core`, `bun run bench`, `node bench/index.m
 | ---------------------- | ------- |
 | `crates/thaiwrap-core` | Pure Rust segmentation and wrapping. All logic lives here. |
 | `crates/thaiwrap-node` | Thin napi-rs binding. Converts types, validates input, maps errors. |
+| `crates/bench-compare` | Bench-only crate that compares `thaiwrap` with other Thai segmenters. Never shipped. |
 | `__test__/`            | JS tests, run against the built addon. |
 | `corpus/`              | Test corpora, each with its own license. Never packaged. |
 | `site/`                | Source of the docs site. |
@@ -247,9 +254,12 @@ See [SECURITY.md](SECURITY.md).
 ## Acknowledgements
 
 Word boundaries come from [ICU4X](https://github.com/unicode-org/icu4x).
+Long Thai words are split with the Thai Character Cluster rules of Theeramunkong et al. ("Character cluster based Thai information retrieval", IRAL 2000), as extended in [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp) `tcc_p.py` (Apache-2.0).
 The Node-API binding uses [napi-rs](https://napi.rs).
 
 ## License
 
 [MIT](LICENSE).
+The native binary embeds Unicode data from ICU4X (CLDR and ICU), licensed under the [Unicode License v3](LICENSE-UNICODE).
+The Thai Character Cluster rules are adapted from PyThaiNLP under the [Apache License 2.0](LICENSE-APACHE).
 Test corpora under `corpus/` keep their own licenses.

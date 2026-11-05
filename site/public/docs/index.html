@@ -32,7 +32,7 @@ const lines = wrapThai(&quot;กระบวนการสื่อสาร �
 <pre>wrapThai(&quot;&quot;, 10)            // []
 wrapThai(&quot;ก\n\nข&quot;, 10)      // [&quot;ก&quot;, &quot;&quot;, &quot;ข&quot;]
 wrapThai(&quot;\n\nก\n\n&quot;, 10)   // [&quot;ก&quot;]</pre>
-<h3>Long words</h3><p><code>overflow: "split"</code> cuts a long word at grapheme boundaries that keep vowels and tone marks with their consonant. <code>"keep"</code> puts the whole word on its own line. A unit that cannot be cut sits alone on its line, even if longer than maxLength. For Thai text, use a maxLength of 5 or more.</p>
+<h3>Long words</h3><p><code>overflow: "split"</code> cuts a long word between Thai Character Clusters, the smallest groups of Thai letters that cannot be split apart (for example <code>เกี่ยว</code> is <code>เกี่ย</code> + <code>ว</code>). Outside Thai, and inside a single cluster that is longer than maxLength, it cuts at grapheme boundaries. Every cut still keeps Thai vowels and tone marks with their consonant. <code>"keep"</code> puts the whole word on its own line. A unit that cannot be cut sits alone on its line, even if longer than maxLength. For Thai text, use a maxLength of 5 or more.</p>
 <h2 id="measuring">Measuring length</h2>
 <p>By default, length is counted like <code>String.prototype.length</code> (UTF-16 code units). Vowel and tone marks above or below a consonant count as one unit each. The same input at 10:</p>
 <pre>// codeUnits (default)
@@ -55,5 +55,6 @@ wrapThai(&quot;\n\nก\n\n&quot;, 10)   // [&quot;ก&quot;]</pre>
 <li>Lone surrogates become U+FFFD.</li>
 <li>Invisible format characters (soft hyphen, LRM/RLM) are not looked through by the Thai rules.</li>
 <li>Output can differ from Intl.Segmenter, for example it keeps <code>?</code> and <code>)</code> with the word before them.</li>
+<li>Unsupported scripts: Lao, Khmer and Burmese. The package ships Thai dictionary data only, so a run of these scripts between spaces is never broken at word boundaries.</li>
 <li>A split inside a long word can leave a single final consonant on a line, for example <code>สร้า</code> / <code>ง</code>.</li></ul>
-</div></div><footer>MIT licensed. Pre-release (v0.x), the API may change. <a href="https://github.com/theerakarnm/wrapthai">Source on GitHub</a>.</footer></main></body></html>
+</div></div><footer>MIT licensed, with the Unicode License v3 for the embedded ICU data and Apache-2.0 for the Thai Character Cluster rules. Pre-release (v0.x), the API may change. <a href="https://github.com/theerakarnm/wrapthai">Source on GitHub</a>.</footer></main></body></html>

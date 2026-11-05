@@ -6,7 +6,7 @@ use std::sync::OnceLock;
 use icu_segmenter::options::LineBreakOptions;
 use icu_segmenter::{GraphemeClusterSegmenter, LineSegmenter, LineSegmenterBorrowed};
 use proptest::prelude::*;
-use thaiwrap_core::{wrap, Measure, Overflow, WrapOptions};
+use thaiwrap::{wrap, Measure, Overflow, WrapOptions};
 
 const CONSONANTS: &[char] = &[
     'ก', 'ข', 'ค', 'ง', 'จ', 'ช', 'ด', 'ต', 'ท', 'น', 'บ', 'ป', 'พ', 'ม', 'ย', 'ร', 'ล', 'ว', 'ส',

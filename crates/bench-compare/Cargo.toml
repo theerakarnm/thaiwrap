@@ -13,7 +13,7 @@ license = "MIT"
 # wordcut-engine, which we call with the same Thai dictionary and cluster rules the
 # chamkho CLI loads by default (dictionary copied to data/chamkho-words_th.txt).
 [dependencies]
-thaiwrap-core = { path = "../thaiwrap-core" }
+thaiwrap = { path = "../thaiwrap-core" }
 icu_segmenter = { version = "=2.4.0", default-features = false, features = ["compiled_data"] }
 wordcut-engine = "=1.2.2"
 nlpo3 = "=1.4.0"
