@@ -4,7 +4,7 @@ resolver = "3"
 members = ["crates/thaiwrap-core", "crates/thaiwrap-node", "crates/bench-compare"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.88"
 license = "MIT AND Unicode-3.0 AND Apache-2.0"
